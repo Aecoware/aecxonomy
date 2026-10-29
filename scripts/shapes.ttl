@@ -1,0 +1,45 @@
+# SHACL shapes for the AECO base taxonomy. Run with scripts/taxo.py check.
+# Checks SHACL cannot express (sentence length, depth, children, shared labels) live in taxo.py.
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix aeco: <https://w3id.org/aeco/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+aeco:ConceptShape a sh:NodeShape ;
+    sh:targetSubjectsOf skos:notation ;
+    sh:property [ sh:path skos:definition ; sh:minCount 1 ; sh:datatype rdf:langString ;
+        sh:message "Every concept has a definition with a language tag." ] ;
+    sh:property [ sh:path skos:prefLabel ; sh:minCount 1 ; sh:uniqueLang true ; sh:datatype rdf:langString ;
+        sh:message "One preferred label per language, each with a language tag." ] ;
+    sh:property [ sh:path skos:prefLabel ; sh:qualifiedValueShape [ sh:languageIn ( "en-US" ) ] ; sh:qualifiedMinCount 1 ;
+        sh:message "Every concept has an en-US preferred label." ] ;
+    sh:property [ sh:path skos:altLabel ; sh:datatype rdf:langString ;
+        sh:message "Every alternative label has a language tag." ] ;
+    sh:property [ sh:path skos:altLabel ; sh:maxCount 7 ; sh:severity sh:Warning ;
+        sh:message "Up to 7 alternative labels." ] ;
+    sh:property [ sh:path skos:hiddenLabel ; sh:datatype rdf:langString ;
+        sh:message "Every hidden label has a language tag." ] ;
+    sh:property [ sh:path skos:inScheme ; sh:minCount 1 ; sh:maxCount 1 ; sh:hasValue aeco:base ;
+        sh:message "Every concept sits in exactly one scheme, the base." ] ;
+    sh:property [ sh:path skos:notation ; sh:minCount 1 ; sh:maxCount 1 ; sh:pattern "^aeco-[0-9]{5}$" ;
+        sh:message "One code in the form aeco-00000." ] ;
+    sh:property [ sh:path aeco:tag ; sh:minCount 1 ; sh:maxCount 2 ;
+        sh:in ( aeco:tag-who aeco:tag-what aeco:tag-where aeco:tag-when aeco:tag-why aeco:tag-how ) ;
+        sh:message "1 or 2 5W1H tags." ] ;
+    sh:property [ sh:path aeco:primaryTag ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:in ( aeco:tag-who aeco:tag-what aeco:tag-where aeco:tag-when aeco:tag-why aeco:tag-how ) ;
+        sh:message "Exactly one primary 5W1H tag." ] ;
+    sh:property [ sh:path aeco:appliesUnder ; sh:minCount 1 ; sh:class skos:Concept ;
+        sh:message "Every concept names its standard set: Shared, or a named set." ] ;
+    sh:or ( [ sh:path skos:topConceptOf ; sh:minCount 1 ] [ sh:path skos:broader ; sh:minCount 1 ] ) ;
+    sh:message "No orphans: a concept is a top branch or has a broader concept." .
+
+aeco:PrimaryTagInTags a sh:NodeShape ;
+    sh:targetSubjectsOf aeco:primaryTag ;
+    sh:sparql [
+        sh:message "The primary tag is one of the concept's tags." ;
+        sh:select """
+            PREFIX aeco: <https://w3id.org/aeco/>
+            SELECT $this WHERE { $this aeco:primaryTag ?p . FILTER NOT EXISTS { $this aeco:tag ?p } }
+        """ ] .

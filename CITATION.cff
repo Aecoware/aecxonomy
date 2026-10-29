@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this taxonomy, please cite it as below."
+type: dataset
+title: "Aecoware Open Taxonomy"
+version: "0.1.0"
+date-released: "2026-11-01"
+license: CC-BY-4.0
+url: "https://w3id.org/aeco/"
+repository-code: "https://github.com/Aecoware/aecxonomy"
+abstract: >-
+  An open SKOS taxonomy for architecture, engineering, construction and
+  operations (AECO). 1,073 concepts in 15 branches, with plain definitions,
+  US and UK English labels, 5W1H routing tags for AI agents, SHACL checks
+  and opt-in links to IFC 4.3, BOT, Brick, RealEstateCore, Uniclass 2015
+  and Wikidata.
+authors:
+  - given-names: "Roman"
+    family-names: "Makarov"
+  - given-names: "Tomasz"
+    family-names: "Pijanowski"
+  - given-names: "Kamil"
+    family-names: "Grecki"
+keywords:
+  - AECO
+  - construction
+  - built environment
+  - taxonomy
+  - SKOS
+  - controlled vocabulary
+  - knowledge graph
+  - linked data
+  - BIM
+  - AI agents

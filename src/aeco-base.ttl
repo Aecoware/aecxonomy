@@ -1,0 +1,54 @@
+# Aecoware Open Taxonomy: the concept scheme and the vocabulary it uses.
+# Top level aligned with the ISO 12006-2 framework. No ISO text is reproduced.
+# License: see LICENSE and NOTICE.md. Namespace: https://w3id.org/aeco/
+
+@prefix aeco: <https://w3id.org/aeco/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+aeco:base a skos:ConceptScheme ;
+    dct:title "Aecoware Open Taxonomy"@en ;
+    dct:description "An open base vocabulary for architecture, engineering, construction and operations. People and agents use it to name, find and link AECO concepts."@en ;
+    dct:created "2026-10-24"^^xsd:date ;
+    dct:modified "2026-10-28"^^xsd:date ;
+    skos:hasTopConcept aeco:aeco-00001 ,
+        aeco:aeco-00002 ,
+        aeco:aeco-00003 ,
+        aeco:aeco-00004 ,
+        aeco:aeco-00005 ,
+        aeco:aeco-00006 ,
+        aeco:aeco-00007 ,
+        aeco:aeco-00008 ,
+        aeco:aeco-00009 ,
+        aeco:aeco-00010 ,
+        aeco:aeco-00011 ,
+        aeco:aeco-00012 ,
+        aeco:aeco-00013 ,
+        aeco:aeco-00014 ,
+        aeco:aeco-00015 .
+
+aeco:primaryTag a owl:ObjectProperty ;
+    rdfs:label "primary 5W1H tag"@en ;
+    rdfs:comment "The first 5W1H tag of a concept. Agents route on it first."@en ;
+    rdfs:range skos:Concept .
+
+aeco:tag a owl:ObjectProperty ;
+    rdfs:label "5W1H tag"@en ;
+    rdfs:comment "A 5W1H routing tag of a concept. A concept has 1 or 2. The primary tag is one of them."@en ;
+    rdfs:range skos:Concept .
+
+aeco:appliesUnder a owl:ObjectProperty ;
+    rdfs:label "applies under"@en ;
+    rdfs:comment "The standard set under which a concept applies: Shared, or a named set such as AIA."@en ;
+    rdfs:range skos:Concept .
+
+aeco:group a owl:DatatypeProperty ;
+    rdfs:label "framework group"@en ;
+    rdfs:comment "For a top branch: Results, Process, Resources or Properties after the ISO 12006-2 framework, or Added for a branch outside it."@en .
+
+aeco:depthLimit a owl:DatatypeProperty ;
+    rdfs:label "depth limit"@en ;
+    rdfs:comment "For a top branch: the maximum number of levels in the base, the top branch included."@en .

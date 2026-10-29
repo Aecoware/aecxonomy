@@ -1,0 +1,212 @@
+# Mappings from the Aecoware Open Taxonomy to Uniclass 2015, NBS. License of the target: CC BY-ND 4.0. Codes only, no titles, tables not adapted.
+code	label_en_us	relation	target	target_label	note	group	added
+aeco-00413	Watercourse	close	co_32_65_72			U1	2026-10-25
+aeco-00418	Historic resource	close	co_40_35_39			U1	2026-10-25
+aeco-00420	Tree protection zone	exact	sl_32_40_90			U1	2026-10-25
+aeco-00432	Residential buildings	exact	en_45_10			U1	2026-10-25
+aeco-00447	Circulation spaces	exact	sl_90_10			U1	2026-10-25
+aeco-00449	Sanitary spaces	exact	sl_35_80			U1	2026-10-25
+aeco-00452	Residential spaces	exact	sl_45			U1	2026-10-25
+aeco-00471	Single-family house	close	en_45_10_39			U1	2026-10-25
+aeco-00477	Hotel	exact	co_45_10_38			U1	2026-10-25
+aeco-00478	Mixed-use building	exact	en_20_50_53			U1	2026-10-25
+aeco-00483	Nursing home	exact	co_35_50_58			U1	2026-10-25
+aeco-00484	School	narrow	co_25_10_66			U1	2026-10-25
+aeco-00484	School	narrow	co_25_10_77			U1	2026-10-25
+aeco-00496	Park	close	co_40_75_68			U1	2026-10-25
+aeco-00498	Warehouse	exact	co_90_50_94			U1	2026-10-25
+aeco-00501	Data center	exact	en_75_10_20			U1	2026-10-25
+aeco-00502	Laboratory building	exact	en_25_30_40			U1	2026-10-25
+aeco-00505	Road	exact	en_80_35_74			U1	2026-10-25
+aeco-00506	Bridge	exact	en_80_94			U1	2026-10-25
+aeco-00507	Tunnel	exact	en_80_96_90			U1	2026-10-25
+aeco-00509	Transit station	narrow	en_80_50_74			U1	2026-10-25
+aeco-00517	Levee	exact	en_32_85_45			U1	2026-10-25
+aeco-00525	Business park	exact	co_20_15_08			U1	2026-10-25
+aeco-00527	Level	exact	sl_90_40_46			U1	2026-10-25
+aeco-00532	Fire compartment	exact	sl_20_95_30			U1	2026-10-25
+aeco-00536	Private office	exact	sl_20_15_27			U1	2026-10-25
+aeco-00537	Open office area	exact	sl_20_15_61			U1	2026-10-25
+aeco-00538	Meeting room	exact	sl_20_15_50			U1	2026-10-25
+aeco-00539	Reception area	exact	sl_20_15_71			U1	2026-10-25
+aeco-00540	Break room	close	sl_90_20_85			U1	2026-10-25
+aeco-00541	Corridor	exact	sl_90_10_15			U1	2026-10-25
+aeco-00542	Lobby	exact	sl_90_10_51			U1	2026-10-25
+aeco-00545	Vestibule	exact	sl_90_10_94			U1	2026-10-25
+aeco-00546	Atrium	exact	sl_90_10_04			U1	2026-10-25
+aeco-00547	Mechanical room	exact	sl_90_90_64			U1	2026-10-25
+aeco-00548	Electrical room	close	sl_90_90_85			U1	2026-10-25
+aeco-00551	Loading dock	exact	sl_30_90_48			U1	2026-10-25
+aeco-00553	Restroom	exact	sl_35_80_89			U1	2026-10-25
+aeco-00554	Shower room	close	sl_35_80_80			U1	2026-10-25
+aeco-00555	Locker room	exact	sl_90_50_48			U1	2026-10-25
+aeco-00557	Classroom	exact	sl_25_10_14			U1	2026-10-25
+aeco-00558	Auditorium	exact	sl_40_60_05			U1	2026-10-25
+aeco-00559	Gymnasium	exact	sl_42_40_35			U1	2026-10-25
+aeco-00560	Dining area	close	sl_40_20_22			U1	2026-10-25
+aeco-00562	Operating room	exact	sl_35_10_59			U1	2026-10-25
+aeco-00563	Exam room	exact	sl_20_65_28			U1	2026-10-25
+aeco-00566	Bedroom	exact	sl_45_10_09			U1	2026-10-25
+aeco-00568	Living room	exact	sl_45_10_49			U1	2026-10-25
+aeco-00569	Bathroom	exact	sl_35_80_08			U1	2026-10-25
+aeco-00571	Server room	exact	sl_90_90_77			U1	2026-10-25
+aeco-00573	Cleanroom	exact	sl_25_30_14			U1	2026-10-25
+aeco-00574	Control room	exact	sl_90_90_15			U1	2026-10-25
+aeco-00575	Courtyard	exact	sl_90_10_17			U1	2026-10-25
+aeco-00576	Plaza	exact	sl_90_10_68			U1	2026-10-25
+aeco-00579	Laydown area	close	sl_30_90_84			U1	2026-10-25
+aeco-00582	Exclusion zone	close	sl_75_50_30			U1	2026-10-25
+aeco-00456	Substructure	exact	ef_20_05			U2	2026-10-25
+aeco-00457	Superstructure	exact	ef_20_10			U2	2026-10-25
+aeco-00460	Vertical transportation	close	ss_80_20			U2	2026-10-25
+aeco-00464	Electrical systems	exact	ss_70			U2	2026-10-25
+aeco-00465	Communications systems	exact	ss_75_10			U2	2026-10-25
+aeco-00591	Floor structure	close	ef_30_20_93			U2	2026-10-25
+aeco-00594	Stair	exact	ef_35_10			U2	2026-10-25
+aeco-00595	Exterior wall	exact	ef_25_10_25			U2	2026-10-25
+aeco-00597	Window assembly	close	ss_25_30_95_95			U2	2026-10-25
+aeco-00604	Ceiling	exact	ef_30_25_12			U2	2026-10-25
+aeco-00608	Interior specialties	narrow	ef_40_10			U2	2026-10-25
+aeco-00618	Heating system	exact	ss_60_40_37			U2	2026-10-25
+aeco-00619	Cooling system	exact	ss_60_40_17			U2	2026-10-25
+aeco-00620	Air distribution system	close	ss_65_40			U2	2026-10-25
+aeco-00624	Sprinkler system	exact	ss_55_30_98_85			U2	2026-10-25
+aeco-00630	Lighting system	exact	ss_70_80			U2	2026-10-25
+aeco-00633	Lightning protection system	exact	ss_70_30_25_45			U2	2026-10-25
+aeco-00638	Public address system	exact	ss_75_10_68_68			U2	2026-10-25
+aeco-00639	Fire alarm system	exact	ss_75_50_28_29			U2	2026-10-25
+aeco-00640	Access control system	exact	ss_75_40_02			U2	2026-10-25
+aeco-00643	Mass notification system	close	ss_75_10_72			U2	2026-10-25
+aeco-00652	Paving	exact	ef_30_60			U2	2026-10-25
+aeco-00657	Site lighting	exact	ef_70_80_25			U2	2026-10-25
+aeco-00659	Bridge superstructure	close	ef_20_50_10			U2	2026-10-25
+aeco-00663	Rail track	exact	ef_80_70			U2	2026-10-25
+aeco-00769	Doors, windows and hardware	close	pr_30			U2	2026-10-25
+aeco-00779	Access equipment	exact	te_20_40			U2	2026-10-25
+aeco-00781	Safety equipment	close	pr_40_70_75			U2	2026-10-25
+aeco-00785	Aggregate	exact	pr_20_31_04			U2	2026-10-25
+aeco-00791	Rigid insulation board	exact	pr_25_71_70			U2	2026-10-25
+aeco-00793	Insulated metal panel	close	pr_25_71_50_22			U2	2026-10-25
+aeco-00798	Sealant	exact	pr_30_31_76			U2	2026-10-25
+aeco-00801	Window unit	exact	pr_30_59_98			U2	2026-10-25
+aeco-00803	Lockset	close	pr_30_36_08_36			U2	2026-10-25
+aeco-00804	Exit device	exact	pr_30_36_08_63			U2	2026-10-25
+aeco-00806	Ceramic tile	exact	pr_35_93_96_19			U2	2026-10-25
+aeco-00812	Water heater	exact	pr_60_60_96			U2	2026-10-25
+aeco-00813	Pipe and fittings	exact	pr_65_52_63			U2	2026-10-25
+aeco-00816	Boiler	exact	pr_60_60_08			U2	2026-10-25
+aeco-00817	Air handling unit	exact	pr_60_65_03			U2	2026-10-25
+aeco-00819	Fan coil unit	exact	pr_70_65_03_29			U2	2026-10-25
+aeco-00820	Variable air volume box	exact	pr_65_65_24_93			U2	2026-10-25
+aeco-00821	Heat pump	exact	pr_70_60_37			U2	2026-10-25
+aeco-00829	Sprinkler head	exact	pr_70_55_97_84			U2	2026-10-25
+aeco-00830	Fire extinguisher	close	pr_40_50_28_64			U2	2026-10-25
+aeco-00831	Smoke detector	close	pr_75_80_30_80			U2	2026-10-25
+aeco-00834	Network switch	exact	pr_70_75_52_56			U2	2026-10-25
+aeco-00842	Bathroom pod	exact	pr_20_65_50_10			U2	2026-10-25
+aeco-00843	Tower crane	exact	te_30_10_10_89			U2	2026-10-25
+aeco-00847	Excavator	exact	te_40_70_30			U2	2026-10-25
+aeco-00848	Loader	exact	te_40_70_40			U2	2026-10-25
+aeco-00851	Scaffolding	exact	te_20_10_60			U2	2026-10-25
+aeco-00852	Aerial work platform	narrow	te_30_30_60_10			U2	2026-10-25
+aeco-00852	Aerial work platform	narrow	te_30_30_60_60			U2	2026-10-25
+aeco-00860	Personal fall arrest system	close	pr_40_70_75_37			U2	2026-10-25
+aeco-00863	Total station	exact	pr_80_51_85_90			U2	2026-10-25
+aeco-00866	Drone	exact	te_70_40_70_25			U2	2026-10-25
+aeco-00971	Air terminal	exact	pr_65_70_46_01			U2	2026-10-25
+aeco-00683	Dimensions and areas	close	pc_20_32_34			U3	2026-10-25
+aeco-00688	Moisture and durability properties	close	pc_35_65_25			U3	2026-10-25
+aeco-00872	Area	exact	pc_20_25_05			U3	2026-10-25
+aeco-00874	Elevation	exact	pc_20_25_94_27			U3	2026-10-25
+aeco-00875	Slope	close	pc_20_67_34			U3	2026-10-25
+aeco-00878	Compressive strength	exact	pc_35_51_53_17			U3	2026-10-25
+aeco-00879	Yield strength	exact	pc_35_51_53_99			U3	2026-10-25
+aeco-00885	Surface burning characteristics	exact	pc_35_30_84			U3	2026-10-25
+aeco-00886	Combustibility	exact	pc_35_30_15			U3	2026-10-25
+aeco-00887	R-value	exact	pc_35_90_88_71			U3	2026-10-25
+aeco-00888	U-factor	exact	pc_35_90_88_90			U3	2026-10-25
+aeco-00893	Sound transmission class	exact	pc_35_05_84			U3	2026-10-25
+aeco-00895	Noise reduction coefficient	exact	pc_35_05_56			U3	2026-10-25
+aeco-00897	Vapor permeance	close	pc_35_65_62_94			U3	2026-10-25
+aeco-00903	Voltage	exact	pc_35_25_95			U3	2026-10-25
+aeco-00906	Recycled content	exact	pc_35_85_72			U3	2026-10-25
+aeco-00912	Manufacturer name	exact	pc_10_50_50			U3	2026-10-25
+aeco-00915	Installation date	exact	pc_20_77_42			U3	2026-10-25
+aeco-00916	Warranty period	exact	pc_20_05_96_95			U3	2026-10-25
+aeco-00921	Lead time	close	pc_20_77_25_22			U3	2026-10-25
+aeco-00008	Information	close	pm_10			U4	2026-10-25
+aeco-00011	Contracts and commercial	narrow	pm_55_55			U4	2026-10-25
+aeco-00033	Business case	exact	pm_50_30_10			U4	2026-10-25
+aeco-00066	Cost risk	exact	rk_50_60_15			U4	2026-10-25
+aeco-00067	Schedule risk	exact	rk_50_60_88			U4	2026-10-25
+aeco-00071	Flood	close	rk_40_80_30			U4	2026-10-25
+aeco-00091	Owner's representative	close	ro_30_10_27			U4	2026-10-25
+aeco-00095	Facility manager	exact	ro_10_40_30			U4	2026-10-25
+aeco-00096	Architect	exact	ro_50_10_03			U4	2026-10-25
+aeco-00097	Structural engineer	exact	ro_50_20_83			U4	2026-10-25
+aeco-00098	MEP engineer	exact	ro_50_20_08			U4	2026-10-25
+aeco-00099	Civil engineer	exact	ro_50_20_11			U4	2026-10-25
+aeco-00100	Landscape architect	exact	ro_50_30_47			U4	2026-10-25
+aeco-00102	General contractor	close	ro_30_30_67			U4	2026-10-25
+aeco-00103	Construction manager	close	ro_70_65_15			U4	2026-10-25
+aeco-00105	Subcontractor	exact	ro_30_10_85			U4	2026-10-25
+aeco-00106	Supplier	exact	ro_30_40_86			U4	2026-10-25
+aeco-00107	Manufacturer	exact	ro_30_40_54			U4	2026-10-25
+aeco-00108	Project manager	exact	ro_30_10_67			U4	2026-10-25
+aeco-00112	Estimator	exact	ro_30_10_28			U4	2026-10-25
+aeco-00113	Safety manager	exact	ro_10_40_74			U4	2026-10-25
+aeco-00115	Building official	close	ro_30_30_09			U4	2026-10-25
+aeco-00120	Cost consultant	exact	ro_30_10_22			U4	2026-10-25
+aeco-00122	Land surveyor	exact	ro_70_10_46			U4	2026-10-25
+aeco-00150	Payment application	exact	pm_60_50_60			U4	2026-10-25
+aeco-00187	Field records	close	pm_60_60_70			U4	2026-10-25
+aeco-00229	Corrective maintenance	close	ac_10_70_75			U4	2026-10-25
+aeco-00238	Specification	exact	pm_40_45			U4	2026-10-25
+aeco-00239	Calculation	close	pm_40_25			U4	2026-10-25
+aeco-00241	Design model	exact	pm_40_35			U4	2026-10-25
+aeco-00255	Request for information	exact	pm_60_30_71			U4	2026-10-25
+aeco-00256	Transmittal	exact	fi_10_90			U4	2026-10-25
+aeco-00257	Meeting minutes	exact	pm_60_40_55			U4	2026-10-25
+aeco-00258	Notice	close	pm_55_15_17			U4	2026-10-25
+aeco-00259	Correspondence	exact	fi_10_20			U4	2026-10-25
+aeco-00267	Cost estimate	exact	pm_60_50_23			U4	2026-10-25
+aeco-00268	Budget	exact	pm_60_50_10			U4	2026-10-25
+aeco-00269	Cost report	close	pm_60_50_37			U4	2026-10-25
+aeco-00270	Progress report	exact	pm_60_30_66			U4	2026-10-25
+aeco-00272	Operation and maintenance manual	exact	pm_70_85_56			U4	2026-10-25
+aeco-00274	Asset register	exact	pm_80_10_10			U4	2026-10-25
+aeco-00281	BIM execution plan	exact	pm_40_60_08			U4	2026-10-25
+aeco-00282	Information requirements	close	pm_10_20_28			U4	2026-10-25
+aeco-00289	Permits and certificates	close	pm_40_20_67			U4	2026-10-25
+aeco-00295	Project requirements	exact	pm_60_20			U4	2026-10-25
+aeco-00360	Historic preservation review	close	pm_80_25_38			U4	2026-10-25
+aeco-00929	Project management plan	exact	pm_40_60_65			U4	2026-10-25
+aeco-00930	Site-specific safety plan	exact	pm_60_70_17			U4	2026-10-25
+aeco-00931	Quality plan	exact	pm_10_20_69			U4	2026-10-25
+aeco-00933	Site logistics plan	exact	pm_60_10_63			U4	2026-10-25
+aeco-00951	Permit to work	exact	pm_60_60_55			U4	2026-10-25
+aeco-00961	Certificate of insurance	exact	pm_70_15_42			U4	2026-10-25
+aeco-01001	Spread footing	broad	ss_20_05_15_70			C4	2026-10-25
+aeco-01002	Strip footing	broad	ss_20_05_15_70			C4	2026-10-25
+aeco-01003	Mat foundation	close	ss_20_05_15_72			C4	2026-10-25
+aeco-01004	Grade beam	broad	ss_20_05_15_71			C4	2026-10-25
+aeco-01005	Pile	close	ss_20_05_65			C4	2026-10-25
+aeco-01006	Drilled shaft	close	ss_20_05_65_41			C4	2026-10-25
+aeco-01007	Pile cap	broad	ss_20_05_15_71			C4	2026-10-25
+aeco-01008	Beam	close	ss_20_20			C4	2026-10-25
+aeco-01009	Column	close	ss_20_30			C4	2026-10-25
+aeco-01011	Structural connection	close	pr_20_85_30			C4	2026-10-25
+aeco-01013	Joist	broad	pr_20_85_08			C4	2026-10-25
+aeco-01014	Truss	close	pr_20_85_90			C4	2026-10-25
+aeco-01021	Railing	close	ss_25_60_05			C4	2026-10-25
+aeco-01000	Ramp	exact	ef_35_20			C4	2026-10-25
+aeco-01024	Escalator	exact	ss_80_20_62_28			C4	2026-10-25
+aeco-01025	Moving walk	exact	ss_80_20_62_53			C4	2026-10-25
+aeco-01026	Curb	close	ss_30_60_45			C4	2026-10-25
+aeco-01027	Sidewalk	close	ef_30_60_60			C4	2026-10-25
+aeco-01028	Fence	exact	ef_25_55_28			C4	2026-10-25
+aeco-01029	Gate	exact	ef_25_30_33			C4	2026-10-25
+aeco-01031	Bridge bearing	exact	ef_20_50_07			C4	2026-10-25
+aeco-01032	Abutment	exact	ef_20_50_01			C4	2026-10-25
+aeco-01033	Bridge pier	exact	ef_20_50_64			C4	2026-10-25
+aeco-01035	Railroad tie	close	pr_20_85_72			C4	2026-10-25

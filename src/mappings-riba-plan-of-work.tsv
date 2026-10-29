@@ -1,0 +1,13 @@
+# Links from Aecoware Open Taxonomy phases to RIBA Plan of Work 2020 stages, by stage number and name only. No RIBA text is reproduced.
+# Not mapped: Procurement, Preconstruction, Permitting, End of life. RIBA treats procurement and planning approval as tasks inside stages and ends at Use.
+# UK labels and RIBA as a standard set will follow.
+code	label_en_us	riba_stage	relation
+aeco-00033	Business case	0 Strategic Definition	close
+aeco-00034	Feasibility	1 Preparation and Briefing	close
+aeco-00035	Programming	1 Preparation and Briefing	close
+aeco-00036	Schematic design	2 Concept Design	close
+aeco-00037	Design development	3 Spatial Coordination	close
+aeco-00038	Construction documents phase	4 Technical Design	close
+aeco-00019	Construction	5 Manufacturing and Construction	close
+aeco-00020	Closeout	6 Handover	close
+aeco-00021	Operations	7 Use	close

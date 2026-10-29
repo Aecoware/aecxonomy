@@ -1,0 +1,384 @@
+# Mappings from the Aecoware Open Taxonomy to Wikidata. License of the target: CC0 1.0.
+code	label_en_us	relation	target	target_label	note	group	added
+aeco-00304	Protected areas	close	Q473972	protected area		W1	2026-10-25
+aeco-00401	Property line	exact	Q1303417	boundary		W1	2026-10-25
+aeco-00402	Easement	exact	Q448405	easement		W1	2026-10-25
+aeco-00405	Soil	exact	Q36133	soil		W1	2026-10-25
+aeco-00406	Rock	close	Q8063	rock		W1	2026-10-25
+aeco-00407	Groundwater	exact	Q161598	groundwater		W1	2026-10-25
+aeco-00412	Topography	close	Q186131	terrain		W1	2026-10-25
+aeco-00413	Watercourse	exact	Q355304	watercourse		W1	2026-10-25
+aeco-00414	Wetland	exact	Q170321	wetland		W1	2026-10-25
+aeco-00419	Archaeological site	exact	Q839954	archaeological site		W1	2026-10-25
+aeco-00422	Climate zone	close	Q1639168	climate zone		W1	2026-10-25
+aeco-00423	Flood zone	close	Q2364755	Flood zone		W1	2026-10-25
+aeco-00434	Healthcare facilities	close	Q9386252	healthcare facility		W1	2026-10-25
+aeco-00438	Industrial facilities	close	Q134496677	industrial facility		W1	2026-10-25
+aeco-00440	Transportation infrastructure	exact	Q376799	transport infrastructure		W1	2026-10-25
+aeco-00442	Energy infrastructure	close	Q56397239	energy infrastructure		W1	2026-10-25
+aeco-00446	Work spaces	close	Q628858	workplace		W1	2026-10-25
+aeco-00471	Single-family house	exact	Q1307276	single-family detached home		W1	2026-10-25
+aeco-00472	Multifamily building	exact	Q13402009	apartment building		W1	2026-10-25
+aeco-00474	Student housing	close	Q30301498	student housing		W1	2026-10-25
+aeco-00475	Office building	exact	Q1021645	office building		W1	2026-10-25
+aeco-00476	Retail building	exact	Q18760388	retail building		W1	2026-10-25
+aeco-00477	Hotel	close	Q27686	hotel		W1	2026-10-25
+aeco-00478	Mixed-use building	exact	Q47012103	mixed-use building		W1	2026-10-25
+aeco-00479	Parking structure	exact	Q13218805	parking garage		W1	2026-10-25
+aeco-00480	Hospital	exact	Q16917	hospital		W1	2026-10-25
+aeco-00481	Medical office building	exact	Q70374082	medical office building		W1	2026-10-25
+aeco-00482	Outpatient facility	close	Q1774898	clinic		W1	2026-10-25
+aeco-00483	Nursing home	exact	Q837142	nursing home		W1	2026-10-25
+aeco-00484	School	close	Q3914	school		W1	2026-10-25
+aeco-00486	Childcare center	close	Q27008444	childcare center		W1	2026-10-25
+aeco-00487	Government office building	exact	Q117863327	government office building		W1	2026-10-25
+aeco-00488	Courthouse	exact	Q1137809	courthouse		W1	2026-10-25
+aeco-00489	Correctional facility	close	Q114713775	correctional facility		W1	2026-10-25
+aeco-00491	Library	close	Q7075	library		W1	2026-10-25
+aeco-00493	Place of worship	close	Q1370598	structure of worship		W1	2026-10-25
+aeco-00494	Sports venue	exact	Q1076486	sports venue		W1	2026-10-25
+aeco-00495	Recreation center	close	Q30313989	leisure center		W1	2026-10-25
+aeco-00496	Park	exact	Q22698	park		W1	2026-10-25
+aeco-00497	Manufacturing plant	close	Q83405	factory		W1	2026-10-25
+aeco-00498	Warehouse	exact	Q181623	warehouse		W1	2026-10-25
+aeco-00502	Laboratory building	close	Q483242	laboratory		W1	2026-10-25
+aeco-00503	Semiconductor fab	exact	Q4168959	semiconductor fabrication plant		W1	2026-10-25
+aeco-00504	Telecommunications facility	exact	Q7695875	telecommunications facility		W1	2026-10-25
+aeco-00505	Road	exact	Q34442	road		W1	2026-10-25
+aeco-00506	Bridge	exact	Q12280	bridge		W1	2026-10-25
+aeco-00507	Tunnel	exact	Q44377	tunnel		W1	2026-10-25
+aeco-00508	Railway	close	Q22667	railway		W1	2026-10-25
+aeco-00509	Transit station	close	Q12819564	station		W1	2026-10-25
+aeco-00510	Airport	exact	Q1248784	airport		W1	2026-10-25
+aeco-00511	Port	exact	Q44782	port		W1	2026-10-25
+aeco-00512	Water treatment plant	exact	Q9341055	water treatment plant		W1	2026-10-25
+aeco-00513	Wastewater treatment plant	exact	Q15242449	wastewater treatment plant		W1	2026-10-25
+aeco-00515	Pump station	exact	Q446013	pumping station		W1	2026-10-25
+aeco-00516	Dam	exact	Q12323	dam		W1	2026-10-25
+aeco-00517	Levee	exact	Q105190	levee		W1	2026-10-25
+aeco-00518	Power plant	exact	Q159719	power station		W1	2026-10-25
+aeco-00519	Solar farm	exact	Q2298412	solar power plant		W1	2026-10-25
+aeco-00520	Wind farm	exact	Q194356	wind farm		W1	2026-10-25
+aeco-00521	Substation	exact	Q174814	electrical substation		W1	2026-10-25
+aeco-00522	Transmission line	close	Q2144320	overhead power line		W1	2026-10-25
+aeco-00524	Campus	close	Q209465	campus		W1	2026-10-25
+aeco-00525	Business park	exact	Q338313	business park		W1	2026-10-25
+aeco-00526	Mixed-use development	exact	Q4298922	mixed-use development		W1	2026-10-25
+aeco-00527	Level	exact	Q831691	storey		W1	2026-10-25
+aeco-00528	Basement	exact	Q234852	basement		W1	2026-10-25
+aeco-00529	Mezzanine	exact	Q958148	mezzanine		W1	2026-10-25
+aeco-00530	Building part	close	Q3305339	building part		W1	2026-10-25
+aeco-00531	Room	exact	Q180516	room		W1	2026-10-25
+aeco-00532	Fire compartment	close	Q86726304	fire compartment		W1	2026-10-25
+aeco-00534	Security zone	close	Q126901293	security zone		W1	2026-10-25
+aeco-00538	Meeting room	close	Q133821658	meeting room		W1	2026-10-25
+aeco-00540	Break room	exact	Q128931161	break room		W1	2026-10-25
+aeco-00541	Corridor	exact	Q1135449	corridor		W1	2026-10-25
+aeco-00542	Lobby	exact	Q31948	lobby		W1	2026-10-25
+aeco-00543	Stairwell	exact	Q2451751	stairwell		W1	2026-10-25
+aeco-00544	Elevator lobby	exact	Q136771829	elevator lobby		W1	2026-10-25
+aeco-00545	Vestibule	exact	Q301276	vestibule		W1	2026-10-25
+aeco-00546	Atrium	exact	Q189265	atrium		W1	2026-10-25
+aeco-00547	Mechanical room	exact	Q6804549	mechanical room		W1	2026-10-25
+aeco-00548	Electrical room	exact	Q2230680	electrical room		W1	2026-10-25
+aeco-00551	Loading dock	exact	Q1799919	loading dock		W1	2026-10-25
+aeco-00552	Waste room	exact	Q10423543	garbage room		W1	2026-10-25
+aeco-00553	Restroom	exact	Q7813355	toilet		W1	2026-10-25
+aeco-00554	Shower room	exact	Q25376982	shower room		W1	2026-10-25
+aeco-00555	Locker room	exact	Q1070054	changing room		W1	2026-10-25
+aeco-00556	Lactation room	exact	Q6468983	lactation room		W1	2026-10-25
+aeco-00557	Classroom	exact	Q621114	classroom		W1	2026-10-25
+aeco-00558	Auditorium	exact	Q230752	auditorium		W1	2026-10-25
+aeco-00560	Dining area	close	Q661199	dining room		W1	2026-10-25
+aeco-00561	Patient room	exact	Q1786607	patient room		W1	2026-10-25
+aeco-00562	Operating room	exact	Q1060822	operating theater		W1	2026-10-25
+aeco-00565	Dwelling unit	close	Q188507	apartment		W1	2026-10-25
+aeco-00566	Bedroom	exact	Q193837	bedroom		W1	2026-10-25
+aeco-00567	Kitchen	exact	Q43164	kitchen		W1	2026-10-25
+aeco-00568	Living room	exact	Q475018	living room		W1	2026-10-25
+aeco-00569	Bathroom	exact	Q190771	bathroom		W1	2026-10-25
+aeco-00572	Laboratory	close	Q483242	laboratory		W1	2026-10-25
+aeco-00573	Cleanroom	exact	Q794827	cleanroom		W1	2026-10-25
+aeco-00574	Control room	exact	Q390516	control room		W1	2026-10-25
+aeco-00575	Courtyard	exact	Q309250	courtyard		W1	2026-10-25
+aeco-00576	Plaza	exact	Q174782	square		W1	2026-10-25
+aeco-00577	Roof terrace	exact	Q1081213	roof terrace		W1	2026-10-25
+aeco-00578	Parking lot	exact	Q6501349	parking area		W1	2026-10-25
+aeco-00580	Staging area	close	Q818978	staging area		W1	2026-10-25
+aeco-00456	Substructure	close	Q60790794	substructure		W2	2026-10-25
+aeco-00457	Superstructure	close	Q1370583	superstructure		W2	2026-10-25
+aeco-00458	Building envelope	exact	Q4986592	building envelope		W2	2026-10-25
+aeco-00467	Building automation	exact	Q1149653	building automation		W2	2026-10-25
+aeco-00584	Shallow foundation	exact	Q1426185	shallow foundation		W2	2026-10-25
+aeco-00585	Deep foundation	exact	Q1129209	deep foundation		W2	2026-10-25
+aeco-00590	Structural frame	close	Q2448108	structural system		W2	2026-10-25
+aeco-00592	Roof structure	close	Q137163126	Roof structure		W2	2026-10-25
+aeco-00594	Stair	exact	Q12511	stairs		W2	2026-10-25
+aeco-00595	Exterior wall	close	Q183061	façade		W2	2026-10-25
+aeco-00596	Curtain wall	exact	Q1370962	curtain wall		W2	2026-10-25
+aeco-00600	Skylight	exact	Q2712955	skylight		W2	2026-10-25
+aeco-00604	Ceiling	exact	Q221706	ceiling		W2	2026-10-25
+aeco-00611	Platform lift	close	Q2164387	wheelchair lift		W2	2026-10-25
+aeco-00619	Cooling system	close	Q173725	air conditioning		W2	2026-10-25
+aeco-00624	Sprinkler system	exact	Q220224	fire sprinkler system		W2	2026-10-25
+aeco-00630	Lighting system	close	Q815414	lighting system		W2	2026-10-25
+aeco-00631	Emergency power system	exact	Q1364228	emergency power system		W2	2026-10-25
+aeco-00634	Photovoltaic system	exact	Q1897785	photovoltaic system		W2	2026-10-25
+aeco-00635	Structured cabling	exact	Q1413030	structured cabling		W2	2026-10-25
+aeco-00637	Distributed antenna system	exact	Q5283138	Distributed antenna system		W2	2026-10-25
+aeco-00638	Public address system	exact	Q1051241	public address system		W2	2026-10-25
+aeco-00639	Fire alarm system	exact	Q898090	fire alarm system		W2	2026-10-25
+aeco-00640	Access control system	close	Q2996130	entry control system		W2	2026-10-25
+aeco-00642	Intrusion detection system	close	Q1497831	security alarm		W2	2026-10-25
+aeco-00645	Lighting control system	close	Q6546384	lighting control system		W2	2026-10-25
+aeco-00647	Casework	close	Q2741056	cabinetry		W2	2026-10-25
+aeco-00649	Window treatment	exact	Q3001801	window covering		W2	2026-10-25
+aeco-00655	Site drainage system	close	Q1139766	stormwater network		W2	2026-10-25
+aeco-00656	Retaining wall	exact	Q1076291	retaining wall		W2	2026-10-25
+aeco-00662	Tunnel lining	exact	Q16682031	tunnel lining		W2	2026-10-25
+aeco-00663	Rail track	exact	Q15079401	rail track		W2	2026-10-25
+aeco-00664	Culvert	exact	Q4168092	culvert		W2	2026-10-25
+aeco-00665	Traffic barrier	exact	Q1344551	traffic barrier		W2	2026-10-25
+aeco-00673	Carpentry	close	Q203605	carpentry		W2	2026-10-25
+aeco-00675	Passive fire protection	exact	Q643227	passive fire protection		W2	2026-10-25
+aeco-00682	Construction aids	narrow	Q874311	heavy equipment		W2	2026-10-25
+aeco-00692	Structure demolition	close	Q331483	demolition		W2	2026-10-25
+aeco-00698	Dewatering	close	Q2076369	dewatering		W2	2026-10-25
+aeco-00700	Piling	close	Q1374167	piling		W2	2026-10-25
+aeco-00703	Pavement marking	close	Q1392287	road surface marking		W2	2026-10-25
+aeco-00709	Cast-in-place concrete	exact	Q4301829	cast-in-place concrete		W2	2026-10-25
+aeco-00710	Precast concrete	close	Q831541	precast concrete		W2	2026-10-25
+aeco-00715	Shotcrete	close	Q1335568	shotcrete		W2	2026-10-25
+aeco-00716	Unit masonry	narrow	Q1131313	brickwork		W2	2026-10-25
+aeco-00727	Membrane roofing	exact	Q6815139	membrane roofing		W2	2026-10-25
+aeco-00728	Metal roofing	close	Q10690144	metal roof		W2	2026-10-25
+aeco-00731	Waterproofing	close	Q2326110	waterproofing		W2	2026-10-25
+aeco-00732	Building insulation	exact	Q2740343	building insulation		W2	2026-10-25
+aeco-00733	Joint sealants	close	Q1411795	caulking		W2	2026-10-25
+aeco-00736	Intumescent coating	exact	Q139029359	Intumescent coating		W2	2026-10-25
+aeco-00739	Door hardware	exact	Q5297202	door hardware		W2	2026-10-25
+aeco-00742	Glazing	close	Q5567362	glazing		W2	2026-10-25
+aeco-00745	Plastering	exact	Q2350995	plastering		W2	2026-10-25
+aeco-00747	Resilient flooring	exact	Q2185149	resilient flooring		W2	2026-10-25
+aeco-00748	Carpeting	close	Q124371860	carpeting		W2	2026-10-25
+aeco-00749	Wood flooring	exact	Q21141633	wood flooring		W2	2026-10-25
+aeco-00754	Plumbing work	close	Q11603248	plumbing work		W2	2026-10-25
+aeco-00757	Mechanical insulation	exact	Q6804533	mechanical insulation		W2	2026-10-25
+aeco-00767	Boards and panels	close	Q115753768	boards and panels		W2	2026-10-25
+aeco-00773	Electrical equipment	close	Q3749263	electrical device		W2	2026-10-25
+aeco-00777	Lifting equipment	exact	Q173878	lifting equipment		W2	2026-10-25
+aeco-00778	Earthmoving equipment	exact	Q138515037	earthmoving equipment		W2	2026-10-25
+aeco-00779	Access equipment	exact	Q138645438	access equipment		W2	2026-10-25
+aeco-00781	Safety equipment	close	Q3030569	protective device		W2	2026-10-25
+aeco-00783	Ready-mix concrete	exact	Q1058822	ready-mix concrete		W2	2026-10-25
+aeco-00784	Reinforcing bar	exact	Q150425	reinforcing bar		W2	2026-10-25
+aeco-00785	Aggregate	exact	Q866298	aggregate		W2	2026-10-25
+aeco-00786	Lumber	exact	Q354757	lumber		W2	2026-10-25
+aeco-00788	Masonry units	narrow	Q766952	concrete block		W2	2026-10-25
+aeco-00789	Gypsum board	exact	Q372852	gypsum drywall		W2	2026-10-25
+aeco-00790	Wood sheathing panel	narrow	Q219803	plywood		W2	2026-10-25
+aeco-00792	Cement board	exact	Q2000568	cement board		W2	2026-10-25
+aeco-00798	Sealant	exact	Q1427914	sealant		W2	2026-10-25
+aeco-00800	Door frame	exact	Q15461768	door frame		W2	2026-10-25
+aeco-00802	Insulating glass unit	exact	Q1037104	insulated glazing		W2	2026-10-25
+aeco-00803	Lockset	exact	Q6665813	Lockset		W2	2026-10-25
+aeco-00806	Ceramic tile	exact	Q55654686	ceramic tile		W2	2026-10-25
+aeco-00807	Carpet tile	exact	Q2404195	carpet tile		W2	2026-10-25
+aeco-00810	Water closet	exact	Q7857	toilet		W2	2026-10-25
+aeco-00811	Wash basin	close	Q140565	sink		W2	2026-10-25
+aeco-00813	Pipe and fittings	close	Q3679502	piping		W2	2026-10-25
+aeco-00814	Valve	exact	Q208443	valve		W2	2026-10-25
+aeco-00815	Chiller	exact	Q1501558	chiller		W2	2026-10-25
+aeco-00816	Boiler	exact	Q3195517	boiler		W2	2026-10-25
+aeco-00819	Fan coil unit	exact	Q2472061	fan coil unit		W2	2026-10-25
+aeco-00821	Heat pump	exact	Q131313	heat pump		W2	2026-10-25
+aeco-00822	Cooling tower	exact	Q193886	cooling tower		W2	2026-10-25
+aeco-00823	Switchboard	close	Q20825998	switchboard		W2	2026-10-25
+aeco-00824	Panelboard	exact	Q1128622	distribution board		W2	2026-10-25
+aeco-00825	Transformer	exact	Q11658	transformer		W2	2026-10-25
+aeco-00826	Generator	exact	Q131502	electrical generator		W2	2026-10-25
+aeco-00827	Luminaire	exact	Q815738	light fixture		W2	2026-10-25
+aeco-00830	Fire extinguisher	exact	Q190672	fire extinguisher		W2	2026-10-25
+aeco-00831	Smoke detector	exact	Q565858	smoke detector		W2	2026-10-25
+aeco-00832	Fire alarm control panel	exact	Q1960985	fire alarm control panel		W2	2026-10-25
+aeco-00835	Wireless access point	exact	Q326717	wireless access point		W2	2026-10-25
+aeco-00837	Card reader	close	Q912405	card reader		W2	2026-10-25
+aeco-00843	Tower crane	exact	Q1536423	tower crane		W2	2026-10-25
+aeco-00844	Mobile crane	exact	Q782664	mobile crane		W2	2026-10-25
+aeco-00846	Telehandler	exact	Q1943369	telescopic handler		W2	2026-10-25
+aeco-00847	Excavator	exact	Q182661	excavator		W2	2026-10-25
+aeco-00848	Loader	exact	Q217416	loader		W2	2026-10-25
+aeco-00849	Bulldozer	exact	Q131677	bulldozer		W2	2026-10-25
+aeco-00851	Scaffolding	exact	Q233320	scaffold		W2	2026-10-25
+aeco-00852	Aerial work platform	exact	Q6078052	aerial work platform		W2	2026-10-25
+aeco-00853	Mast climbing work platform	exact	Q110622748	mast climbing work platform		W2	2026-10-25
+aeco-00854	Ladder	exact	Q168639	ladder		W2	2026-10-25
+aeco-00859	Personal protective equipment	exact	Q1333024	personal protective equipment		W2	2026-10-25
+aeco-00863	Total station	exact	Q641296	total station		W2	2026-10-25
+aeco-00866	Drone	exact	Q484000	unmanned aerial vehicle		W2	2026-10-25
+aeco-00970	Pump	exact	Q134574	pump		W2	2026-10-25
+aeco-00972	Uninterruptible power supply	exact	Q207696	uninterruptible power supply		W2	2026-10-25
+aeco-00008	Information	close	Q11028	information		W3	2026-10-25
+aeco-00016	Planning	close	Q309100	planning		W3	2026-10-25
+aeco-00017	Design	close	Q82604	design		W3	2026-10-25
+aeco-00018	Procurement	close	Q829492	procurement		W3	2026-10-25
+aeco-00019	Construction	close	Q3875186	construction		W3	2026-10-25
+aeco-00025	Renovation	close	Q2144402	renovation		W3	2026-10-25
+aeco-00033	Business case	exact	Q1896170	business case		W3	2026-10-25
+aeco-00039	Bidding	close	Q3276328	bidding		W3	2026-10-25
+aeco-00040	Negotiation	close	Q202875	negotiation		W3	2026-10-25
+aeco-00174	Project management processes	close	Q179012	project management		W3	2026-10-25
+aeco-00183	Models and data	close	Q842017	building information modeling		W3	2026-10-25
+aeco-00185	Submittals	exact	Q7631708	submittals		W3	2026-10-25
+aeco-00191	Information management	close	Q579488	information management		W3	2026-10-25
+aeco-00192	Scope management	close	Q472160	project scope		W3	2026-10-25
+aeco-00194	Cost management	close	Q1389553	cost management		W3	2026-10-25
+aeco-00195	Risk management	close	Q189447	risk management		W3	2026-10-25
+aeco-00196	Change management	close	Q255144	change management		W3	2026-10-25
+aeco-00199	Design review	close	Q5264369	design review		W3	2026-10-25
+aeco-00201	Value engineering	exact	Q1067270	value engineering		W3	2026-10-25
+aeco-00215	Materials management	close	Q1242875	materials management		W3	2026-10-25
+aeco-00217	Quality control	exact	Q827792	quality control		W3	2026-10-25
+aeco-00218	Quality assurance	close	Q836575	quality assurance		W3	2026-10-25
+aeco-00220	Safety inspection	close	Q2281295	safety inspection		W3	2026-10-25
+aeco-00223	Waste management	close	Q180388	waste management		W3	2026-10-25
+aeco-00228	Preventive maintenance	exact	Q2607871	preventive maintenance		W3	2026-10-25
+aeco-00229	Corrective maintenance	exact	Q2291518	corrective maintenance		W3	2026-10-25
+aeco-00230	Asset management	close	Q873442	asset management		W3	2026-10-25
+aeco-00232	Energy management	close	Q1779504	energy management		W3	2026-10-25
+aeco-00234	Program management	exact	Q603948	program management		W3	2026-10-25
+aeco-00237	Drawing	close	Q192521	technical drawing		W3	2026-10-25
+aeco-00238	Specification	close	Q2101564	specification		W3	2026-10-25
+aeco-00244	Point cloud	exact	Q1899648	point cloud		W3	2026-10-25
+aeco-00245	Geospatial data	exact	Q121810372	geospatial data		W3	2026-10-25
+aeco-00246	Digital twin	exact	Q25099680	digital twin		W3	2026-10-25
+aeco-00249	Addendum	close	Q352858	addendum		W3	2026-10-25
+aeco-00251	Shop drawing	exact	Q2560484	Shop drawing		W3	2026-10-25
+aeco-00253	Sample	close	Q485146	sample		W3	2026-10-25
+aeco-00254	Test report	exact	Q136546394	Test report		W3	2026-10-25
+aeco-00257	Meeting minutes	exact	Q2085515	minutes		W3	2026-10-25
+aeco-00258	Notice	close	Q7063001	notice		W3	2026-10-25
+aeco-00259	Correspondence	close	Q1277575	correspondence		W3	2026-10-25
+aeco-00263	Punch list	exact	Q7259956	punch list		W3	2026-10-25
+aeco-00267	Cost estimate	close	Q795053	cost estimate		W3	2026-10-25
+aeco-00268	Budget	close	Q41263	budget		W3	2026-10-25
+aeco-00273	Warranty certificate	exact	Q102301466	warranty certificate		W3	2026-10-25
+aeco-00277	Process map	close	Q116483260	Process map		W3	2026-10-25
+aeco-00283	Naming convention	close	Q6961869	naming convention		W3	2026-10-25
+aeco-00872	Area	close	Q11500	area		W3	2026-10-25
+aeco-00873	Gross floor area	exact	Q1186036	gross floor area		W3	2026-10-25
+aeco-00874	Elevation	close	Q2633778	elevation		W3	2026-10-25
+aeco-00878	Compressive strength	exact	Q186191	compressive strength		W3	2026-10-25
+aeco-00879	Yield strength	exact	Q3807177	yield strength		W3	2026-10-25
+aeco-00884	Fire-resistance rating	exact	Q7889370	fire-resistance rating		W3	2026-10-25
+aeco-00886	Combustibility	exact	Q355777	combustibility		W3	2026-10-25
+aeco-00887	R-value	exact	Q3361425	R-value		W3	2026-10-25
+aeco-00888	U-factor	close	Q634340	heat transfer coefficient		W3	2026-10-25
+aeco-00893	Sound transmission class	exact	Q7564819	Sound transmission class		W3	2026-10-25
+aeco-00894	Impact insulation class	exact	Q6005893	Impact insulation class		W3	2026-10-25
+aeco-00895	Noise reduction coefficient	exact	Q17083791	Noise reduction coefficient		W3	2026-10-25
+aeco-00898	Service life	exact	Q1675349	service life		W3	2026-10-25
+aeco-00900	Cooling capacity	exact	Q5167494	Cooling capacity		W3	2026-10-25
+aeco-00902	Electrical load	close	Q931447	electrical load		W3	2026-10-25
+aeco-00903	Voltage	exact	Q25428	voltage		W3	2026-10-25
+aeco-00905	Embodied carbon	close	Q5370001	embedded emissions		W3	2026-10-25
+aeco-00920	Unit cost	close	Q16897780	unit cost		W3	2026-10-25
+aeco-00921	Lead time	exact	Q1267117	lead time		W3	2026-10-25
+aeco-00922	Duration	exact	Q5316263	duration		W3	2026-10-25
+aeco-00929	Project management plan	exact	Q65268705	project management plan		W3	2026-10-25
+aeco-00934	Stormwater pollution prevention plan	exact	Q16956756	stormwater pollution prevention plan		W3	2026-10-25
+aeco-00938	Hazardous materials survey	exact	Q135989360	Hazardous materials survey		W3	2026-10-25
+aeco-00946	Safety data sheet	exact	Q222067	safety data sheet		W3	2026-10-25
+aeco-00967	Biosafety level	exact	Q898943	biosafety level		W3	2026-10-25
+aeco-00011	Contracts and commercial	narrow	Q93288	contract		W4	2026-10-25
+aeco-00029	Incidents	close	Q12890393	incident		W4	2026-10-25
+aeco-00031	Risks	close	Q104493	risk		W4	2026-10-25
+aeco-00051	Design change	close	Q5264323	Design change		W4	2026-10-25
+aeco-00058	Injury	exact	Q193078	injury		W4	2026-10-25
+aeco-00060	Property damage	close	Q554774	property damage		W4	2026-10-25
+aeco-00065	Electrical hazard	exact	Q6822425	electrical hazard		W4	2026-10-25
+aeco-00069	Safety risk	exact	Q124744498	safety risk		W4	2026-10-25
+aeco-00071	Flood	exact	Q8068	flood		W4	2026-10-25
+aeco-00072	Earthquake	exact	Q7944	earthquake		W4	2026-10-25
+aeco-00073	Wildfire	exact	Q169950	wildfire		W4	2026-10-25
+aeco-00092	Program manager	close	Q3922754	program manager		W4	2026-10-25
+aeco-00093	Tenant	close	Q105483554	tenant		W4	2026-10-25
+aeco-00096	Architect	exact	Q42973	architect		W4	2026-10-25
+aeco-00097	Structural engineer	exact	Q2305987	structural engineer		W4	2026-10-25
+aeco-00099	Civil engineer	exact	Q13582652	civil engineer		W4	2026-10-25
+aeco-00100	Landscape architect	exact	Q2815948	landscape architect		W4	2026-10-25
+aeco-00102	General contractor	exact	Q289612	general contractor		W4	2026-10-25
+aeco-00103	Construction manager	close	Q811459	construction manager		W4	2026-10-25
+aeco-00105	Subcontractor	exact	Q2144423	subcontractor		W4	2026-10-25
+aeco-00108	Project manager	close	Q816432	project manager		W4	2026-10-25
+aeco-00111	Foreman	close	Q811342	foreman		W4	2026-10-25
+aeco-00116	Fire marshal	exact	Q898372	fire marshal		W4	2026-10-25
+aeco-00122	Land surveyor	close	Q294126	surveyor		W4	2026-10-25
+aeco-00128	Design-build	exact	Q4921794	design–build		W4	2026-10-25
+aeco-00132	Integrated project delivery	exact	Q4041443	Integrated project delivery		W4	2026-10-25
+aeco-00135	Cost plus fee	close	Q2995824	cost-plus contract		W4	2026-10-25
+aeco-00140	Owner-contractor agreement	close	Q11889921	construction contract		W4	2026-10-25
+aeco-00143	Purchase order	exact	Q643327	purchase order		W4	2026-10-25
+aeco-00144	Joint venture agreement	close	Q489209	joint venture		W4	2026-10-25
+aeco-00149	Schedule of values	exact	Q7431054	Schedule of values		W4	2026-10-25
+aeco-00151	Retainage	exact	Q7316620	Retainage		W4	2026-10-25
+aeco-00152	Lien waiver	exact	Q6544181	Lien waiver		W4	2026-10-25
+aeco-00155	Performance bond	exact	Q13405539	Performance bond		W4	2026-10-25
+aeco-00157	Bid bond	exact	Q4903973	Bid bond		W4	2026-10-25
+aeco-00158	Builder's risk insurance	exact	Q811455	builder's risk insurance		W4	2026-10-25
+aeco-00159	Commercial general liability insurance	exact	Q22907382	Commercial general liability insurance		W4	2026-10-25
+aeco-00160	Professional liability insurance	exact	Q472902	professional liability insurance		W4	2026-10-25
+aeco-00161	Indemnification	close	Q708399	indemnity		W4	2026-10-25
+aeco-00162	Liquidated damages	exact	Q874771	Liquidated damages		W4	2026-10-25
+aeco-00163	Warranty	close	Q329717	warranty		W4	2026-10-25
+aeco-00166	Dispute resolution	exact	Q5282696	dispute resolution		W4	2026-10-25
+aeco-00167	Competitive bidding	close	Q70470283	competitive bidding		W4	2026-10-25
+aeco-00172	Change order	exact	Q5071881	change order		W4	2026-10-25
+aeco-00293	Environmental regulations	close	Q110590221	environmental regulation		W4	2026-10-25
+aeco-00307	Building code	exact	Q2333573	building code		W4	2026-10-25
+aeco-00310	Fire code	close	Q123698335	fire safety code		W4	2026-10-25
+aeco-00314	Plumbing code	exact	Q7205407	Plumbing code		W4	2026-10-25
+aeco-00315	Electrical code	exact	Q3878494	electrical code		W4	2026-10-25
+aeco-00322	Zoning ordinance	close	Q123120422	zoning statute		W4	2026-10-25
+aeco-00328	Impact fee	exact	Q6005889	impact fee		W4	2026-10-25
+aeco-00329	Building permit	close	Q836900	construction permit		W4	2026-10-25
+aeco-00335	Certificate of occupancy	exact	Q5065109	certificate of occupancy		W4	2026-10-25
+aeco-00340	Fire inspection	exact	Q1409508	fire inspection		W4	2026-10-25
+aeco-00363	Contractor license	exact	Q135923307	contractor license		W4	2026-10-25
+aeco-00364	Professional license	close	Q110987438	occupational license		W4	2026-10-25
+aeco-00375	Functional requirement	close	Q3264234	functional requirement		W4	2026-10-25
+aeco-00396	Trade-off	exact	Q638123	trade-off		W4	2026-10-25
+aeco-00399	Waiver	close	Q797551	waiver		W4	2026-10-25
+aeco-00960	Force majeure	exact	Q161398	force majeure		W4	2026-10-25
+aeco-00962	Craft worker	close	Q1294787	artisan		W4	2026-10-25
+aeco-01001	Spread footing	exact	Q3478383	spread footing		C2	2026-10-25
+aeco-01004	Grade beam	exact	Q3604803	grade beam		C2	2026-10-25
+aeco-01005	Pile	exact	Q1374167	piling		C2	2026-10-25
+aeco-01007	Pile cap	exact	Q7193854	pile cap		C2	2026-10-25
+aeco-01008	Beam	exact	Q3705329	beam		C2	2026-10-25
+aeco-01009	Column	exact	Q4817	column		C2	2026-10-25
+aeco-01010	Load-bearing wall	exact	Q2313934	load-bearing wall		C2	2026-10-25
+aeco-01012	Floor slab	close	Q2168387	concrete slab		C2	2026-10-25
+aeco-01013	Joist	exact	Q6587065	joist		C2	2026-10-25
+aeco-01014	Truss	exact	Q1328068	truss		C2	2026-10-25
+aeco-01015	Rafter	exact	Q1154705	rafter		C2	2026-10-25
+aeco-01016	Purlin	exact	Q645110	purlin		C2	2026-10-25
+aeco-01017	Shear wall	exact	Q7492192	shear wall		C2	2026-10-25
+aeco-01018	Brace	close	Q5188440	cross bracing		C2	2026-10-25
+aeco-01020	Stair landing	exact	Q2451731	landing		C2	2026-10-25
+aeco-01021	Railing	close	Q3095365	guard rail		C2	2026-10-25
+aeco-01000	Ramp	exact	Q661343	ramp		C2	2026-10-25
+aeco-01022	Mullion	close	Q2031967	mullion		C2	2026-10-25
+aeco-01024	Escalator	exact	Q15003	escalator		C2	2026-10-25
+aeco-01025	Moving walk	exact	Q847580	moving walkway		C2	2026-10-25
+aeco-01026	Curb	exact	Q37442	curb		C2	2026-10-25
+aeco-01027	Sidewalk	exact	Q177749	sidewalk		C2	2026-10-25
+aeco-01028	Fence	exact	Q148571	fence		C2	2026-10-25
+aeco-01029	Gate	exact	Q53060	gate		C2	2026-10-25
+aeco-01030	Bridge girder	close	Q1371480	girder		C2	2026-10-25
+aeco-01031	Bridge bearing	exact	Q1425190	bridge bearing		C2	2026-10-25
+aeco-01032	Abutment	exact	Q6452175	abutment		C2	2026-10-25
+aeco-01033	Bridge pier	exact	Q21155149	bridge pile		C2	2026-10-25
+aeco-01034	Rail	exact	Q633423	rail		C2	2026-10-25
+aeco-01035	Railroad tie	exact	Q220229	railroad tie		C2	2026-10-25
+aeco-01073	Building	exact	Q41176	building		C5	2026-10-26

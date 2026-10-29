@@ -1,0 +1,379 @@
+code_a	label_a	code_b	label_b	group	session	added
+aeco-00255	Request for information	aeco-00206	RFI management	L01	8	2026-10-25
+aeco-00185	Submittals	aeco-00205	Submittal review	L01	8	2026-10-25
+aeco-00260	Daily report	aeco-00212	Daily reporting	L01	8	2026-10-25
+aeco-00261	Field observation report	aeco-00207	Field observation	L01	8	2026-10-25
+aeco-00263	Punch list	aeco-00209	Punch list management	L01	8	2026-10-25
+aeco-00150	Payment application	aeco-00208	Payment application review	L01	8	2026-10-25
+aeco-00266	Look-ahead schedule	aeco-00213	Look-ahead planning	L01	8	2026-10-25
+aeco-00265	Project schedule	aeco-00193	Schedule management	L01	8	2026-10-25
+aeco-00267	Cost estimate	aeco-00194	Cost management	L01	8	2026-10-25
+aeco-00268	Budget	aeco-00194	Cost management	L01	8	2026-10-25
+aeco-00269	Cost report	aeco-00235	Project controls	L01	8	2026-10-25
+aeco-00270	Progress report	aeco-00235	Project controls	L01	8	2026-10-25
+aeco-00275	Commissioning report	aeco-00224	Functional performance testing	L01	8	2026-10-25
+aeco-00272	Operation and maintenance manual	aeco-00226	Owner training	L01	8	2026-10-25
+aeco-00274	Asset register	aeco-00230	Asset management	L01	8	2026-10-25
+aeco-00242	Federated model	aeco-00200	Design coordination	L01	8	2026-10-25
+aeco-00281	BIM execution plan	aeco-00200	Design coordination	L01	8	2026-10-25
+aeco-00262	Inspection report	aeco-00338	Code inspection	L01	8	2026-10-25
+aeco-00257	Meeting minutes	aeco-00198	Stakeholder and communication management	L01	8	2026-10-25
+aeco-00271	Record drawings	aeco-00243	Record model	L01	8	2026-10-25
+aeco-00062	Fall hazard	aeco-00347	Fall protection rule	L02	8	2026-10-25
+aeco-00062	Fall hazard	aeco-00860	Personal fall arrest system	L02	8	2026-10-25
+aeco-00062	Fall hazard	aeco-00861	Edge protection system	L02	8	2026-10-25
+aeco-00063	Struck-by hazard	aeco-00350	Crane and rigging rule	L02	8	2026-10-25
+aeco-00064	Caught-in or between hazard	aeco-00349	Excavation rule	L02	8	2026-10-25
+aeco-00064	Caught-in or between hazard	aeco-00857	Trench box	L02	8	2026-10-25
+aeco-00065	Electrical hazard	aeco-00351	Electrical safety rule	L02	8	2026-10-25
+aeco-00348	Scaffold rule	aeco-00851	Scaffolding	L02	8	2026-10-25
+aeco-00350	Crane and rigging rule	aeco-00777	Lifting equipment	L02	8	2026-10-25
+aeco-00354	Confined space rule	aeco-00862	Gas monitor	L02	8	2026-10-25
+aeco-00353	Silica exposure rule	aeco-00694	Concrete cutting and coring	L02	8	2026-10-25
+aeco-00349	Excavation rule	aeco-00696	Excavation and backfill	L02	8	2026-10-25
+aeco-00359	Hazardous building material rule	aeco-00431	Hazardous building material	L02	8	2026-10-25
+aeco-00431	Hazardous building material	aeco-00693	Hazardous material abatement	L02	8	2026-10-25
+aeco-00220	Safety inspection	aeco-00341	Occupational safety inspection	L02	8	2026-10-25
+aeco-00221	Incident investigation	aeco-00029	Incidents	L02	8	2026-10-25
+aeco-00069	Safety risk	aeco-00219	Safety planning	L02	8	2026-10-25
+aeco-00859	Personal protective equipment	aeco-00030	Hazards	L02	8	2026-10-25
+aeco-00423	Flood zone	aeco-00071	Flood	L03	8	2026-10-25
+aeco-00424	Seismic hazard zone	aeco-00072	Earthquake	L03	8	2026-10-25
+aeco-00424	Seismic hazard zone	aeco-00882	Seismic design category	L03	8	2026-10-25
+aeco-00425	Wildfire zone	aeco-00073	Wildfire	L03	8	2026-10-25
+aeco-00426	High wind zone	aeco-00070	Severe weather	L03	8	2026-10-25
+aeco-00426	High wind zone	aeco-00883	Wind exposure category	L03	8	2026-10-25
+aeco-00422	Climate zone	aeco-00312	Energy code	L03	8	2026-10-25
+aeco-00414	Wetland	aeco-00357	Wetland permit	L03	8	2026-10-25
+aeco-00417	Protected habitat	aeco-00361	Protected species review	L03	8	2026-10-25
+aeco-00418	Historic resource	aeco-00360	Historic preservation review	L03	8	2026-10-25
+aeco-00419	Archaeological site	aeco-00360	Historic preservation review	L03	8	2026-10-25
+aeco-00415	Natural drainage	aeco-00356	Stormwater permit	L03	8	2026-10-25
+aeco-00412	Topography	aeco-00332	Grading permit	L03	8	2026-10-25
+aeco-00403	Public right-of-way	aeco-00334	Right-of-way permit	L03	8	2026-10-25
+aeco-00400	Parcel	aeco-00326	Subdivision approval	L03	8	2026-10-25
+aeco-00407	Groundwater	aeco-00698	Dewatering	L03	8	2026-10-25
+aeco-00411	Buried obstruction	aeco-00052	Differing site condition	L03	8	2026-10-25
+aeco-00429	Existing utility	aeco-00708	Utility tie-in	L03	8	2026-10-25
+aeco-00428	Existing structure	aeco-00692	Structure demolition	L03	8	2026-10-25
+aeco-00416	Existing vegetation	aeco-00695	Site clearing	L03	8	2026-10-25
+aeco-00420	Tree protection zone	aeco-00416	Existing vegetation	L03	8	2026-10-25
+aeco-00405	Soil	aeco-00881	Allowable bearing pressure	L03	8	2026-10-25
+aeco-00585	Deep foundation	aeco-00700	Piling	L04	8	2026-10-25
+aeco-00587	Slab on grade	aeco-00709	Cast-in-place concrete	L04	8	2026-10-25
+aeco-00709	Cast-in-place concrete	aeco-00783	Ready-mix concrete	L04	8	2026-10-25
+aeco-00711	Concrete reinforcement	aeco-00784	Reinforcing bar	L04	8	2026-10-25
+aeco-00712	Concrete formwork	aeco-00855	Formwork system	L04	8	2026-10-25
+aeco-00588	Below-grade waterproofing	aeco-00731	Waterproofing	L04	8	2026-10-25
+aeco-00731	Waterproofing	aeco-00795	Waterproofing membrane	L04	8	2026-10-25
+aeco-00590	Structural frame	aeco-00719	Structural steel erection	L04	8	2026-10-25
+aeco-00719	Structural steel erection	aeco-00787	Structural steel shapes	L04	8	2026-10-25
+aeco-00591	Floor structure	aeco-00720	Metal decking	L04	8	2026-10-25
+aeco-00595	Exterior wall	aeco-00716	Unit masonry	L04	8	2026-10-25
+aeco-00716	Unit masonry	aeco-00788	Masonry units	L04	8	2026-10-25
+aeco-00595	Exterior wall	aeco-00793	Insulated metal panel	L04	8	2026-10-25
+aeco-00724	Rough carpentry	aeco-00786	Lumber	L04	8	2026-10-25
+aeco-00724	Rough carpentry	aeco-00790	Wood sheathing panel	L04	8	2026-10-25
+aeco-00596	Curtain wall	aeco-00742	Glazing	L04	8	2026-10-25
+aeco-00597	Window assembly	aeco-00742	Glazing	L04	8	2026-10-25
+aeco-00597	Window assembly	aeco-00801	Window unit	L04	8	2026-10-25
+aeco-00742	Glazing	aeco-00802	Insulating glass unit	L04	8	2026-10-25
+aeco-00598	Exterior door assembly	aeco-00741	Storefronts and entrances	L04	8	2026-10-25
+aeco-00599	Roof covering	aeco-00727	Membrane roofing	L04	8	2026-10-25
+aeco-00727	Membrane roofing	aeco-00794	Roofing membrane	L04	8	2026-10-25
+aeco-00601	Air and water barrier	aeco-00797	Air barrier membrane	L04	8	2026-10-25
+aeco-00732	Building insulation	aeco-00791	Rigid insulation board	L04	8	2026-10-25
+aeco-00733	Joint sealants	aeco-00798	Sealant	L04	8	2026-10-25
+aeco-00603	Interior door assembly	aeco-00737	Hollow metal doors and frames	L05	8	2026-10-25
+aeco-00603	Interior door assembly	aeco-00799	Door leaf	L05	8	2026-10-25
+aeco-00737	Hollow metal doors and frames	aeco-00800	Door frame	L05	8	2026-10-25
+aeco-00739	Door hardware	aeco-00803	Lockset	L05	8	2026-10-25
+aeco-00739	Door hardware	aeco-00804	Exit device	L05	8	2026-10-25
+aeco-00602	Partition	aeco-00743	Metal stud framing	L05	8	2026-10-25
+aeco-00602	Partition	aeco-00744	Drywall installation	L05	8	2026-10-25
+aeco-00744	Drywall installation	aeco-00789	Gypsum board	L05	8	2026-10-25
+aeco-00604	Ceiling	aeco-00751	Acoustical ceiling installation	L05	8	2026-10-25
+aeco-00751	Acoustical ceiling installation	aeco-00805	Ceiling tile	L05	8	2026-10-25
+aeco-00605	Floor finish	aeco-00747	Resilient flooring	L05	8	2026-10-25
+aeco-00605	Floor finish	aeco-00748	Carpeting	L05	8	2026-10-25
+aeco-00605	Floor finish	aeco-00746	Tiling	L05	8	2026-10-25
+aeco-00747	Resilient flooring	aeco-00808	Resilient floor tile	L05	8	2026-10-25
+aeco-00748	Carpeting	aeco-00807	Carpet tile	L05	8	2026-10-25
+aeco-00746	Tiling	aeco-00806	Ceramic tile	L05	8	2026-10-25
+aeco-00606	Wall finish	aeco-00752	Painting and coating	L05	8	2026-10-25
+aeco-00752	Painting and coating	aeco-00809	Paint	L05	8	2026-10-25
+aeco-00615	Plumbing fixtures	aeco-00810	Water closet	L06	8	2026-10-25
+aeco-00615	Plumbing fixtures	aeco-00811	Wash basin	L06	8	2026-10-25
+aeco-00612	Domestic water system	aeco-00812	Water heater	L06	8	2026-10-25
+aeco-00754	Plumbing work	aeco-00813	Pipe and fittings	L06	8	2026-10-25
+aeco-00618	Heating system	aeco-00816	Boiler	L06	8	2026-10-25
+aeco-00618	Heating system	aeco-00821	Heat pump	L06	8	2026-10-25
+aeco-00619	Cooling system	aeco-00815	Chiller	L06	8	2026-10-25
+aeco-00619	Cooling system	aeco-00822	Cooling tower	L06	8	2026-10-25
+aeco-00620	Air distribution system	aeco-00817	Air handling unit	L06	8	2026-10-25
+aeco-00620	Air distribution system	aeco-00820	Variable air volume box	L06	8	2026-10-25
+aeco-00620	Air distribution system	aeco-00756	Sheet metal ductwork	L06	8	2026-10-25
+aeco-00628	Electrical service and distribution	aeco-00823	Switchboard	L06	8	2026-10-25
+aeco-00628	Electrical service and distribution	aeco-00824	Panelboard	L06	8	2026-10-25
+aeco-00628	Electrical service and distribution	aeco-00825	Transformer	L06	8	2026-10-25
+aeco-00631	Emergency power system	aeco-00826	Generator	L06	8	2026-10-25
+aeco-00630	Lighting system	aeco-00827	Luminaire	L06	8	2026-10-25
+aeco-00624	Sprinkler system	aeco-00829	Sprinkler head	L06	8	2026-10-25
+aeco-00624	Sprinkler system	aeco-00758	Fire sprinkler work	L06	8	2026-10-25
+aeco-00639	Fire alarm system	aeco-00832	Fire alarm control panel	L06	8	2026-10-25
+aeco-00639	Fire alarm system	aeco-00831	Smoke detector	L06	8	2026-10-25
+aeco-00639	Fire alarm system	aeco-00833	Notification appliance	L06	8	2026-10-25
+aeco-00640	Access control system	aeco-00837	Card reader	L06	8	2026-10-25
+aeco-00640	Access control system	aeco-00838	Electrified lock	L06	8	2026-10-25
+aeco-00641	Video surveillance system	aeco-00836	IP camera	L06	8	2026-10-25
+aeco-00635	Structured cabling	aeco-00760	Low-voltage work	L06	8	2026-10-25
+aeco-00609	Elevator system	aeco-00761	Elevator work	L06	8	2026-10-25
+aeco-00652	Paving	aeco-00701	Asphalt paving	L06	8	2026-10-25
+aeco-00652	Paving	aeco-00702	Site concrete work	L06	8	2026-10-25
+aeco-00653	Landscape planting	aeco-00704	Landscape installation	L06	8	2026-10-25
+aeco-00658	Fencing and gates	aeco-00705	Fence installation	L06	8	2026-10-25
+aeco-00654	Site utilities	aeco-00706	Underground piping	L06	8	2026-10-25
+aeco-00096	Architect	aeco-00236	Design services	L07	8	2026-10-25
+aeco-00091	Owner's representative	aeco-00233	Owner's representation	L07	8	2026-10-25
+aeco-00092	Program manager	aeco-00234	Program management	L07	8	2026-10-25
+aeco-00108	Project manager	aeco-00174	Project management processes	L07	8	2026-10-25
+aeco-00095	Facility manager	aeco-00180	Facility management processes	L07	8	2026-10-25
+aeco-00119	Commissioning agent	aeco-00179	Commissioning and handover activities	L07	8	2026-10-25
+aeco-00119	Commissioning agent	aeco-00368	Owner's project requirements	L07	8	2026-10-25
+aeco-00120	Cost consultant	aeco-00194	Cost management	L07	8	2026-10-25
+aeco-00112	Estimator	aeco-00267	Cost estimate	L07	8	2026-10-25
+aeco-00121	Code consultant	aeco-00203	Code compliance review	L07	8	2026-10-25
+aeco-00117	Special inspector	aeco-00339	Special inspection	L07	8	2026-10-25
+aeco-00115	Building official	aeco-00338	Code inspection	L07	8	2026-10-25
+aeco-00116	Fire marshal	aeco-00340	Fire inspection	L07	8	2026-10-25
+aeco-00114	Authority having jurisdiction	aeco-00329	Building permit	L07	8	2026-10-25
+aeco-00118	Planning authority	aeco-00323	Land use entitlement	L07	8	2026-10-25
+aeco-00113	Safety manager	aeco-00219	Safety planning	L07	8	2026-10-25
+aeco-00110	Superintendent	aeco-00177	Site operations	L07	8	2026-10-25
+aeco-00122	Land surveyor	aeco-00401	Property line	L07	8	2026-10-25
+aeco-00123	Testing agency	aeco-00254	Test report	L07	8	2026-10-25
+aeco-00124	Third-party inspector	aeco-00218	Quality assurance	L07	8	2026-10-25
+aeco-00104	Design-builder	aeco-00128	Design-build	L07	8	2026-10-25
+aeco-00103	Construction manager	aeco-00130	Construction manager at risk	L07	8	2026-10-25
+aeco-00105	Subcontractor	aeco-00141	Subcontract	L07	8	2026-10-25
+aeco-00106	Supplier	aeco-00143	Purchase order	L07	8	2026-10-25
+aeco-00107	Manufacturer	aeco-00912	Manufacturer name	L07	8	2026-10-25
+aeco-00017	Design	aeco-00175	Design management processes	L08	8	2026-10-25
+aeco-00019	Construction	aeco-00176	Construction administration	L08	8	2026-10-25
+aeco-00023	Preconstruction	aeco-00202	Constructability review	L08	8	2026-10-25
+aeco-00021	Operations	aeco-00180	Facility management processes	L08	8	2026-10-25
+aeco-00035	Programming	aeco-00371	Space program	L08	8	2026-10-25
+aeco-00033	Business case	aeco-00370	Project goal	L08	8	2026-10-25
+aeco-00024	Permitting	aeco-00204	Permit application	L08	8	2026-10-25
+aeco-00024	Permitting	aeco-00329	Building permit	L08	8	2026-10-25
+aeco-00039	Bidding	aeco-00250	Bid package	L08	8	2026-10-25
+aeco-00039	Bidding	aeco-00167	Competitive bidding	L08	8	2026-10-25
+aeco-00041	Buyout	aeco-00141	Subcontract	L08	8	2026-10-25
+aeco-00042	Commissioning phase	aeco-00179	Commissioning and handover activities	L08	8	2026-10-25
+aeco-00043	Turnover	aeco-00227	Systems handover	L08	8	2026-10-25
+aeco-00045	Demolition phase	aeco-00331	Demolition permit	L08	8	2026-10-25
+aeco-00045	Demolition phase	aeco-00692	Structure demolition	L08	8	2026-10-25
+aeco-00025	Renovation	aeco-00309	Existing building code	L08	8	2026-10-25
+aeco-00047	Notice to proceed	aeco-00140	Owner-contractor agreement	L08	8	2026-10-25
+aeco-00048	Substantial completion	aeco-00263	Punch list	L08	8	2026-10-25
+aeco-00049	Final completion	aeco-00210	Final inspection	L08	8	2026-10-25
+aeco-00172	Change order	aeco-00196	Change management	L09	8	2026-10-25
+aeco-00050	Owner-requested change	aeco-00146	Potential change order	L09	8	2026-10-25
+aeco-00051	Design change	aeco-00385	Design decision	L09	8	2026-10-25
+aeco-00051	Design change	aeco-00173	Architect's supplemental instruction	L09	8	2026-10-25
+aeco-00052	Differing site condition	aeco-00148	Claim	L09	8	2026-10-25
+aeco-00055	Compensable delay	aeco-00148	Claim	L09	8	2026-10-25
+aeco-00056	Non-excusable delay	aeco-00162	Liquidated damages	L09	8	2026-10-25
+aeco-00048	Substantial completion	aeco-00162	Liquidated damages	L09	8	2026-10-25
+aeco-00166	Dispute resolution	aeco-00148	Claim	L09	8	2026-10-25
+aeco-00053	Regulatory change	aeco-00377	Statutory requirement	L09	8	2026-10-25
+aeco-00067	Schedule risk	aeco-00028	Delays	L09	8	2026-10-25
+aeco-00066	Cost risk	aeco-00154	Contingency	L09	8	2026-10-25
+aeco-00068	Quality risk	aeco-00217	Quality control	L09	8	2026-10-25
+aeco-00386	Owner selection	aeco-00153	Allowance	L10	8	2026-10-25
+aeco-00390	Bid decision	aeco-00039	Bidding	L10	8	2026-10-25
+aeco-00389	Procurement decision	aeco-00088	Procurement methods	L10	8	2026-10-25
+aeco-00388	Means and methods decision	aeco-00216	Temporary works management	L10	8	2026-10-25
+aeco-00392	Field decision	aeco-00255	Request for information	L10	8	2026-10-25
+aeco-00381	Budget constraint	aeco-00268	Budget	L10	8	2026-10-25
+aeco-00382	Schedule constraint	aeco-00265	Project schedule	L10	8	2026-10-25
+aeco-00374	Sustainability target	aeco-00905	Embodied carbon	L10	8	2026-10-25
+aeco-00374	Sustainability target	aeco-00891	Energy use intensity	L10	8	2026-10-25
+aeco-00163	Warranty	aeco-00273	Warranty certificate	L10	8	2026-10-25
+aeco-00163	Warranty	aeco-00916	Warranty period	L10	8	2026-10-25
+aeco-00149	Schedule of values	aeco-00150	Payment application	L10	8	2026-10-25
+aeco-00152	Lien waiver	aeco-00150	Payment application	L10	8	2026-10-25
+aeco-00151	Retainage	aeco-00049	Final completion	L10	8	2026-10-25
+aeco-00136	Guaranteed maximum price	aeco-00130	Construction manager at risk	L10	8	2026-10-25
+aeco-00137	Unit price	aeco-00920	Unit cost	L10	8	2026-10-25
+aeco-00501	Data center	aeco-00570	Data hall	L11	8	2026-10-25
+aeco-00502	Laboratory building	aeco-00572	Laboratory	L11	8	2026-10-25
+aeco-00503	Semiconductor fab	aeco-00573	Cleanroom	L11	8	2026-10-25
+aeco-00480	Hospital	aeco-00561	Patient room	L11	8	2026-10-25
+aeco-00480	Hospital	aeco-00562	Operating room	L11	8	2026-10-25
+aeco-00484	School	aeco-00557	Classroom	L11	8	2026-10-25
+aeco-00472	Multifamily building	aeco-00565	Dwelling unit	L11	8	2026-10-25
+aeco-00535	Tenant space	aeco-00093	Tenant	L11	8	2026-10-25
+aeco-00547	Mechanical room	aeco-00462	HVAC systems	L11	8	2026-10-25
+aeco-00548	Electrical room	aeco-00628	Electrical service and distribution	L11	8	2026-10-25
+aeco-00549	Telecommunications room	aeco-00635	Structured cabling	L11	8	2026-10-25
+aeco-00543	Stairwell	aeco-00594	Stair	L11	8	2026-10-25
+aeco-00544	Elevator lobby	aeco-00609	Elevator system	L11	8	2026-10-25
+aeco-00532	Fire compartment	aeco-00884	Fire-resistance rating	L11	8	2026-10-25
+aeco-00534	Security zone	aeco-00640	Access control system	L11	8	2026-10-25
+aeco-00551	Loading dock	aeco-00651	Loading dock equipment	L11	8	2026-10-25
+aeco-00553	Restroom	aeco-00615	Plumbing fixtures	L11	8	2026-10-25
+aeco-00873	Gross floor area	aeco-00371	Space program	L11	8	2026-10-25
+aeco-00887	R-value	aeco-00732	Building insulation	L12	8	2026-10-25
+aeco-00888	U-factor	aeco-00801	Window unit	L12	8	2026-10-25
+aeco-00889	Solar heat gain coefficient	aeco-00801	Window unit	L12	8	2026-10-25
+aeco-00890	Air leakage rate	aeco-00601	Air and water barrier	L12	8	2026-10-25
+aeco-00897	Vapor permeance	aeco-00796	Vapor retarder	L12	8	2026-10-25
+aeco-00893	Sound transmission class	aeco-00602	Partition	L12	8	2026-10-25
+aeco-00894	Impact insulation class	aeco-00591	Floor structure	L12	8	2026-10-25
+aeco-00895	Noise reduction coefficient	aeco-00805	Ceiling tile	L12	8	2026-10-25
+aeco-00876	Clear height	aeco-00604	Ceiling	L12	8	2026-10-25
+aeco-00878	Compressive strength	aeco-00783	Ready-mix concrete	L12	8	2026-10-25
+aeco-00879	Yield strength	aeco-00784	Reinforcing bar	L12	8	2026-10-25
+aeco-00899	Airflow rate	aeco-00817	Air handling unit	L12	8	2026-10-25
+aeco-00900	Cooling capacity	aeco-00815	Chiller	L12	8	2026-10-25
+aeco-00901	Heating capacity	aeco-00816	Boiler	L12	8	2026-10-25
+aeco-00892	Equipment efficiency rating	aeco-00772	HVAC equipment	L12	8	2026-10-25
+aeco-00907	VOC content	aeco-00809	Paint	L12	8	2026-10-25
+aeco-00923	Level of development	aeco-00241	Design model	L12	8	2026-10-25
+aeco-00924	Document status	aeco-00284	Document register	L12	8	2026-10-25
+aeco-00925	Revision	aeco-00237	Drawing	L12	8	2026-10-25
+aeco-00918	Asset tag	aeco-00274	Asset register	L12	8	2026-10-25
+aeco-00917	Condition rating	aeco-00230	Asset management	L12	8	2026-10-25
+aeco-00921	Lead time	aeco-00197	Procurement management	L12	8	2026-10-25
+aeco-00929	Project management plan	aeco-00174	Project management processes	L13	9	2026-10-25
+aeco-00930	Site-specific safety plan	aeco-00219	Safety planning	L13	9	2026-10-25
+aeco-00931	Quality plan	aeco-00217	Quality control	L13	9	2026-10-25
+aeco-00931	Quality plan	aeco-00218	Quality assurance	L13	9	2026-10-25
+aeco-00932	Commissioning plan	aeco-00179	Commissioning and handover activities	L13	9	2026-10-25
+aeco-00932	Commissioning plan	aeco-00368	Owner's project requirements	L13	9	2026-10-25
+aeco-00933	Site logistics plan	aeco-00211	Site logistics	L13	9	2026-10-25
+aeco-00934	Stormwater pollution prevention plan	aeco-00356	Stormwater permit	L13	9	2026-10-25
+aeco-00934	Stormwater pollution prevention plan	aeco-00699	Erosion and sediment control	L13	9	2026-10-25
+aeco-00935	Work plan	aeco-00388	Means and methods decision	L13	9	2026-10-25
+aeco-00936	Geotechnical report	aeco-00405	Soil	L13	9	2026-10-25
+aeco-00936	Geotechnical report	aeco-00407	Groundwater	L13	9	2026-10-25
+aeco-00937	Environmental site assessment	aeco-00409	Contaminated ground	L13	9	2026-10-25
+aeco-00938	Hazardous materials survey	aeco-00431	Hazardous building material	L13	9	2026-10-25
+aeco-00938	Hazardous materials survey	aeco-00693	Hazardous material abatement	L13	9	2026-10-25
+aeco-00939	Existing conditions survey	aeco-00244	Point cloud	L13	9	2026-10-25
+aeco-00939	Existing conditions survey	aeco-00025	Renovation	L13	9	2026-10-25
+aeco-00940	Topographic survey	aeco-00412	Topography	L13	9	2026-10-25
+aeco-00940	Topographic survey	aeco-00122	Land surveyor	L13	9	2026-10-25
+aeco-00941	Boundary survey	aeco-00401	Property line	L13	9	2026-10-25
+aeco-00941	Boundary survey	aeco-00402	Easement	L13	9	2026-10-25
+aeco-00942	Code analysis	aeco-00203	Code compliance review	L13	9	2026-10-25
+aeco-00942	Code analysis	aeco-00908	Occupancy classification	L13	9	2026-10-25
+aeco-00943	Request for proposal	aeco-00039	Bidding	L13	9	2026-10-25
+aeco-00944	Bid	aeco-00157	Bid bond	L13	9	2026-10-25
+aeco-00944	Bid	aeco-00039	Bidding	L13	9	2026-10-25
+aeco-00945	Mock-up	aeco-00253	Sample	L13	9	2026-10-25
+aeco-00946	Safety data sheet	aeco-00352	Hazard communication rule	L13	9	2026-10-25
+aeco-00947	Substitution request	aeco-00391	Substitution decision	L13	9	2026-10-25
+aeco-00948	Asset handover data	aeco-00274	Asset register	L13	9	2026-10-25
+aeco-00948	Asset handover data	aeco-00043	Turnover	L13	9	2026-10-25
+aeco-00949	Model exchange file	aeco-00241	Design model	L13	9	2026-10-25
+aeco-00950	Information container	aeco-00285	Common data environment	L13	9	2026-10-25
+aeco-00951	Permit to work	aeco-00354	Confined space rule	L14	9	2026-10-25
+aeco-00952	Toolbox talk	aeco-00219	Safety planning	L14	9	2026-10-25
+aeco-00953	Pull planning	aeco-00213	Look-ahead planning	L14	9	2026-10-25
+aeco-00954	Progress meeting	aeco-00257	Meeting minutes	L14	9	2026-10-25
+aeco-00955	Document control	aeco-00284	Document register	L14	9	2026-10-25
+aeco-00956	Warranty management	aeco-00163	Warranty	L14	9	2026-10-25
+aeco-00956	Warranty management	aeco-00916	Warranty period	L14	9	2026-10-25
+aeco-00957	Bid alternate	aeco-00944	Bid	L14	9	2026-10-25
+aeco-00958	Project labor agreement	aeco-00362	Prevailing wage requirement	L14	9	2026-10-25
+aeco-00959	Back charge	aeco-00141	Subcontract	L14	9	2026-10-25
+aeco-00960	Force majeure	aeco-00054	Excusable delay	L14	9	2026-10-25
+aeco-00961	Certificate of insurance	aeco-00159	Commercial general liability insurance	L14	9	2026-10-25
+aeco-00962	Craft worker	aeco-00111	Foreman	L14	9	2026-10-25
+aeco-00963	Crew	aeco-00111	Foreman	L14	9	2026-10-25
+aeco-00970	Pump	aeco-00612	Domestic water system	L14	9	2026-10-25
+aeco-00970	Pump	aeco-00626	Fire pump system	L14	9	2026-10-25
+aeco-00971	Air terminal	aeco-00620	Air distribution system	L14	9	2026-10-25
+aeco-00972	Uninterruptible power supply	aeco-00631	Emergency power system	L14	9	2026-10-25
+aeco-00964	Data center tier	aeco-00501	Data center	L14	9	2026-10-25
+aeco-00965	Redundancy level	aeco-00631	Emergency power system	L14	9	2026-10-25
+aeco-00966	Cleanroom class	aeco-00573	Cleanroom	L14	9	2026-10-25
+aeco-00967	Biosafety level	aeco-00572	Laboratory	L14	9	2026-10-25
+aeco-00968	Ventilation standard	aeco-00313	Mechanical code	L14	9	2026-10-25
+aeco-00969	Facility design guideline	aeco-00480	Hospital	L14	9	2026-10-25
+aeco-00975	Submit RFI	aeco-00206	RFI management	L15	9	2026-10-25
+aeco-00975	Submit RFI	aeco-00255	Request for information	L15	9	2026-10-25
+aeco-00976	Answer RFI	aeco-00206	RFI management	L15	9	2026-10-25
+aeco-00977	Close RFI	aeco-00206	RFI management	L15	9	2026-10-25
+aeco-00978	Send submittal	aeco-00205	Submittal review	L15	9	2026-10-25
+aeco-00978	Send submittal	aeco-00185	Submittals	L15	9	2026-10-25
+aeco-00979	Review submittal	aeco-00205	Submittal review	L15	9	2026-10-25
+aeco-00980	Return submittal	aeco-00205	Submittal review	L15	9	2026-10-25
+aeco-00981	Issue drawing set	aeco-00237	Drawing	L15	9	2026-10-25
+aeco-00981	Issue drawing set	aeco-00256	Transmittal	L15	9	2026-10-25
+aeco-00982	Issue addendum	aeco-00249	Addendum	L15	9	2026-10-25
+aeco-00983	Issue meeting minutes	aeco-00257	Meeting minutes	L15	9	2026-10-25
+aeco-00984	Send notice	aeco-00258	Notice	L15	9	2026-10-25
+aeco-00985	Record decision	aeco-00298	Decision types	L15	9	2026-10-25
+aeco-00986	Submit closeout documents	aeco-00043	Turnover	L15	9	2026-10-25
+aeco-00986	Submit closeout documents	aeco-00189	Closeout and operations documents	L15	9	2026-10-25
+aeco-00987	Request change	aeco-00146	Potential change order	L15	9	2026-10-25
+aeco-00987	Request change	aeco-00196	Change management	L15	9	2026-10-25
+aeco-00988	Price change	aeco-00196	Change management	L15	9	2026-10-25
+aeco-00989	Approve change order	aeco-00172	Change order	L15	9	2026-10-25
+aeco-00990	Issue construction change directive	aeco-00147	Construction change directive	L15	9	2026-10-25
+aeco-00991	Submit payment application	aeco-00150	Payment application	L15	9	2026-10-25
+aeco-00992	Certify payment application	aeco-00208	Payment application review	L15	9	2026-10-25
+aeco-00993	Request inspection	aeco-00338	Code inspection	L15	9	2026-10-25
+aeco-00994	Record inspection result	aeco-00262	Inspection report	L15	9	2026-10-25
+aeco-00995	Add punch item	aeco-00263	Punch list	L15	9	2026-10-25
+aeco-00996	Close punch item	aeco-00209	Punch list management	L15	9	2026-10-25
+aeco-00997	Submit daily report	aeco-00260	Daily report	L15	9	2026-10-25
+aeco-00998	Report incident	aeco-00221	Incident investigation	L15	9	2026-10-25
+aeco-00998	Report incident	aeco-00029	Incidents	L15	9	2026-10-25
+aeco-00999	Certify substantial completion	aeco-00048	Substantial completion	L15	9	2026-10-25
+aeco-00789	Gypsum board	aeco-00602	Partition	L16	9	2026-10-26
+aeco-00790	Wood sheathing panel	aeco-00595	Exterior wall	L16	9	2026-10-26
+aeco-00791	Rigid insulation board	aeco-00595	Exterior wall	L16	9	2026-10-26
+aeco-00791	Rigid insulation board	aeco-00599	Roof covering	L16	9	2026-10-26
+aeco-00792	Cement board	aeco-00606	Wall finish	L16	9	2026-10-26
+aeco-00794	Roofing membrane	aeco-00599	Roof covering	L16	9	2026-10-26
+aeco-00795	Waterproofing membrane	aeco-00588	Below-grade waterproofing	L16	9	2026-10-26
+aeco-00796	Vapor retarder	aeco-00587	Slab on grade	L16	9	2026-10-26
+aeco-00798	Sealant	aeco-01055	Movement joint	L16	9	2026-10-26
+aeco-00799	Door leaf	aeco-00598	Exterior door assembly	L16	9	2026-10-26
+aeco-00800	Door frame	aeco-00603	Interior door assembly	L16	9	2026-10-26
+aeco-00800	Door frame	aeco-00598	Exterior door assembly	L16	9	2026-10-26
+aeco-00802	Insulating glass unit	aeco-00597	Window assembly	L16	9	2026-10-26
+aeco-00802	Insulating glass unit	aeco-00596	Curtain wall	L16	9	2026-10-26
+aeco-00803	Lockset	aeco-00603	Interior door assembly	L16	9	2026-10-26
+aeco-00804	Exit device	aeco-00598	Exterior door assembly	L16	9	2026-10-26
+aeco-00805	Ceiling tile	aeco-00604	Ceiling	L16	9	2026-10-26
+aeco-00806	Ceramic tile	aeco-00605	Floor finish	L16	9	2026-10-26
+aeco-00806	Ceramic tile	aeco-00606	Wall finish	L16	9	2026-10-26
+aeco-00807	Carpet tile	aeco-00605	Floor finish	L16	9	2026-10-26
+aeco-00808	Resilient floor tile	aeco-00605	Floor finish	L16	9	2026-10-26
+aeco-00809	Paint	aeco-00606	Wall finish	L16	9	2026-10-26
+aeco-00813	Pipe and fittings	aeco-00612	Domestic water system	L16	9	2026-10-26
+aeco-00813	Pipe and fittings	aeco-00613	Sanitary drainage system	L16	9	2026-10-26
+aeco-00814	Valve	aeco-00612	Domestic water system	L16	9	2026-10-26
+aeco-00814	Valve	aeco-00622	Hydronic distribution	L16	9	2026-10-26
+aeco-00818	Rooftop unit	aeco-00620	Air distribution system	L16	9	2026-10-26
+aeco-00819	Fan coil unit	aeco-00620	Air distribution system	L16	9	2026-10-26
+aeco-00828	Wire and cable	aeco-00629	Branch power	L16	9	2026-10-26
+aeco-00828	Wire and cable	aeco-00635	Structured cabling	L16	9	2026-10-26
+aeco-01065	Conduit	aeco-00629	Branch power	L16	9	2026-10-26
+aeco-01066	Receptacle	aeco-00629	Branch power	L16	9	2026-10-26
+aeco-01068	Circuit breaker	aeco-00628	Electrical service and distribution	L16	9	2026-10-26
+aeco-00830	Fire extinguisher	aeco-00463	Fire protection systems	L16	9	2026-10-26
+aeco-00834	Network switch	aeco-00635	Structured cabling	L16	9	2026-10-26
+aeco-00835	Wireless access point	aeco-00635	Structured cabling	L16	9	2026-10-26
+aeco-00840	Prefabricated wall panel	aeco-00595	Exterior wall	L16	9	2026-10-26
+aeco-01069	Structural bolt	aeco-01011	Structural connection	L16	9	2026-10-26
+aeco-01070	Anchor rod	aeco-01011	Structural connection	L16	9	2026-10-26
+aeco-01071	Post-installed anchor	aeco-01011	Structural connection	L16	9	2026-10-26
+aeco-01072	Headed stud	aeco-01012	Floor slab	L16	9	2026-10-26
+aeco-00787	Structural steel shapes	aeco-00590	Structural frame	L16	9	2026-10-26
+aeco-01064	Mortar and grout	aeco-00716	Unit masonry	L16	9	2026-10-26

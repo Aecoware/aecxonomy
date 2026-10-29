@@ -1,0 +1,65 @@
+name: Concept proposal
+description: Propose a new concept, or a change to a concept or a link
+title: "[Concept] "
+labels: ["proposal"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What do you propose?
+      options:
+        - A new concept
+        - A change to a label or synonym
+        - A change to a definition
+        - Move a concept to a different parent
+        - A new or changed link to an outside standard
+        - Something else
+    validations:
+      required: true
+  - type: input
+    id: code
+    attributes:
+      label: Code of the concept, if it exists
+      placeholder: aeco-01008
+  - type: input
+    id: label
+    attributes:
+      label: Label (US English)
+      placeholder: Beam
+    validations:
+      required: true
+  - type: input
+    id: label_uk
+    attributes:
+      label: UK English label, if different
+  - type: input
+    id: parent
+    attributes:
+      label: Parent concept (code or label)
+      placeholder: aeco-00590 Structural frame
+  - type: textarea
+    id: definition
+    attributes:
+      label: Proposed definition
+      description: One or two sentences, 25 words or fewer each. Start with the type of thing. Use your own words.
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is this needed?
+      description: Who uses this term, and in which task or document?
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Public sources
+      description: Links to public pages that use the term. Name a standard if it applies, but do not paste its text.
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirm
+      options:
+        - label: I wrote the definition in my own words, or I took it from a source that allows reuse and I named it.
+          required: true
+        - label: This proposal contains no client, project or employer information.
+          required: true

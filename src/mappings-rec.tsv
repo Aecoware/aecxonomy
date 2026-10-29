@@ -1,0 +1,42 @@
+# Mappings from the Aecoware Open Taxonomy to RealEstateCore. License of the target: BSD-3-Clause.
+code	label_en_us	relation	target	target_label	note	group	added
+aeco-00527	Level	exact	Level	Level		O6	2026-10-25
+aeco-00528	Basement	exact	BasementLevel	BasementLevel		O6	2026-10-25
+aeco-00529	Mezzanine	exact	MezzanineLevel	MezzanineLevel		O6	2026-10-25
+aeco-00531	Room	exact	Room	Room		O6	2026-10-25
+aeco-00524	Campus	exact	Campus	Campus		O6	2026-10-25
+aeco-00400	Parcel	close	Site	Site		O6	2026-10-25
+aeco-00480	Hospital	exact	Hospital	Hospital		O6	2026-10-25
+aeco-00484	School	exact	School	School		O6	2026-10-25
+aeco-00491	Library	exact	Library	Library		O6	2026-10-25
+aeco-00546	Atrium	exact	Atrium	Atrium		O6	2026-10-25
+aeco-00558	Auditorium	exact	Auditorium	Auditorium		O6	2026-10-25
+aeco-00569	Bathroom	exact	Bathroom	Bathroom		O6	2026-10-25
+aeco-00566	Bedroom	exact	Bedroom	Bedroom		O6	2026-10-25
+aeco-00557	Classroom	exact	Classroom	Classroom		O6	2026-10-25
+aeco-00538	Meeting room	exact	ConferenceRoom	ConferenceRoom		O6	2026-10-25
+aeco-00560	Dining area	close	DiningRoom	DiningRoom		O6	2026-10-25
+aeco-00548	Electrical room	exact	ElectricityRoom	ElectricityRoom		O6	2026-10-25
+aeco-00541	Corridor	close	Hallway	Hallway		O6	2026-10-25
+aeco-00572	Laboratory	exact	Laboratory	Laboratory		O6	2026-10-25
+aeco-00568	Living room	exact	LivingRoom	LivingRoom		O6	2026-10-25
+aeco-00555	Locker room	exact	LockerRoom	LockerRoom		O6	2026-10-25
+aeco-00556	Lactation room	exact	MothersRoom	MothersRoom		O6	2026-10-25
+aeco-00536	Private office	close	OfficeRoom	OfficeRoom		O6	2026-10-25
+aeco-00537	Open office area	exact	OfficeLandscape	OfficeLandscape		O6	2026-10-25
+aeco-00562	Operating room	exact	OperatingRoom	OperatingRoom		O6	2026-10-25
+aeco-00539	Reception area	exact	Reception	Reception		O6	2026-10-25
+aeco-00543	Stairwell	exact	Stairwell	Stairwell		O6	2026-10-25
+aeco-00554	Shower room	exact	ShowerRoom	ShowerRoom		O6	2026-10-25
+aeco-00571	Server room	exact	DataServerRoom	DataServerRoom		O6	2026-10-25
+aeco-00549	Telecommunications room	exact	TelecommunicationRoom	TelecommunicationRoom		O6	2026-10-25
+aeco-00547	Mechanical room	close	UtilitiesRoom	UtilitiesRoom		O6	2026-10-25
+aeco-00552	Waste room	exact	WasteManagementRoom	WasteManagementRoom		O6	2026-10-25
+aeco-00551	Loading dock	exact	LoadingReceivingRoom	LoadingReceivingRoom		O6	2026-10-25
+aeco-00567	Kitchen	close	CookingRoom	CookingRoom		O6	2026-10-25
+aeco-00564	Imaging room	exact	RadiologyRoom	RadiologyRoom		O6	2026-10-25
+aeco-00563	Exam room	close	TreatmentRoom	TreatmentRoom		O6	2026-10-25
+aeco-00550	Shaft	close	ServiceShaft	ServiceShaft		O6	2026-10-25
+aeco-00533	HVAC zone	exact	HVACZone	HVACZone		O6	2026-10-25
+aeco-00534	Security zone	close	AccessControlZone	AccessControlZone		O6	2026-10-25
+aeco-01073	Building	exact	Building	Building		C5	2026-10-26

@@ -1,0 +1,17 @@
+# Links from the Aecoware Open Taxonomy top branches to ISO 12006-2 classes, by class name only. No ISO text is reproduced.
+# relation: close = similar scope, broader = the ISO class is wider. Codes from ISO tables are not used.
+code	label_en_us	iso_12006_2_class	relation
+aeco-00001	Built assets	construction complex	close
+aeco-00001	Built assets	construction entity	close
+aeco-00002	Spaces	built space	close
+aeco-00003	Elements and systems	construction element	close
+aeco-00004	Work results	work result	close
+aeco-00005	Processes and services	management	close
+aeco-00005	Processes and services	construction process	close
+aeco-00006	Phases	project stage	close
+aeco-00006	Phases	lifecycle stage	close
+aeco-00007	Roles and organizations	construction agent	close
+aeco-00015	Products and equipment	construction product	close
+aeco-00015	Products and equipment	construction aid	close
+aeco-00008	Information	construction information	close
+aeco-00009	Properties	properties and characteristics	close

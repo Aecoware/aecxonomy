@@ -1,0 +1,10 @@
+# Built by scripts/build_site.py. GitHub Actions builds them for the site.
+site/index.html
+site/aeco.ttl
+site/aeco.jsonld
+site/aeco-mappings.ttl
+
+__pycache__/
+*.pyc
+.DS_Store
+.obsidian/

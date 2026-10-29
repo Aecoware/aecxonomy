@@ -1,0 +1,10 @@
+# Mappings from the Aecoware Open Taxonomy to Building Topology Ontology, W3C Linked Building Data Community Group. License of the target: CC BY 1.0.
+code	label_en_us	relation	target	target_label	note	group	added
+aeco-00527	Level	exact	Storey	Storey		O6	2026-10-25
+aeco-00002	Spaces	close	Space	Space		O6	2026-10-25
+aeco-00531	Room	broad	Space	Space		O6	2026-10-25
+aeco-00445	Zones	broad	Zone	Zone		O6	2026-10-25
+aeco-00400	Parcel	close	Site	Site		O6	2026-10-25
+aeco-00003	Elements and systems	close	Element	Element		O6	2026-10-25
+aeco-00001	Built assets	narrow	Building	Building		O6	2026-10-25
+aeco-01073	Building	exact	Building	Building		C5	2026-10-26

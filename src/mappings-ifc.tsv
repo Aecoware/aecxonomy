@@ -1,0 +1,158 @@
+# Mappings from the Aecoware Open Taxonomy to IFC 4.3, buildingSMART International. License of the target: CC BY-ND 4.0. Class identifiers only, no IFC text.
+code	label_en_us	relation	target	target_label	note	group	added
+aeco-00001	Built assets	close	IfcFacility	IfcFacility		O1	2026-10-25
+aeco-00506	Bridge	exact	IfcBridge	IfcBridge		O1	2026-10-25
+aeco-00505	Road	exact	IfcRoad	IfcRoad		O1	2026-10-25
+aeco-00508	Railway	exact	IfcRailway	IfcRailway		O1	2026-10-25
+aeco-00511	Port	exact	IfcMarineFacilityPORT	IfcMarineFacilityPORT		O1	2026-10-25
+aeco-00471	Single-family house	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00472	Multifamily building	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00473	Senior living facility	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00474	Student housing	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00475	Office building	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00476	Retail building	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00477	Hotel	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00478	Mixed-use building	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00479	Parking structure	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00480	Hospital	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00481	Medical office building	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00482	Outpatient facility	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00483	Nursing home	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00484	School	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00485	Higher education building	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00486	Childcare center	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00487	Government office building	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00488	Courthouse	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00489	Correctional facility	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00490	Public safety building	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00491	Library	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00493	Place of worship	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00498	Warehouse	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00501	Data center	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00502	Laboratory building	broad	IfcBuilding	IfcBuilding		O1	2026-10-25
+aeco-00527	Level	exact	IfcBuildingStorey	IfcBuildingStorey		O1	2026-10-25
+aeco-00530	Building part	close	IfcFacilityPart	IfcFacilityPart		O1	2026-10-25
+aeco-00531	Room	close	IfcSpace	IfcSpace		O1	2026-10-25
+aeco-00578	Parking lot	close	IfcSpacePARKING	IfcSpacePARKING		O1	2026-10-25
+aeco-00532	Fire compartment	exact	IfcSpatialZoneFIRESAFETY	IfcSpatialZoneFIRESAFETY		O1	2026-10-25
+aeco-00533	HVAC zone	close	IfcSpatialZoneTHERMAL	IfcSpatialZoneTHERMAL		O1	2026-10-25
+aeco-00534	Security zone	exact	IfcSpatialZoneSECURITY	IfcSpatialZoneSECURITY		O1	2026-10-25
+aeco-00455	Construction site areas	close	IfcSpatialZoneCONSTRUCTION	IfcSpatialZoneCONSTRUCTION		O1	2026-10-25
+aeco-00400	Parcel	close	IfcSite	IfcSite		O1	2026-10-25
+aeco-00412	Topography	close	IfcGeographicElementTERRAIN	IfcGeographicElementTERRAIN		O1	2026-10-25
+aeco-00416	Existing vegetation	close	IfcGeographicElementVEGETATION	IfcGeographicElementVEGETATION		O1	2026-10-25
+aeco-00584	Shallow foundation	close	IfcFooting	IfcFooting		O2	2026-10-25
+aeco-00585	Deep foundation	exact	IfcDeepFoundation	IfcDeepFoundation		O2	2026-10-25
+aeco-00586	Basement wall	broad	IfcWall	IfcWall		O2	2026-10-25
+aeco-00587	Slab on grade	exact	IfcSlabBASESLAB	IfcSlabBASESLAB		O2	2026-10-25
+aeco-00592	Roof structure	close	IfcRoof	IfcRoof		O2	2026-10-25
+aeco-00594	Stair	exact	IfcStair	IfcStair		O2	2026-10-25
+aeco-00595	Exterior wall	broad	IfcWall	IfcWall		O2	2026-10-25
+aeco-00596	Curtain wall	exact	IfcCurtainWall	IfcCurtainWall		O2	2026-10-25
+aeco-00597	Window assembly	exact	IfcWindowWINDOW	IfcWindowWINDOW		O2	2026-10-25
+aeco-00598	Exterior door assembly	broad	IfcDoor	IfcDoor		O2	2026-10-25
+aeco-00599	Roof covering	exact	IfcCoveringROOFING	IfcCoveringROOFING		O2	2026-10-25
+aeco-00600	Skylight	exact	IfcWindowSKYLIGHT	IfcWindowSKYLIGHT		O2	2026-10-25
+aeco-00602	Partition	exact	IfcWallPARTITIONING	IfcWallPARTITIONING		O2	2026-10-25
+aeco-00603	Interior door assembly	broad	IfcDoor	IfcDoor		O2	2026-10-25
+aeco-00604	Ceiling	exact	IfcCoveringCEILING	IfcCoveringCEILING		O2	2026-10-25
+aeco-00605	Floor finish	exact	IfcCoveringFLOORING	IfcCoveringFLOORING		O2	2026-10-25
+aeco-00609	Elevator system	exact	IfcTransportElementELEVATOR	IfcTransportElementELEVATOR		O2	2026-10-25
+aeco-00615	Plumbing fixtures	close	IfcSanitaryTerminal	IfcSanitaryTerminal		O2	2026-10-25
+aeco-00634	Photovoltaic system	narrow	IfcSolarDeviceSOLARPANEL	IfcSolarDeviceSOLARPANEL		O2	2026-10-25
+aeco-00649	Window treatment	close	IfcShadingDevice	IfcShadingDevice		O2	2026-10-25
+aeco-00646	Energy metering system	narrow	IfcFlowMeterENERGYMETER	IfcFlowMeterENERGYMETER		O2	2026-10-25
+aeco-00652	Paving	close	IfcSlabPAVING	IfcSlabPAVING		O2	2026-10-25
+aeco-00661	Road pavement structure	exact	IfcPavement	IfcPavement		O2	2026-10-25
+aeco-00656	Retaining wall	exact	IfcWallRETAININGWALL	IfcWallRETAININGWALL		O2	2026-10-25
+aeco-00653	Landscape planting	close	IfcGeographicElementVEGETATION	IfcGeographicElementVEGETATION		O2	2026-10-25
+aeco-00659	Bridge superstructure	exact	IfcBridgePartSUPERSTRUCTURE	IfcBridgePartSUPERSTRUCTURE		O2	2026-10-25
+aeco-00660	Bridge substructure	exact	IfcBridgePartSUBSTRUCTURE	IfcBridgePartSUBSTRUCTURE		O2	2026-10-25
+aeco-00663	Rail track	close	IfcRailwayPartTRACK	IfcRailwayPartTRACK		O2	2026-10-25
+aeco-00664	Culvert	close	IfcPipeSegmentCULVERT	IfcPipeSegmentCULVERT		O2	2026-10-25
+aeco-00665	Traffic barrier	close	IfcRailingGUARDRAIL	IfcRailingGUARDRAIL		O2	2026-10-25
+aeco-00003	Elements and systems	close	IfcBuiltElement	IfcBuiltElement		O2	2026-10-25
+aeco-00784	Reinforcing bar	exact	IfcReinforcingBar	IfcReinforcingBar		O3	2026-10-25
+aeco-00801	Window unit	close	IfcWindow	IfcWindow		O3	2026-10-25
+aeco-00799	Door leaf	close	IfcDoor	IfcDoor	IFC models the door as one object	O3	2026-10-25
+aeco-00810	Water closet	exact	IfcSanitaryTerminalTOILETPAN	IfcSanitaryTerminalTOILETPAN		O3	2026-10-25
+aeco-00811	Wash basin	exact	IfcSanitaryTerminalWASHHANDBASIN	IfcSanitaryTerminalWASHHANDBASIN		O3	2026-10-25
+aeco-00813	Pipe and fittings	narrow	IfcPipeSegment	IfcPipeSegment		O3	2026-10-25
+aeco-00813	Pipe and fittings	narrow	IfcPipeFitting	IfcPipeFitting		O3	2026-10-25
+aeco-00814	Valve	exact	IfcValve	IfcValve		O3	2026-10-25
+aeco-00970	Pump	exact	IfcPump	IfcPump		O3	2026-10-25
+aeco-00815	Chiller	exact	IfcChiller	IfcChiller		O3	2026-10-25
+aeco-00816	Boiler	exact	IfcBoiler	IfcBoiler		O3	2026-10-25
+aeco-00817	Air handling unit	exact	IfcUnitaryEquipmentAIRHANDLER	IfcUnitaryEquipmentAIRHANDLER		O3	2026-10-25
+aeco-00818	Rooftop unit	exact	IfcUnitaryEquipmentROOFTOPUNIT	IfcUnitaryEquipmentROOFTOPUNIT		O3	2026-10-25
+aeco-00819	Fan coil unit	broad	IfcUnitaryEquipment	IfcUnitaryEquipment		O3	2026-10-25
+aeco-00820	Variable air volume box	broad	IfcAirTerminalBox	IfcAirTerminalBox		O3	2026-10-25
+aeco-00822	Cooling tower	exact	IfcCoolingTower	IfcCoolingTower		O3	2026-10-25
+aeco-00971	Air terminal	exact	IfcAirTerminal	IfcAirTerminal		O3	2026-10-25
+aeco-00823	Switchboard	exact	IfcDistributionBoardSWITCHBOARD	IfcDistributionBoardSWITCHBOARD		O3	2026-10-25
+aeco-00824	Panelboard	exact	IfcDistributionBoardDISTRIBUTIONBOARD	IfcDistributionBoardDISTRIBUTIONBOARD		O3	2026-10-25
+aeco-00825	Transformer	exact	IfcTransformer	IfcTransformer		O3	2026-10-25
+aeco-00826	Generator	exact	IfcElectricGenerator	IfcElectricGenerator		O3	2026-10-25
+aeco-00827	Luminaire	exact	IfcLightFixture	IfcLightFixture		O3	2026-10-25
+aeco-00828	Wire and cable	close	IfcCableSegment	IfcCableSegment		O3	2026-10-25
+aeco-00972	Uninterruptible power supply	exact	IfcElectricFlowStorageDeviceUPS	IfcElectricFlowStorageDeviceUPS		O3	2026-10-25
+aeco-00829	Sprinkler head	exact	IfcFireSuppressionTerminalSPRINKLER	IfcFireSuppressionTerminalSPRINKLER		O3	2026-10-25
+aeco-00831	Smoke detector	exact	IfcSensorSMOKESENSOR	IfcSensorSMOKESENSOR		O3	2026-10-25
+aeco-00832	Fire alarm control panel	close	IfcUnitaryControlElementALARMPANEL	IfcUnitaryControlElementALARMPANEL		O3	2026-10-25
+aeco-00833	Notification appliance	close	IfcAlarm	IfcAlarm		O3	2026-10-25
+aeco-00834	Network switch	broad	IfcCommunicationsApplianceIPNETWORKEQUIPMENT	IfcCommunicationsApplianceIPNETWORKEQUIPMENT		O3	2026-10-25
+aeco-00835	Wireless access point	broad	IfcCommunicationsApplianceIPNETWORKEQUIPMENT	IfcCommunicationsApplianceIPNETWORKEQUIPMENT		O3	2026-10-25
+aeco-00836	IP camera	broad	IfcAudioVisualApplianceCAMERA	IfcAudioVisualApplianceCAMERA		O3	2026-10-25
+aeco-00837	Card reader	close	IfcSensorIDENTIFIERSENSOR	IfcSensorIDENTIFIERSENSOR		O3	2026-10-25
+aeco-00007	Roles and organizations	close	IfcActor	IfcActor		O4	2026-10-25
+aeco-00093	Tenant	exact	IfcOccupantTENANT	IfcOccupantTENANT		O4	2026-10-25
+aeco-00089	Owner	close	IfcOccupantOWNER	IfcOccupantOWNER		O4	2026-10-25
+aeco-00255	Request for information	broad	IfcActionRequest	IfcActionRequest		O4	2026-10-25
+aeco-00172	Change order	exact	IfcProjectOrderCHANGEORDER	IfcProjectOrderCHANGEORDER		O4	2026-10-25
+aeco-00143	Purchase order	exact	IfcProjectOrderPURCHASEORDER	IfcProjectOrderPURCHASEORDER		O4	2026-10-25
+aeco-00329	Building permit	exact	IfcPermitBUILDING	IfcPermitBUILDING		O4	2026-10-25
+aeco-00951	Permit to work	exact	IfcPermitWORK	IfcPermitWORK		O4	2026-10-25
+aeco-00268	Budget	exact	IfcCostScheduleBUDGET	IfcCostScheduleBUDGET		O4	2026-10-25
+aeco-00267	Cost estimate	exact	IfcCostScheduleESTIMATE	IfcCostScheduleESTIMATE		O4	2026-10-25
+aeco-00944	Bid	close	IfcCostScheduleTENDER	IfcCostScheduleTENDER		O4	2026-10-25
+aeco-00265	Project schedule	close	IfcWorkSchedule	IfcWorkSchedule		O4	2026-10-25
+aeco-00274	Asset register	exact	IfcInventoryASSETINVENTORY	IfcInventoryASSETINVENTORY		O4	2026-10-25
+aeco-00228	Preventive maintenance	close	IfcTaskMAINTENANCE	IfcTaskMAINTENANCE		O4	2026-10-25
+aeco-00229	Corrective maintenance	close	IfcTaskMAINTENANCE	IfcTaskMAINTENANCE		O4	2026-10-25
+aeco-00338	Code inspection	close	IfcTaskINSPECTION	IfcTaskINSPECTION		O4	2026-10-25
+aeco-00224	Functional performance testing	close	IfcTaskTESTING	IfcTaskTESTING		O4	2026-10-25
+aeco-01001	Spread footing	exact	IfcFootingPAD_FOOTING	IfcFootingPAD_FOOTING		C1	2026-10-25
+aeco-01002	Strip footing	exact	IfcFootingSTRIP_FOOTING	IfcFootingSTRIP_FOOTING		C1	2026-10-25
+aeco-01004	Grade beam	exact	IfcFootingFOOTING_BEAM	IfcFootingFOOTING_BEAM		C1	2026-10-25
+aeco-01005	Pile	exact	IfcPile	IfcPile		C1	2026-10-25
+aeco-01006	Drilled shaft	close	IfcPileBORED	IfcPileBORED		C1	2026-10-25
+aeco-01007	Pile cap	exact	IfcFootingPILE_CAP	IfcFootingPILE_CAP		C1	2026-10-25
+aeco-01008	Beam	exact	IfcBeam	IfcBeam		C1	2026-10-25
+aeco-01009	Column	exact	IfcColumn	IfcColumn		C1	2026-10-25
+aeco-01010	Load-bearing wall	broad	IfcWall	IfcWall		C1	2026-10-25
+aeco-01012	Floor slab	exact	IfcSlabFLOOR	IfcSlabFLOOR		C1	2026-10-25
+aeco-01013	Joist	exact	IfcBeamJOIST	IfcBeamJOIST		C1	2026-10-25
+aeco-01014	Truss	exact	IfcElementAssemblyTRUSS	IfcElementAssemblyTRUSS		C1	2026-10-25
+aeco-01015	Rafter	exact	IfcMemberRAFTER	IfcMemberRAFTER		C1	2026-10-25
+aeco-01016	Purlin	exact	IfcMemberPURLIN	IfcMemberPURLIN		C1	2026-10-25
+aeco-01017	Shear wall	exact	IfcWallSHEAR	IfcWallSHEAR		C1	2026-10-25
+aeco-01018	Brace	exact	IfcMemberBRACE	IfcMemberBRACE		C1	2026-10-25
+aeco-01019	Stair flight	exact	IfcStairFlight	IfcStairFlight		C1	2026-10-25
+aeco-01020	Stair landing	exact	IfcSlabLANDING	IfcSlabLANDING		C1	2026-10-25
+aeco-01021	Railing	exact	IfcRailing	IfcRailing		C1	2026-10-25
+aeco-01000	Ramp	exact	IfcRamp	IfcRamp		C1	2026-10-25
+aeco-01022	Mullion	exact	IfcMemberMULLION	IfcMemberMULLION		C1	2026-10-25
+aeco-01023	Curtain wall panel	exact	IfcPlateCURTAIN_PANEL	IfcPlateCURTAIN_PANEL		C1	2026-10-25
+aeco-01024	Escalator	exact	IfcTransportElementESCALATOR	IfcTransportElementESCALATOR		C1	2026-10-25
+aeco-01025	Moving walk	exact	IfcTransportElementMOVINGWALKWAY	IfcTransportElementMOVINGWALKWAY		C1	2026-10-25
+aeco-01026	Curb	exact	IfcKerb	IfcKerb		C1	2026-10-25
+aeco-01027	Sidewalk	exact	IfcSlabSIDEWALK	IfcSlabSIDEWALK		C1	2026-10-25
+aeco-01028	Fence	exact	IfcRailingFENCE	IfcRailingFENCE		C1	2026-10-25
+aeco-01029	Gate	exact	IfcDoorGATE	IfcDoorGATE		C1	2026-10-25
+aeco-01030	Bridge girder	close	IfcElementAssemblyGIRDER	IfcElementAssemblyGIRDER		C1	2026-10-25
+aeco-01031	Bridge bearing	exact	IfcBearing	IfcBearing		C1	2026-10-25
+aeco-01032	Abutment	close	IfcElementAssemblyABUTMENT	IfcElementAssemblyABUTMENT		C1	2026-10-25
+aeco-01033	Bridge pier	close	IfcElementAssemblyPIER	IfcElementAssemblyPIER		C1	2026-10-25
+aeco-01034	Rail	exact	IfcRail	IfcRail		C1	2026-10-25
+aeco-01035	Railroad tie	exact	IfcTrackElementSLEEPER	IfcTrackElementSLEEPER		C1	2026-10-25
+aeco-01073	Building	exact	IfcBuilding	IfcBuilding		C5	2026-10-26

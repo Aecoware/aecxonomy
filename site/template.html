@@ -1,0 +1,1194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aecoware Open Taxonomy</title>
+<meta name="description" content="Explore the Aecoware Open Taxonomy: an open SKOS taxonomy for architecture, engineering, construction and operations, with 5W1H routing tags and SHACL checks.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Cg fill='none' stroke='%2315171C' stroke-width='1.6' stroke-linejoin='round'%3E%3Cpath d='M14 2 L25 7 L14 12 L3 7 Z'/%3E%3Cpath d='M3 12 V14.5 L14 19.5 L25 14.5 V12'/%3E%3Cpath d='M3 17 V19.5 L14 24.5 L25 19.5 V17'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<!-- Built by scripts/build_site.py from site/template.html. Edit the template, not index.html. -->
+<style>
+/* Layout: brand bar, view tabs, one shared filter bar, then the active view beside a live concept panel. */
+:root {
+  --bg: #F6F6F3; --surface: #FFFFFF; --ink: #15171C; --muted: #5B606B; --line: #E2E2DC; --soft: #EFEFEA;
+  --accent: #2342B5; --accent-soft: #EEF1FB; --accent-ink: #FFFFFF;
+  --flag-bg: #FFF4E5; --flag-ink: #7A3E00; --ok-bg: #E6F2EA; --ok-ink: #1E5B33;
+  --tip-bg: #15171C; --tip-ink: #F2F3F5; --code-bg: #15171C; --code-ink: #E6E8EE; --code-dim: #8D93A1; --code-key: #9DB1FF; --code-str: #A7DDB4;
+  --arc-l: 0.66; --arc-step: 0.065; --arc-s: 0.42; --arc-text: #15171C;
+  --q-who: #E7A36B; --q-what: #7E9BE6; --q-where: #B48BDB; --q-when: #E2C25A; --q-why: #6CC0C9; --q-how: #79C08E;
+  --sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121418; --surface: #1A1D23; --ink: #ECEDF0; --muted: #A2A7B2; --line: #2C3038; --soft: #23272E;
+  --accent: #8EA6FF; --accent-soft: #232B47; --accent-ink: #0F1424;
+  --flag-bg: #3A2A12; --flag-ink: #F6C987; --ok-bg: #16301F; --ok-ink: #9ED9B0;
+  --tip-bg: #ECEDF0; --tip-ink: #15171C; --code-bg: #0C0E11; --code-ink: #E6E8EE; --code-dim: #7E8492; --code-key: #9DB1FF; --code-str: #A7DDB4;
+  --arc-l: 0.34; --arc-step: -0.035; --arc-s: 0.32; --arc-text: #F2F3F5;
+  --q-who: #9A6234; --q-what: #3E5AA8; --q-where: #6E4C96; --q-when: #8C7424; --q-why: #2F7A83; --q-how: #3C7A4E; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121418; --surface: #1A1D23; --ink: #ECEDF0; --muted: #A2A7B2; --line: #2C3038; --soft: #23272E;
+  --accent: #8EA6FF; --accent-soft: #232B47; --accent-ink: #0F1424;
+  --flag-bg: #3A2A12; --flag-ink: #F6C987; --ok-bg: #16301F; --ok-ink: #9ED9B0;
+  --tip-bg: #ECEDF0; --tip-ink: #15171C; --code-bg: #0C0E11; --code-ink: #E6E8EE; --code-dim: #7E8492; --code-key: #9DB1FF; --code-str: #A7DDB4;
+  --arc-l: 0.34; --arc-step: -0.035; --arc-s: 0.32; --arc-text: #F2F3F5;
+  --q-who: #9A6234; --q-what: #3E5AA8; --q-where: #6E4C96; --q-when: #8C7424; --q-why: #2F7A83; --q-how: #3C7A4E; color-scheme: dark }
+
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button, select, input { font: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1360px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+header.top { background: var(--surface); border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; padding-block: 12px 0; }
+.brand { display: flex; align-items: center; gap: 12px; color: var(--ink); padding-bottom: 12px; }
+.brand:hover { text-decoration: none; }
+.brand svg g { stroke: var(--ink); }
+.brand .name { display: flex; flex-direction: column; line-height: 1.15; }
+.brand .name b { font-size: 19px; letter-spacing: -0.015em; }
+.brand .name small { color: var(--muted); font-size: 12.5px; letter-spacing: 0.01em; }
+.search { position: relative; flex: 1 1 320px; max-width: 560px; padding-bottom: 12px; }
+.search .box { display: flex; align-items: center; gap: 10px; height: 42px; padding: 0 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 9px; }
+.search .box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.search input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; color: var(--ink); }
+.search svg g { stroke: var(--muted); }
+kbd { font-family: var(--mono); font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 0 6px; background: var(--surface); }
+.results { position: absolute; left: 0; right: 0; top: calc(100% - 6px); z-index: 40; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 14px 34px rgba(0,0,0,0.14); overflow: hidden; }
+.results .flag { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; padding: 10px 14px; background: var(--flag-bg); color: var(--flag-ink); font-size: 14px; }
+.results button { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 9px 14px; border: 0; border-top: 1px solid var(--soft); background: transparent; color: var(--ink); text-align: left; cursor: pointer; }
+.results button[aria-selected="true"] { background: var(--accent-soft); }
+.results .lab { font-weight: 600; flex: 0 0 auto; }
+.results .path { color: var(--muted); font-size: 13px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.results .code { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.results .empty { padding: 12px 14px; color: var(--muted); font-size: 14px; }
+.tabs { display: flex; gap: 4px; margin-left: auto; align-self: flex-end; }
+.tabs button { border: 0; background: none; color: var(--muted); padding: 10px 14px 12px; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+
+.filters { border-bottom: 1px solid var(--line); background: var(--surface); }
+.filters .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; padding-block: 10px; }
+.fgroup { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.fgroup > .flabel { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-right: 4px; }
+.chipbtn { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 13px; cursor: pointer; }
+.chipbtn .dot { width: 9px; height: 9px; border-radius: 50%; }
+.chipbtn .n { font-family: var(--mono); font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.chipbtn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.chipbtn[aria-pressed="true"] .n { color: var(--accent-ink); opacity: 0.8; }
+.chipbtn small { font-size: 11px; color: var(--muted); }
+.chipbtn[aria-pressed="true"] small { color: var(--accent-ink); }
+.check { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink); }
+.fcount { margin-left: auto; font-size: 13px; color: var(--muted); display: flex; gap: 10px; align-items: center; }
+.fcount b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.linkbtn { border: 0; background: none; color: var(--accent); cursor: pointer; padding: 2px 4px; font-size: 13px; }
+.why { position: relative; }
+.why > button { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: 12px; cursor: pointer; padding: 0; }
+.why .pop { position: absolute; z-index: 35; top: 28px; left: -8px; width: min(340px, 86vw); padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 14px 34px rgba(0,0,0,0.14); font-size: 13px; line-height: 1.5; }
+.why .pop dl { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 4px 10px; margin: 8px 0 0; }
+.why .pop dt { font-weight: 600; }
+.why .pop dd { margin: 0; color: var(--muted); }
+
+main.wrap { display: flex; flex-wrap: wrap; gap: 20px; padding-block: 18px 40px; align-items: flex-start; }
+.stage { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 14px; min-width: 0; flex: 1 1 280px; }
+.crumbs button { border: 0; background: none; padding: 2px 4px; color: var(--accent); cursor: pointer; border-radius: 5px; }
+.crumbs button:hover { background: var(--accent-soft); }
+.crumbs .sep { color: var(--muted); }
+.crumbs .here { font-weight: 600; color: var(--ink); padding: 2px 4px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.seg button { border: 0; background: transparent; color: var(--ink); padding: 5px 11px; font-size: 13px; cursor: pointer; min-height: 32px; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.ctl-label { font-size: 13px; color: var(--muted); }
+.btn { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); font-size: 13px; cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+
+.chart { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; touch-action: manipulation; }
+.chart svg { display: block; width: 100%; height: auto; max-height: 76vh; margin: 0 auto; }
+.chart svg:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; border-radius: 14px; }
+.chart path.arc { cursor: pointer; transition: opacity 140ms ease; }
+.chart text { font-family: var(--sans); pointer-events: none; user-select: none; }
+.chart .center-hit { cursor: pointer; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--muted); padding: 0 4px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+.hint { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12.5px; color: var(--muted); padding: 0 4px; }
+.hint b { color: var(--ink); font-weight: 600; }
+.tip { position: absolute; z-index: 20; max-width: 300px; padding: 10px 12px; border-radius: 9px; background: var(--tip-bg); color: var(--tip-ink); font-size: 13px; line-height: 1.45; pointer-events: none; box-shadow: 0 10px 26px rgba(0,0,0,0.22); }
+.tip .t1 { display: flex; gap: 8px; align-items: baseline; margin-bottom: 3px; }
+.tip .t1 b { font-size: 14px; }
+.tip .t1 code { font-family: var(--mono); font-size: 11.5px; opacity: 0.75; }
+.tip .t2 { opacity: 0.78; font-size: 12px; margin-bottom: 4px; }
+
+.cols-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
+.cols-scroll { overflow-x: auto; }
+.cols { display: flex; min-height: 600px; height: 64vh; }
+.col { flex: 0 0 228px; border-right: 1px solid var(--soft); overflow-y: auto; padding: 8px; }
+.col h3 { margin: 0; padding: 6px 10px 8px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.col button { display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: transparent; color: var(--ink); text-align: left; padding: 8px 10px; border-radius: 7px; cursor: pointer; font-size: 14px; }
+.col button:hover { background: var(--soft); }
+.col button.on { background: var(--accent-soft); font-weight: 600; }
+.col button.sel { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.col button .m { margin-left: auto; font-family: var(--mono); font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.col button.sel .m { color: var(--accent-ink); opacity: 0.8; }
+.col button .chev { color: var(--muted); }
+.col button.sel .chev { color: var(--accent-ink); }
+.col .none { padding: 8px 10px; color: var(--muted); font-size: 13px; }
+.cols-foot { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 14px; border-top: 1px solid var(--soft); font-size: 12.5px; color: var(--muted); }
+
+aside.panel { flex: 1 1 360px; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+.panel .mode { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); min-height: 22px; }
+.chip { font-size: 12px; padding: 1px 9px; border-radius: 999px; background: var(--soft); color: var(--ink); }
+.chip.preview, .chip.warn { background: var(--flag-bg); color: var(--flag-ink); }
+.chip.ok { background: var(--ok-bg); color: var(--ok-ink); }
+.panel .path { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px; }
+.panel .path button { border: 0; background: none; padding: 0; color: var(--accent); cursor: pointer; font-size: 13px; }
+.panel h2 { margin: 0; font-size: 26px; line-height: 1.15; letter-spacing: -0.015em; text-wrap: balance; }
+.titlerow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.code-pill { font-family: var(--mono); font-size: 13px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
+.copy { border: 1px solid var(--line); background: var(--surface); color: var(--accent); border-radius: 7px; padding: 2px 9px; font-size: 12.5px; cursor: pointer; min-height: 28px; }
+.iri { font-family: var(--mono); font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.def { margin: 0; font-size: 16px; line-height: 1.58; }
+.note { margin: 0; font-size: 13.5px; color: var(--muted); }
+.kv { display: grid; grid-template-columns: minmax(96px, 124px) minmax(0, 1fr); gap: 6px 12px; font-size: 14px; margin: 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; min-width: 0; }
+.sec h3 { margin: 0 0 8px; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.qs { display: flex; flex-direction: column; gap: 6px; }
+.q { display: grid; grid-template-columns: 66px minmax(0, 1fr); gap: 10px; align-items: baseline; font-size: 13.5px; }
+.q b { display: inline-flex; align-items: center; gap: 6px; }
+.q b i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.q span { color: var(--muted); }
+.q em { font-style: normal; font-size: 11px; color: var(--accent); margin-left: 4px; }
+.kids { display: flex; flex-direction: column; gap: 2px; max-height: 260px; overflow-y: auto; margin: 0 -6px; }
+.kids button { display: flex; align-items: baseline; gap: 8px; width: 100%; border: 0; background: transparent; color: var(--ink); text-align: left; padding: 6px; border-radius: 7px; cursor: pointer; font-size: 14px; }
+.kids button:hover, .kids button:focus-visible { background: var(--accent-soft); }
+.kids .n { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.maps { display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; }
+.maps .row { display: grid; grid-template-columns: minmax(84px, 118px) minmax(0, 1fr) auto; gap: 10px; align-items: baseline; }
+.maps .src { color: var(--muted); }
+.maps a, .maps .plain { font-family: var(--mono); font-size: 12.5px; overflow-wrap: anywhere; }
+.rel { font-size: 11.5px; padding: 0 8px; border-radius: 999px; white-space: nowrap; }
+.rel.exact { background: var(--ok-bg); color: var(--ok-ink); }
+.rel.other { background: var(--flag-bg); color: var(--flag-ink); }
+.empty-sec { font-size: 13.5px; color: var(--muted); }
+.datasec { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.dtabs { display: flex; flex-wrap: nowrap; overflow-x: auto; align-items: center; gap: 2px; padding: 6px; background: var(--soft); }
+.dtabs button { white-space: nowrap; flex: 0 0 auto; border: 0; background: transparent; color: var(--muted); padding: 5px 8px; border-radius: 6px; cursor: pointer; font-family: var(--mono); font-size: 12.5px; }
+.dtabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+.dtabs .copy { margin-left: auto; }
+pre.code { margin: 0; padding: 14px 16px; background: var(--code-bg); color: var(--code-ink); font-family: var(--mono); font-size: 12.3px; line-height: 1.6; max-height: 360px; overflow: auto; white-space: pre; tab-size: 4; }
+pre.code .c { color: var(--code-dim); }
+pre.code .k { color: var(--code-key); }
+pre.code .s { color: var(--code-str); }
+.dnote { padding: 8px 12px; font-size: 12.5px; color: var(--muted); background: var(--surface); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+@media (prefers-reduced-motion: reduce) { .chart path.arc { transition: none; } }
+
+.frow { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.vseg button { min-height: 34px; padding: 5px 14px; font-size: 13.5px; font-weight: 500; }
+.vdesc { font-size: 13px; color: var(--muted); flex: 1 1 260px; }
+.col button.ctx, .kids button.ctx { color: var(--muted); font-style: italic; }
+.col button.ctx.sel { color: var(--accent-ink); }
+@media (max-width: 520px) { .vseg button { padding: 5px 9px; font-size: 13px; } }
+.plug { border-style: dashed; color: var(--accent); }
+.plug[aria-pressed="true"] { border-style: solid; }
+.ctxnote { background: var(--soft); padding: 8px 10px; border-radius: 8px; color: var(--ink); }
+
+footer.site { border-top: 1px solid var(--line); background: var(--surface); }
+footer.site .wrap { display: flex; flex-wrap: wrap; gap: 6px 18px; padding-block: 14px 18px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#" id="home" aria-label="Aecoware Open Taxonomy, back to the overview">
+      <svg width="30" height="30" viewBox="0 0 28 28" aria-hidden="true"><g fill="none" stroke-width="1.4" stroke-linejoin="round"><path d="M14 2 L25 7 L14 12 L3 7 Z"></path><path d="M3 7 V9.5 L14 14.5 L25 9.5 V7"></path><path d="M3 12 V14.5 L14 19.5 L25 14.5 V12"></path><path d="M3 17 V19.5 L14 24.5 L25 19.5 V17"></path></g></svg>
+      <span class="name"><b>Aecoware Open Taxonomy</b><small id="subline">SKOS</small></span>
+    </a>
+    <div class="search" role="search">
+      <div class="box">
+        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20 L16 16"></path></g></svg>
+        <label for="q" style="position:absolute;left:-9999px">Search concepts</label>
+        <input id="q" type="search" autocomplete="off" placeholder="Search concepts, synonyms or codes" aria-controls="results" aria-expanded="false">
+        <kbd>/</kbd>
+      </div>
+      <div class="results" id="results" role="listbox" hidden></div>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Layout">
+      <button type="button" role="tab" id="tab-map" aria-controls="view-map" aria-selected="true">Map</button>
+      <button type="button" role="tab" id="tab-cols" aria-controls="view-cols" aria-selected="false">Columns</button>
+    </div>
+  </div>
+</header>
+
+<section class="filters" aria-label="View and filters">
+  <div class="wrap">
+    <div class="frow">
+      <div class="fgroup">
+        <span class="flabel" id="view-label">View</span>
+        <div class="seg vseg" role="group" aria-labelledby="view-label" id="vseg"></div>
+      </div>
+      <span class="vdesc" id="vdesc"></span>
+    </div>
+    <div class="fgroup" id="fq">
+      <span class="flabel">5W1H</span>
+      <span class="why">
+        <button type="button" id="why-btn" aria-expanded="false" aria-controls="why-pop" aria-label="How the 5W1H tags work">?</button>
+        <div class="pop" id="why-pop" hidden></div>
+      </span>
+    </div>
+    <button type="button" class="chipbtn plug" id="plug" aria-pressed="false" aria-controls="links-row">+ Plug in linked standards</button>
+    <div class="fcount" id="fcount"></div>
+    <div class="frow" id="links-row" hidden>
+      <div class="fgroup" id="fs">
+        <span class="flabel">Linked to</span>
+      </div>
+      <label class="check"><input type="checkbox" id="exact"> Exact matches only</label>
+    </div>
+  </div>
+</section>
+
+<main class="wrap">
+  <section class="stage" id="view-map" role="tabpanel" aria-labelledby="tab-map">
+    <div class="bar">
+      <nav class="crumbs" id="crumbs" aria-label="Zoom path"></nav>
+      <span class="ctl-label" id="color-label">Colour</span>
+      <div class="seg" role="group" aria-labelledby="color-label" id="colormode">
+        <button type="button" data-c="branch" aria-pressed="true">Branch</button>
+        <button type="button" data-c="question" aria-pressed="false">5W1H</button>
+      </div>
+      <span class="ctl-label" id="rings-label">Rings</span>
+      <div class="seg" role="group" aria-labelledby="rings-label" id="rings">
+        <button type="button" data-r="2" aria-pressed="false">2</button>
+        <button type="button" data-r="3" aria-pressed="true">3</button>
+        <button type="button" data-r="4" aria-pressed="false">4</button>
+      </div>
+      <button type="button" class="btn" id="up">Zoom out</button>
+    </div>
+    <div class="chart" id="chart"><div class="tip" id="tip" hidden></div></div>
+    <div class="legend" id="legend" hidden></div>
+    <div class="hint" aria-hidden="true">
+      <span><b>Scroll up</b> over a branch to zoom in, <b>scroll down</b> to zoom out</span>
+      <span><b>Hover</b> to preview</span>
+      <span><b>Click</b> to focus</span>
+      <span><b>Arrow keys</b> when the map is selected</span>
+    </div>
+  </section>
+
+  <section class="stage" id="view-cols" role="tabpanel" aria-labelledby="tab-cols" hidden>
+    <div class="cols-wrap">
+      <div class="cols-scroll" id="cols-scroll"><div class="cols" id="cols"></div></div>
+      <div class="cols-foot" aria-hidden="true">
+        <span><kbd>←</kbd> <kbd>→</kbd> level up or down</span>
+        <span><kbd>↑</kbd> <kbd>↓</kbd> move in a column</span>
+        <span>Numbers show places below, or matches when a filter is on. <i>Italic</i> items are only on the path.</span>
+      </div>
+    </div>
+  </section>
+
+  <aside class="panel" id="panel" aria-live="polite"></aside>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <span id="f-copy">© 2026 the Aecoware founders</span>
+    <span>Content <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a>, code Apache 2.0</span>
+    <a id="f-notice" href="#">Credits and third-party notices</a>
+    <a id="f-repo" href="#">Source</a>
+    <span id="f-version"></span>
+  </div>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+const DATA = /*DATA*/null;
+(function () {
+  'use strict';
+  const TAGS = ['Who', 'What', 'Where', 'When', 'Why', 'How'];
+  const SRC = { ifc: 'IFC 4.3', uniclass: 'Uniclass 2015', wikidata: 'Wikidata', brick: 'Brick', rec: 'RealEstateCore', bot: 'BOT', iso: 'ISO 12006-2', riba: 'RIBA Plan of Work' };
+  const SRC_ORDER = ['ifc', 'bot', 'brick', 'rec', 'uniclass', 'wikidata', 'iso', 'riba'];
+  const BY_NAME = { iso: true, riba: true };
+  const NS = { ifc: 'https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3/class/', wikidata: 'http://www.wikidata.org/entity/', uniclass: 'https://uniclass.thenbs.com/taxon/', brick: 'https://brickschema.org/schema/Brick#', rec: 'https://w3id.org/rec#', bot: 'https://w3id.org/bot#' };
+  const PFX_OF = { ifc: 'ifc', wikidata: 'wd', uniclass: 'uc', brick: 'brick', rec: 'rec', bot: 'bot' };
+  const URLS = {
+    ifc: t => NS.ifc + t,
+    wikidata: t => 'https://www.wikidata.org/wiki/' + t,
+    uniclass: t => NS.uniclass + t.toLowerCase(),
+    brick: t => 'https://brickschema.org/ontology/Brick/' + t,
+    rec: t => NS.rec + t,
+    bot: t => NS.bot + t
+  };
+  const REL = { exact: 'Exact', close: 'Close', broad: 'Broader', narrow: 'Narrower' };
+  const STD_DEF = {
+    ifc: 'The buildingSMART data schema for built assets. Links go to IFC 4.3 classes.',
+    bot: 'The W3C Building Topology Ontology for sites, buildings, storeys, spaces and elements.',
+    brick: 'An open schema for building systems, equipment and data points.',
+    rec: 'RealEstateCore, an open ontology for real estate and smart buildings.',
+    uniclass: 'The UK classification system. The open base keeps the codes only, not the titles.',
+    wikidata: 'The open knowledge base. A link gives the general meaning in many languages.',
+    iso: 'The framework for construction classification. Links use the term names only.',
+    riba: 'The UK project stages. Links use the stage names only.',
+    none: 'Concepts with no link to an outside standard yet. These are the gaps to close.'
+  };
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const fmt = n => n.toLocaleString('en-US');
+
+  /* ---------- core tree: the single source of truth ---------- */
+  const byCode = new Map(), tops = [];
+  for (const r of DATA.c) {
+    byCode.set(r[0], { code: r[0], parent: r[1], label: r[2], gb: r[3], def: r[4], alts: r[5] ? r[5].split('|') : [], altsGb: r[6] ? r[6].split('|') : [], hidden: r[7] ? r[7].split('|') : [], tags: r[8] ? r[8].split('|') : [], scope: r[9], std: r[10] ? r[10].split('|') : [], created: r[11], modified: r[12], children: [] });
+  }
+  for (const c of byCode.values()) (c.parent ? byCode.get(c.parent).children : tops).push(c);
+  tops.sort((a, b) => a.code.localeCompare(b.code));
+  for (const c of byCode.values()) c.children.sort((a, b) => a.label.localeCompare(b.label));
+  for (const c of byCode.values()) { let t = c, lv = 1; while (t.parent) { t = byCode.get(t.parent); lv++; } c.top = t; c.level = lv; }
+  (function countBelow(list) { for (const c of list) { countBelow(c.children); c.below = c.children.reduce((s, k) => s + 1 + k.below, 0); } })(tops);
+  const branchIndex = new Map(tops.map((b, i) => [b.code, i]));
+  const related = new Map();
+  for (const [a, b] of DATA.r) { (related.get(a) || related.set(a, []).get(a)).push(b); (related.get(b) || related.set(b, []).get(b)).push(a); }
+  const ambiguous = new Map();
+  for (const c of byCode.values()) for (const h of c.hidden) { const k = h.toLowerCase(); (ambiguous.get(k) || ambiguous.set(k, []).get(k)).push(c.code); }
+  const TOTAL = byCode.size;
+  const LINKS = { rdf: 0, byName: 0, sources: 0 };
+  { const s = new Set(); for (const ms of Object.values(DATA.m)) for (const m of ms) { if (m[0] === 'iso' || m[0] === 'riba') LINKS.byName++; else { LINKS.rdf++; s.add(m[0]); } } LINKS.sources = s.size; }
+
+  /* ---------- views: projections of the core tree ---------- */
+  const KINDS = [
+    { key: 'actor', label: 'Actor', ifc: 'IfcActor', iso: 'construction agent', def: 'A person, a team, a company or an authority that does work, makes decisions or is responsible for something.', branches: ['aeco-00007'] },
+    { key: 'object', label: 'Physical object', ifc: 'IfcProduct', iso: 'construction result', def: 'A thing that has a location and a shape. Examples are a built asset, a space, an element and the result of work.', branches: ['aeco-00001', 'aeco-00002', 'aeco-00014', 'aeco-00003', 'aeco-00004'] },
+    { key: 'resource', label: 'Resource', ifc: 'IfcResource', iso: 'construction resource', def: 'A thing that the work uses or produces, such as a product, equipment or information.', branches: ['aeco-00015', 'aeco-00008'] },
+    { key: 'process', label: 'Process', ifc: 'IfcProcess', iso: 'construction process', def: 'An activity, a series of activities or a period of time in which work occurs.', branches: ['aeco-00005', 'aeco-00006', 'aeco-00004'] },
+    { key: 'control', label: 'Control', ifc: 'IfcControl', iso: '', def: 'A rule, an agreement, a requirement, a decision or a risk that limits, directs or approves the work.', branches: ['aeco-00010', 'aeco-00011', 'aeco-00012', 'aeco-00013', 'aeco-00006'] },
+    { key: 'property', label: 'Property', ifc: 'IfcPropertyDefinition', iso: 'property', def: 'A characteristic of a thing that you can name, measure or compare.', branches: ['aeco-00009'] }
+  ];
+  const kindsOf = new Map();
+  KINDS.forEach(k => k.branches.forEach(b => (kindsOf.get(b) || kindsOf.set(b, []).get(b)).push(k)));
+  const srcOf = c => { const s = new Set((DATA.m[c.code] || []).map(m => m[0])); return SRC_ORDER.filter(x => s.has(x)); };
+  const VIEWS = {
+    branches: { label: 'Branches', root: 'All branches', col: 'Branches', desc: 'The core tree. Every concept has exactly one place.' },
+    kinds: { label: 'Kinds', root: 'All kinds', col: 'Kinds', desc: 'Six kinds of thing. Work results and Phases sit under two kinds. Draft.',
+      groups: KINDS.map(k => ({ key: k.key, label: k.label, def: k.def, kind: k })), of: c => (kindsOf.get(c.top.code) || []).map(k => k.key) },
+    kipling: { label: 'Kipling 5W1H', root: 'All 5W1H tags', col: '5W1H', desc: 'Each concept under every 5W1H tag it carries. Faded arcs are parents shown only for the path.',
+      groups: TAGS.map(t => ({ key: t, label: t, def: DATA.tags[t], tag: t })), of: c => c.tags },
+    standards: { label: 'Standards', root: 'All standards', col: 'Standards', desc: 'Each concept under every outside standard it links to, plus the gaps.',
+      groups: SRC_ORDER.map(s => ({ key: s, label: SRC[s], def: STD_DEF[s], src: s })).concat([{ key: 'none', label: 'No link yet', def: STD_DEF.none, src: 'none' }]),
+      of: c => { const s = srcOf(c); return s.length ? s : ['none']; } }
+  };
+  const VIEW_ORDER = ['branches', 'kinds', 'kipling', 'standards'];
+
+  function buildTree(vk) {
+    const v = VIEWS[vk];
+    let rootD;
+    if (!v.groups) {
+      const proj = c => ({ c, member: true, kids: c.children.map(proj) });
+      rootD = { kids: tops.map(proj) };
+    } else {
+      rootD = { kids: v.groups.map(g => {
+        const proj = c => {
+          const kids = c.children.map(proj).filter(Boolean);
+          const member = v.of(c).includes(g.key);
+          return (member || kids.length) ? { c, member, kids } : null;
+        };
+        return { g, kids: tops.map(proj).filter(Boolean) };
+      }).filter(x => x.kids.length) };
+    }
+    const r = d3.hierarchy(rootD, d => d.kids.length ? d.kids : null).sum(d => d.kids.length ? 0 : 1);
+    d3.partition().size([2 * Math.PI, r.height + 1])(r);
+    const byC = new Map(), occAll = new Map(), occ = new Map();
+    let placements = 0;
+    r.each(d => {
+      const c = d.data.c;
+      if (c) {
+        const n = occ.get(c.code) || 0; occ.set(c.code, n + 1);
+        d.key = c.code + '#' + n;
+        if (!byC.has(c.code)) byC.set(c.code, d);
+        (occAll.get(c.code) || occAll.set(c.code, []).get(c.code)).push(d);
+        if (d.data.member) placements++;
+      } else d.key = d.data.g ? 'g:' + vk + ':' + d.data.g.key : 'root';
+      d.current = { x0: d.x0, x1: d.x1, y0: d.y0, y1: d.y1 };
+      d.group = d.depth >= 1 ? d.ancestors().reverse()[1] : null;
+    });
+    if (v.groups) r.children.forEach(g => { const s = new Set(); g.each(d => { if (d.data.c && d.data.member) s.add(d.data.c.code); }); g.uniq = s.size; });
+    return { root: r, byC, occAll, placements };
+  }
+  const nameOf = d => d.data.c ? d.data.c.label : d.data.g ? d.data.g.label : VIEWS[viewKey].root;
+  const below = d => d.descendants().length - 1;
+
+  let linksOn = false;
+  try { linksOn = localStorage.getItem('aot-links') === '1'; } catch (e) {}
+  let viewKey = 'branches', T = buildTree('branches'), root = T.root;
+  let focus = root, selected = null, hovered = null, busy = false, searchHits = null, view = 'map';
+
+  /* ---------- filters ---------- */
+  const fTags = new Set(), fStd = new Set();
+  let exactOnly = false, matchCodes = null, matchSet = null, matchCount = new Map();
+  function conceptMatches(c) {
+    if (fTags.size && !c.tags.some(t => fTags.has(t))) return false;
+    if (fStd.size) {
+      const ms = DATA.m[c.code] || [];
+      if (!ms.some(m => fStd.has(m[0]) && (!exactOnly || m[1] === 'exact'))) return false;
+    }
+    return true;
+  }
+  function computeMatches() {
+    matchCount = new Map();
+    if (!fTags.size && !fStd.size) { matchCodes = null; matchSet = null; return; }
+    matchCodes = new Set();
+    for (const c of byCode.values()) if (conceptMatches(c)) matchCodes.add(c.code);
+    matchSet = new Set();
+    root.eachAfter(d => {
+      let n = 0;
+      if (d.data.c && d.data.member && matchCodes.has(d.data.c.code)) { n = 1; matchSet.add(d); }
+      if (d.children) for (const k of d.children) n += matchCount.get(k) || 0;
+      matchCount.set(d, n);
+    });
+  }
+  const stdCount = {};
+  for (const s of SRC_ORDER) stdCount[s] = 0;
+  for (const ms of Object.values(DATA.m)) for (const s of new Set(ms.map(m => m[0]))) if (s in stdCount) stdCount[s]++;
+  const tagCount = {};
+  for (const t of TAGS) tagCount[t] = 0;
+  for (const c of byCode.values()) for (const t of c.tags) tagCount[t]++;
+
+  const fq = document.getElementById('fq');
+  TAGS.forEach(t => {
+    const b = el('button', 'chipbtn'); b.type = 'button'; b.setAttribute('aria-pressed', 'false'); b.title = DATA.tags[t] || '';
+    const dot = el('span', 'dot'); dot.style.background = `var(--q-${t.toLowerCase()})`; b.appendChild(dot);
+    b.appendChild(el('span', null, t)); b.appendChild(el('span', 'n', String(tagCount[t])));
+    b.addEventListener('click', () => { fTags.has(t) ? fTags.delete(t) : fTags.add(t); b.setAttribute('aria-pressed', fTags.has(t) ? 'true' : 'false'); onFilter(); });
+    fq.insertBefore(b, fq.querySelector('.why'));
+  });
+  const fs = document.getElementById('fs');
+  SRC_ORDER.forEach(s => {
+    const b = el('button', 'chipbtn'); b.type = 'button'; b.setAttribute('aria-pressed', 'false');
+    b.appendChild(el('span', null, SRC[s]));
+    if (BY_NAME[s]) b.appendChild(el('small', null, 'by name'));
+    b.appendChild(el('span', 'n', String(stdCount[s])));
+    b.addEventListener('click', () => { fStd.has(s) ? fStd.delete(s) : fStd.add(s); b.setAttribute('aria-pressed', fStd.has(s) ? 'true' : 'false'); onFilter(); });
+    fs.appendChild(b);
+  });
+  document.getElementById('exact').addEventListener('change', e => { exactOnly = e.target.checked; onFilter(); });
+  const whyBtn = document.getElementById('why-btn'), whyPop = document.getElementById('why-pop');
+  (function buildWhy() {
+    whyPop.appendChild(el('div', null, 'Every concept carries one or two 5W1H tags. The first is primary. An agent first sorts a task question by these six, then follows only the concepts with the matching tag.'));
+    const dl = el('dl');
+    TAGS.forEach(t => { dl.appendChild(el('dt', null, t)); dl.appendChild(el('dd', null, DATA.tags[t] || '')); });
+    whyPop.appendChild(dl);
+  })();
+  whyBtn.addEventListener('click', () => { const open = whyPop.hidden; whyPop.hidden = !open; whyBtn.setAttribute('aria-expanded', String(open)); });
+  document.addEventListener('click', e => { if (!whyPop.hidden && !e.target.closest('.why')) { whyPop.hidden = true; whyBtn.setAttribute('aria-expanded', 'false'); } });
+
+  function renderCount() {
+    const box = document.getElementById('fcount'); box.textContent = '';
+    if (!matchCodes) { box.appendChild(el('span', null, `${fmt(TOTAL)} concepts`)); return; }
+    const s = el('span'); s.appendChild(el('b', null, fmt(matchCodes.size))); s.appendChild(document.createTextNode(` of ${fmt(TOTAL)} match`)); box.appendChild(s);
+    const clr = el('button', 'linkbtn', 'Clear filters'); clr.type = 'button';
+    clr.addEventListener('click', () => { fTags.clear(); fStd.clear(); exactOnly = false; document.getElementById('exact').checked = false; document.querySelectorAll('#fq .chipbtn, #fs .chipbtn').forEach(b => b.setAttribute('aria-pressed', 'false')); onFilter(); });
+    box.appendChild(clr);
+  }
+  function onFilter() { computeMatches(); renderCount(); highlight(); drawCenter(); if (view === 'cols') colsRender(); renderPanel(selected, false); }
+
+  /* ---------- view switcher ---------- */
+  const vseg = document.getElementById('vseg'), vdesc = document.getElementById('vdesc');
+  VIEW_ORDER.forEach(k => {
+    const b = el('button', null, VIEWS[k].label); b.type = 'button'; b.dataset.v = k;
+    b.addEventListener('click', () => setDim(k, true));
+    vseg.appendChild(b);
+  });
+  function renderViewbar() {
+    vseg.querySelectorAll('button').forEach(b => { b.setAttribute('aria-pressed', b.dataset.v === viewKey ? 'true' : 'false'); b.hidden = b.dataset.v === 'standards' && !linksOn; });
+    vdesc.textContent = VIEWS[viewKey].desc + (viewKey === 'kinds' && linksOn ? ' Aligned to the IFC kernel.' : '');
+  }
+  const plug = document.getElementById('plug'), linksRow = document.getElementById('links-row');
+  function setLinks(on, quiet) {
+    linksOn = on;
+    plug.setAttribute('aria-pressed', on ? 'true' : 'false');
+    plug.textContent = on ? 'Unplug linked standards' : '+ Plug in linked standards';
+    linksRow.hidden = !on;
+    try { localStorage.setItem('aot-links', on ? '1' : '0'); } catch (e) {}
+    if (!on) {
+      fStd.clear(); exactOnly = false; document.getElementById('exact').checked = false;
+      document.querySelectorAll('#fs .chipbtn').forEach(b => b.setAttribute('aria-pressed', 'false'));
+      if (viewKey === 'standards') setDim('branches', true);
+    }
+    renderViewbar();
+    if (!quiet) onFilter();
+  }
+  plug.addEventListener('click', () => setLinks(!linksOn));
+
+  /* ---------- chart ---------- */
+  const W = 820, R = W / 2;
+  let RINGS = 3, effR = 3, ringW = R / 4, colorMode = 'branch';
+  const effRings = f => Math.max(1, Math.min(RINGS, f.height));
+  const chartEl = document.getElementById('chart');
+  const tip = document.getElementById('tip');
+  const svg = d3.select(chartEl).append('svg').attr('viewBox', [-R, -R, W, W]).attr('tabindex', 0).attr('role', 'application').attr('aria-label', 'Sunburst map of the taxonomy. Arrow keys move, Enter zooms in, Escape zooms out.');
+  const gArcs = svg.append('g'), gLabels = svg.append('g').attr('text-anchor', 'middle'), center = svg.append('g');
+  const centerHit = center.append('circle').attr('class', 'center-hit').attr('fill', 'transparent');
+  const centerT1 = center.append('text').attr('text-anchor', 'middle').attr('font-weight', 600);
+  const centerT2 = center.append('text').attr('text-anchor', 'middle').attr('font-size', 12.5);
+  const arc = d3.arc().startAngle(d => d.x0).endAngle(d => d.x1)
+    .padAngle(d => Math.min((d.x1 - d.x0) / 2, 0.004)).padRadius(R * 0.6)
+    .innerRadius(d => d.y0 * ringW).outerRadius(d => Math.max(d.y0 * ringW, d.y1 * ringW - 1.5));
+  const arcVisible = d => d.y1 <= effR + 1 && d.y0 >= 1 && d.x1 > d.x0 + 1e-6;
+  const labelVisible = d => arcVisible(d) && ((d.y1 + d.y0) / 2 * (R / (effR + 1))) * (d.x1 - d.x0) > 13;
+  function labelTransform(d) {
+    const x = (d.x0 + d.x1) / 2 * 180 / Math.PI, y = (d.y0 + d.y1) / 2 * ringW;
+    return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
+  }
+  function fitText(d) {
+    const max = Math.max(3, Math.floor((R / (effR + 1) - 14) / 6.3));
+    const t = nameOf(d);
+    return t.length > max ? t.slice(0, max - 1).trimEnd() + '…' : t;
+  }
+  const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let path = gArcs.selectAll('path'), label = gLabels.selectAll('text');
+  function bind() {
+    const nodes = root.descendants().slice(1);
+    path = gArcs.selectAll('path').data(nodes, d => d.key).join(
+      enter => enter.append('path').attr('class', 'arc').attr('fill-opacity', 0).attr('pointer-events', 'none').attr('d', d => arc(d.current))
+        .on('pointerenter', (event, d) => { hovered = d; highlight(); showTip(event, d); renderPanel(d, true); })
+        .on('pointermove', moveTip)
+        .on('pointerleave', () => { hovered = null; highlight(); hideTip(); })
+        .on('click', (event, d) => { select(d); zoomTo(d.children ? d : d.parent); }),
+      update => update,
+      exit => exit.attr('pointer-events', 'none').transition().duration(reduced() ? 0 : 260).attr('fill-opacity', 0).remove());
+    label = gLabels.selectAll('text').data(nodes, d => d.key).join(
+      enter => enter.append('text').attr('dy', '0.35em').attr('font-size', 11.5).attr('fill-opacity', 0).attr('transform', d => labelTransform(d.current)),
+      update => update,
+      exit => exit.remove());
+    path.order(); label.order();
+  }
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const clamp = v => Math.max(0.12, Math.min(0.92, v));
+  let INK = '#15171C', SURF = '#FFFFFF';
+  function colorize() {
+    const L = parseFloat(css('--arc-l')), step = parseFloat(css('--arc-step')), S = parseFloat(css('--arc-s'));
+    INK = css('--ink'); SURF = css('--surface');
+    const q = {}; TAGS.forEach(t => q[t] = css('--q-' + t.toLowerCase()));
+    const v = VIEWS[viewKey], gcol = new Map(), off = v.groups ? 1 : 0;
+    if (v.groups) v.groups.forEach((g, i) => gcol.set(g.key, g.tag ? q[g.tag] : g.key === 'none' ? d3.interpolateRgb(css('--muted'), css('--surface'))(0.45) : d3.hsl((i * 360 / v.groups.length + 215) % 360, Math.min(0.62, S + 0.12), clamp(L - 0.1)).formatHex()));
+    path.attr('fill', d => {
+      if (d.data.g) return gcol.get(d.data.g.key);
+      const c = d.data.c, dc = d.depth - off;
+      let col;
+      if (colorMode === 'question') { const base = d3.hsl(q[c.tags[0]] || '#999999'); base.l = clamp(base.l + (dc - 1) * step * 0.6); col = base.formatHex(); }
+      else col = d3.hsl((branchIndex.get(c.top.code) * 24 + 205) % 360, S, clamp(L + (dc - 1) * step)).formatHex();
+      return d.data.member ? col : d3.interpolateRgb(col, SURF)(0.62);
+    });
+    label.attr('fill', css('--arc-text'));
+    centerT1.attr('fill', INK); centerT2.attr('fill', css('--muted'));
+    markSelected(); renderLegend();
+  }
+  function renderLegend() {
+    const lg = document.getElementById('legend'); lg.textContent = '';
+    lg.hidden = colorMode !== 'question';
+    if (lg.hidden) return;
+    TAGS.forEach(t => { const s = el('span'); const i = el('i'); i.style.background = `var(--q-${t.toLowerCase()})`; s.appendChild(i); s.appendChild(document.createTextNode(`${t}: ${DATA.tags[t]}`)); lg.appendChild(s); });
+    lg.appendChild(el('span', null, 'Colour shows the primary tag.'));
+  }
+
+  function computeTargets() {
+    root.each(d => {
+      d.target = {
+        x0: Math.max(0, Math.min(1, (d.x0 - focus.x0) / (focus.x1 - focus.x0))) * 2 * Math.PI,
+        x1: Math.max(0, Math.min(1, (d.x1 - focus.x0) / (focus.x1 - focus.x0))) * 2 * Math.PI,
+        y0: Math.max(0, d.y0 - focus.depth), y1: Math.max(0, d.y1 - focus.depth)
+      };
+      if (!d.current) d.current = { x0: d.target.x0, x1: d.target.x1, y0: d.target.y0, y1: d.target.y0 };
+    });
+  }
+  function applyVisibility(animate) {
+    effR = effRings(focus);
+    const newW = R / (effR + 1);
+    computeTargets();
+    const t = animate ? svg.transition().duration(reduced() ? 0 : 640).ease(d3.easeCubicInOut) : null;
+    if (t) { const iw = d3.interpolate(ringW, newW); t.tween('ring', () => s => { ringW = iw(s); }); } else ringW = newW;
+    if (!t) {
+      root.each(d => d.current = d.target);
+      path.interrupt().attr('d', d => arc(d.current)).attr('fill-opacity', d => arcVisible(d.current) ? 1 : 0).attr('pointer-events', d => arcVisible(d.current) ? 'auto' : 'none');
+      label.interrupt().attr('fill-opacity', d => +labelVisible(d.current)).attr('transform', d => labelTransform(d.current)).text(fitText);
+      return Promise.resolve();
+    }
+    busy = true;
+    path.transition(t)
+      .tween('data', d => { const i = d3.interpolate(d.current, d.target); return s => d.current = i(s); })
+      .filter(function (d) { return +this.getAttribute('fill-opacity') || arcVisible(d.target); })
+      .attr('fill-opacity', d => arcVisible(d.target) ? 1 : 0)
+      .attr('pointer-events', d => arcVisible(d.target) ? 'auto' : 'none')
+      .attrTween('d', d => () => arc(d.current));
+    label.text(fitText).filter(function (d) { return +this.getAttribute('fill-opacity') || labelVisible(d.target); }).transition(t)
+      .attr('fill-opacity', d => +labelVisible(d.target))
+      .attrTween('transform', d => () => labelTransform(d.current));
+    return t.end().catch(() => {}).then(() => { busy = false; });
+  }
+  function drawCenter() {
+    const r = R / (effRings(focus) + 1) - 4;
+    centerHit.attr('r', r);
+    const name = focus === root ? VIEWS[viewKey].root : nameOf(focus);
+    const maxC = Math.max(8, Math.floor(r * 1.7 / 8.4));
+    const lines = []; let cur = '';
+    for (const w of name.split(' ')) { if ((cur + ' ' + w).trim().length > maxC && cur) { lines.push(cur); cur = w; } else cur = (cur + ' ' + w).trim(); }
+    if (cur) lines.push(cur);
+    const shown = lines.slice(0, 3), fsz = shown.length > 2 ? 14 : 16;
+    centerT1.selectAll('tspan').remove();
+    centerT1.attr('font-size', fsz).attr('y', -((shown.length - 1) * fsz * 0.6) - 6);
+    shown.forEach((l, i) => centerT1.append('tspan').attr('x', 0).attr('dy', i ? fsz * 1.15 : 0).text(l));
+    let n;
+    if (matchSet) { const mc = matchCount.get(focus) || 0; n = `${fmt(mc)} ${mc === 1 ? 'match' : 'matches'}`; }
+    else if (focus === root) n = viewKey === 'branches' ? `${fmt(TOTAL)} concepts` : `${fmt(TOTAL)} concepts in ${fmt(T.placements)} places`;
+    else n = `${fmt(below(focus))} below`;
+    centerT2.attr('y', ((shown.length - 1) * fsz * 0.6) + 16).text(focus === root ? n : `${n} · click to go up`);
+  }
+  function drawCrumbs() {
+    const box = document.getElementById('crumbs'); box.textContent = '';
+    focus.ancestors().reverse().forEach((d, i) => {
+      if (i) { const s = el('span', 'sep', '›'); s.setAttribute('aria-hidden', 'true'); box.appendChild(s); }
+      const name = d === root ? VIEWS[viewKey].root : nameOf(d);
+      if (d === focus) box.appendChild(el('span', 'here', name));
+      else { const b = el('button', null, name); b.type = 'button'; b.addEventListener('click', () => zoomTo(d)); box.appendChild(b); }
+    });
+    document.getElementById('up').disabled = focus === root;
+  }
+  function zoomTo(p) {
+    if (!p) return Promise.resolve();
+    if (!p.children) p = p.parent;
+    if (p === focus) return Promise.resolve();
+    focus = p; drawCenter(); drawCrumbs(); highlight(); hideTip();
+    return applyVisibility(view === 'map');
+  }
+  function markSelected() {
+    path.attr('stroke', d => d === selected ? INK : SURF).attr('stroke-width', d => d === selected ? 2.2 : 0.75);
+    if (selected) path.filter(d => d === selected).raise();
+  }
+  function writeHash() {
+    const code = selected && selected.data.c ? selected.data.c.code : '';
+    const h = [viewKey !== 'branches' ? viewKey : '', code].filter(Boolean).join('/');
+    try { history.replaceState(null, '', h ? '#' + h : location.pathname + location.search); } catch (e) {}
+  }
+  function select(d, quiet) {
+    selected = d; markSelected(); renderPanel(d, false);
+    if (view === 'cols') colsRender();
+    if (!quiet) writeHash();
+  }
+  function twinsOf(d) { return d.data.c ? (T.occAll.get(d.data.c.code) || [d]) : [d]; }
+  function highlight() {
+    if (hovered) {
+      const ts = twinsOf(hovered), anc = new Set();
+      ts.forEach(t => t.ancestors().forEach(a => anc.add(a)));
+      path.attr('opacity', d => (anc.has(d) || d.ancestors().some(a => ts.includes(a))) ? 1 : 0.3);
+      return;
+    }
+    const set = searchHits ? new Set(searchHits) : matchSet;
+    if (!set) { path.attr('opacity', 1); return; }
+    const keep = new Set();
+    set.forEach(n => n.ancestors().forEach(a => keep.add(a)));
+    path.attr('opacity', d => set.has(d) ? 1 : keep.has(d) ? 0.5 : 0.12);
+  }
+  function otherPlaces(d) { return twinsOf(d).filter(t => t !== d && t.group && t.group.data.g).map(t => t.group.data.g.label); }
+  function showTip(event, d) {
+    if (event.pointerType === 'touch') return;
+    tip.textContent = '';
+    const t1 = el('div', 't1'); t1.appendChild(el('b', null, nameOf(d))); t1.appendChild(el('code', null, d.data.c ? d.data.c.code : VIEWS[viewKey].label)); tip.appendChild(t1);
+    const chain = d.ancestors().reverse().slice(1, -1).map(nameOf);
+    const parts = [];
+    if (chain.length) parts.push(chain.join(' › '));
+    parts.push(d.children ? (matchSet ? `${matchCount.get(d) || 0} matches below` : `${below(d)} below`) : 'no children');
+    if (d.data.c) parts.push(d.data.c.tags.join(', '));
+    if (d.data.c && !d.data.member) parts.push('path only');
+    const op = otherPlaces(d); if (op.length) parts.push('also under ' + op.join(', '));
+    tip.appendChild(el('div', 't2', parts.join(' · ')));
+    const def = d.data.c ? d.data.c.def : d.data.g ? d.data.g.def : '';
+    tip.appendChild(el('div', null, def.length > 150 ? def.slice(0, 148).trimEnd() + '…' : def));
+    tip.hidden = false; moveTip(event);
+  }
+  function moveTip(event) {
+    if (tip.hidden) return;
+    const box = chartEl.getBoundingClientRect();
+    let x = event.clientX - box.left + 16, y = event.clientY - box.top + 16;
+    if (x + tip.offsetWidth > box.width - 8) x = event.clientX - box.left - tip.offsetWidth - 16;
+    if (y + tip.offsetHeight > box.height - 8) y = event.clientY - box.top - tip.offsetHeight - 16;
+    tip.style.left = Math.max(8, x) + 'px'; tip.style.top = Math.max(8, y) + 'px';
+  }
+  function hideTip() { tip.hidden = true; }
+  chartEl.addEventListener('pointerleave', () => { hovered = null; highlight(); hideTip(); renderPanel(selected, false); });
+  centerHit.on('click', () => { if (focus.parent) zoomTo(focus.parent); });
+  let acc = 0, lastStep = 0;
+  chartEl.addEventListener('wheel', (event) => {
+    event.preventDefault();
+    const now = performance.now();
+    if (now - lastStep > 420) acc = 0;
+    acc += event.deltaY * (event.ctrlKey ? 3 : 1);
+    if (busy || now - lastStep < 380) return;
+    if (acc < -40) {
+      acc = 0; lastStep = now;
+      if (!hovered) return;
+      const next = hovered.ancestors().reverse()[focus.depth + 1];
+      if (next && next.children) zoomTo(next);
+    } else if (acc > 40) { acc = 0; lastStep = now; if (focus.parent) zoomTo(focus.parent); }
+  }, { passive: false });
+  svg.on('keydown', (event) => {
+    const k = event.key;
+    const cur = selected && selected.parent === focus ? selected : (focus.children ? focus.children[0] : null);
+    if (!cur) return;
+    const sibs = cur.parent.children, i = sibs.indexOf(cur);
+    if (k === 'ArrowDown') { event.preventDefault(); select(sibs[(i + 1) % sibs.length]); }
+    else if (k === 'ArrowUp') { event.preventDefault(); select(sibs[(i - 1 + sibs.length) % sibs.length]); }
+    else if (k === 'ArrowRight' || k === 'Enter') { event.preventDefault(); if (cur.children) zoomTo(cur).then(() => select(cur.children[0])); }
+    else if (k === 'ArrowLeft' || k === 'Escape') { event.preventDefault(); if (focus.parent) { const back = focus; zoomTo(focus.parent).then(() => select(back)); } }
+  });
+
+  /* ---------- switch view: the same concepts, re-cut ---------- */
+  function setDim(vk, animate, keepHash) {
+    if (vk === viewKey || !VIEWS[vk]) return;
+    const prev = new Map(); path.each(d => prev.set(d.key, d.current));
+    const selCode = selected && selected.data.c ? selected.data.c.code : null;
+    viewKey = vk; T = buildTree(vk); root = T.root;
+    root.each(d => { const p = prev.get(d.key); d.current = p ? { x0: p.x0, x1: p.x1, y0: p.y0, y1: p.y1 } : null; });
+    focus = root; hovered = null; hideTip();
+    searchHits = null; results.hidden = true; q.setAttribute('aria-expanded', 'false');
+    selected = selCode ? T.byC.get(selCode) || null : null;
+    effR = effRings(focus); computeTargets();
+    bind(); computeMatches(); colorize(); renderViewbar(); drawCenter(); drawCrumbs(); highlight();
+    applyVisibility(animate && view === 'map');
+    renderPanel(selected, false);
+    if (view === 'cols') colsRender();
+    try { localStorage.setItem('aot-dim', vk); } catch (e) {}
+    if (!keepHash) writeHash();
+  }
+
+  /* ---------- columns ---------- */
+  const colsEl = document.getElementById('cols'), colsScroll = document.getElementById('cols-scroll');
+  function visibleKids(n) { return (n.children || []).filter(k => !matchSet || (matchCount.get(k) || 0) > 0); }
+  function colsRender() {
+    colsEl.textContent = '';
+    const chain = selected ? selected.ancestors().reverse() : [root];
+    const opened = chain.filter(n => n.children);
+    opened.forEach(parentNode => {
+      const col = el('div', 'col'); col.setAttribute('role', 'listbox');
+      const name = parentNode === root ? VIEWS[viewKey].col : nameOf(parentNode);
+      col.setAttribute('aria-label', name); col.appendChild(el('h3', null, name));
+      const kids = visibleKids(parentNode);
+      if (!kids.length) col.appendChild(el('div', 'none', 'No matches here'));
+      kids.forEach(n => {
+        const b = el('button'); b.type = 'button'; b.setAttribute('role', 'option');
+        const isSel = n === selected, onPath = chain.includes(n);
+        const cls = []; if (isSel) cls.push('sel'); else if (onPath) cls.push('on');
+        if (n.data.c && !n.data.member) cls.push('ctx');
+        b.className = cls.join(' ');
+        b.setAttribute('aria-selected', isSel ? 'true' : 'false');
+        b.appendChild(el('span', null, nameOf(n)));
+        b.appendChild(el('span', 'm', n.children ? fmt(matchSet ? matchCount.get(n) || 0 : n.data.g ? n.uniq : below(n)) : (matchSet && !matchSet.has(n) ? '' : n.data.c ? n.data.c.code : '')));
+        if (n.children) b.appendChild(el('span', 'chev', '›'));
+        b.addEventListener('click', () => select(n));
+        b.addEventListener('mouseenter', () => { if (!isSel) renderPanel(n, true); });
+        b.addEventListener('mouseleave', () => renderPanel(selected, false));
+        col.appendChild(b);
+      });
+      colsEl.appendChild(col);
+    });
+    colsScroll.scrollLeft = colsScroll.scrollWidth;
+    const s = colsEl.querySelector('button.sel'); if (s && colsEl.contains(document.activeElement)) s.focus();
+  }
+  colsEl.addEventListener('keydown', (e) => {
+    const cur = selected || null;
+    if (!cur) { if (e.key.startsWith('Arrow')) { e.preventDefault(); select(visibleKids(root)[0]); } return; }
+    const sibs = visibleKids(cur.parent), i = sibs.indexOf(cur);
+    if (e.key === 'ArrowDown') { e.preventDefault(); select(sibs[Math.min(sibs.length - 1, i + 1)]); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); select(sibs[Math.max(0, i - 1)]); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); const k = visibleKids(cur); if (k.length) select(k[0]); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); if (cur.parent && cur.parent !== root) select(cur.parent); }
+    const s = colsEl.querySelector('button.sel'); if (s) s.focus();
+  });
+
+  /* ---------- layout tabs ---------- */
+  function setView(v) {
+    view = v;
+    document.getElementById('tab-map').setAttribute('aria-selected', v === 'map' ? 'true' : 'false');
+    document.getElementById('tab-cols').setAttribute('aria-selected', v === 'cols' ? 'true' : 'false');
+    document.getElementById('view-map').hidden = v !== 'map';
+    document.getElementById('view-cols').hidden = v !== 'cols';
+    try { localStorage.setItem('aot-tab', v); } catch (e) {}
+    if (v === 'cols') colsRender();
+    else if (selected) { const t = selected.children ? selected : selected.parent; if (t !== focus) { focus = t; drawCenter(); drawCrumbs(); applyVisibility(false); highlight(); } }
+  }
+  document.getElementById('tab-map').addEventListener('click', () => setView('map'));
+  document.getElementById('tab-cols').addEventListener('click', () => setView('cols'));
+
+  /* ---------- machine-readable blocks ---------- */
+  const P = {
+    aeco: '@prefix aeco: <https://w3id.org/aeco/> .', skos: '@prefix skos: <http://www.w3.org/2004/02/skos/core#> .', dct: '@prefix dct: <http://purl.org/dc/terms/> .',
+    xsd: '@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .', rdfs: '@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .'
+  };
+  const OUT_PFX = Object.keys(PFX_OF).map(s => `@prefix ${PFX_OF[s]}: <${NS[s]}> .`);
+  const ttlPfx = () => [P.aeco, P.skos, P.dct, P.xsd].concat(linksOn ? OUT_PFX : []).join('\n') + '\n';
+  const MATCH_LINE = / skos:(exact|close|broad|narrow)Match /;
+  const conceptTtl = c => DATA.ttl[c.code].split('\n').filter(l => linksOn || !MATCH_LINE.test(l)).join('\n').replace(/\n+$/, '');
+  const sparqlPfx = list => list.map(x => x.replace('@prefix', 'PREFIX').replace(/ \.$/, '')).join('\n');
+  function jsonld(c) {
+    const o = { '@context': { aeco: 'https://w3id.org/aeco/', skos: 'http://www.w3.org/2004/02/skos/core#', dct: 'http://purl.org/dc/terms/' }, '@id': 'aeco:' + c.code, '@type': 'skos:Concept', 'skos:inScheme': { '@id': 'aeco:base' } };
+    if (c.parent) o['skos:broader'] = { '@id': 'aeco:' + c.parent }; else o['skos:topConceptOf'] = { '@id': 'aeco:base' };
+    o['skos:notation'] = c.code;
+    o['skos:prefLabel'] = [{ '@value': c.label, '@language': 'en-US' }].concat(c.gb ? [{ '@value': c.gb, '@language': 'en-GB' }] : []);
+    const alts = c.alts.map(a => ({ '@value': a, '@language': 'en-US' })).concat(c.altsGb.map(a => ({ '@value': a, '@language': 'en-GB' })));
+    if (alts.length) o['skos:altLabel'] = alts;
+    if (c.hidden.length) o['skos:hiddenLabel'] = c.hidden.map(h => ({ '@value': h, '@language': 'en-US' }));
+    o['skos:definition'] = { '@value': c.def, '@language': 'en' };
+    if (c.scope) o['skos:scopeNote'] = { '@value': c.scope, '@language': 'en' };
+    if (c.tags.length) o['aeco:primaryTag'] = { '@id': 'aeco:tag-' + c.tags[0].toLowerCase() };
+    o['aeco:tag'] = c.tags.map(t => ({ '@id': 'aeco:tag-' + t.toLowerCase() }));
+    const rels = { exact: 'skos:exactMatch', close: 'skos:closeMatch', broad: 'skos:broadMatch', narrow: 'skos:narrowMatch' };
+    (linksOn ? DATA.m[c.code] || [] : []).filter(m => NS[m[0]]).forEach(([s, r, t]) => { const k = rels[r]; (o[k] = o[k] || []).push({ '@id': NS[s] + t }); });
+    const rl = related.get(c.code) || [];
+    if (rl.length) o['skos:related'] = rl.map(x => ({ '@id': 'aeco:' + x }));
+    o['dct:created'] = { '@value': c.created, '@type': 'xsd:date' };
+    o['dct:modified'] = { '@value': c.modified, '@type': 'xsd:date' };
+    return JSON.stringify(o, null, 2);
+  }
+  function shaclReport(c) {
+    const res = DATA.v[c.code] || [];
+    const sh = res.filter(r => r[0] === 'shacl'), rules = res.filter(r => r[0] === 'rule');
+    const L = ['@prefix sh: <http://www.w3.org/ns/shacl#> .', P.aeco, P.skos, '',
+      '# pySHACL report for focus node aeco:' + c.code, '# Shapes: aeco:ConceptShape (12 property constraints, 1 sh:or), aeco:PrimaryTagInTags (SPARQL)', '',
+      '[] a sh:ValidationReport ;', '    sh:conforms ' + (sh.some(r => r[1] === 'Violation') ? 'false' : 'true') + (sh.length ? ' ;' : ' .')];
+    sh.forEach((r, i) => {
+      L.push('    sh:result [', '        a sh:ValidationResult ;', '        sh:focusNode aeco:' + c.code + ' ;');
+      if (r[3]) L.push('        sh:resultPath ' + r[3] + ' ;');
+      L.push('        sh:resultSeverity sh:' + r[1] + ' ;', '        sh:sourceConstraintComponent sh:' + r[4] + ' ;', '        sh:resultMessage "' + r[2] + '"', '    ]' + (i < sh.length - 1 ? ' ,' : ' .'));
+    });
+    L.push('', '# Rules SHACL does not express, checked by scripts/taxo.py:', '# sentence length, depth limit, number of children, shared labels');
+    if (!rules.length) L.push('# none raised');
+    rules.forEach(r => L.push('# ' + r[1].toUpperCase() + '  ' + (r[3] ? r[3] + '  ' : '') + r[2]));
+    return L.join('\n');
+  }
+  function kindTtl(k) {
+    const L = [P.aeco, P.skos].concat(linksOn ? [P.rdfs, `@prefix ifc: <${NS.ifc}> .`] : []).concat(['', '# Draft. Not part of the published data yet.', '# A kind holds each member branch and every concept below it.', '',
+      `aeco:kind-${k.key} a skos:Collection ;`, `    skos:prefLabel "${k.label}"@en ;`, `    skos:definition "${k.def}"@en ;`]).concat(linksOn ? [`    rdfs:seeAlso ifc:${k.ifc} ;`] : []);
+    k.branches.forEach((b, i) => L.push((i ? '        ' : '    skos:member ') + `aeco:${b}${i < k.branches.length - 1 ? ' ,' : ' .'}   # ${byCode.get(b).label}`));
+    return L.join('\n');
+  }
+  const kindSparql = k => [sparqlPfx([P.aeco, P.skos]), '', `# Every concept of the kind ${k.label}`, 'SELECT DISTINCT ?concept ?label WHERE {', `  aeco:kind-${k.key} skos:member ?branch .`, '  ?concept skos:broader* ?branch ;', '           skos:prefLabel ?label .', '  FILTER (lang(?label) = "en-US")', '}'].join('\n');
+  const tagTtl = t => [P.aeco, P.skos, '', `aeco:tag-${t.toLowerCase()} a skos:Concept ; skos:inScheme aeco:tags ; skos:topConceptOf aeco:tags ;`, `    skos:prefLabel "${t}"@en ;`, `    skos:definition "${DATA.tags[t]}"@en .`].join('\n');
+  const tagSparql = t => [sparqlPfx([P.aeco, P.skos]), '', `# The concepts an agent follows for a ${t} question`, 'SELECT ?concept ?label ?primary WHERE {', `  ?concept aeco:tag aeco:tag-${t.toLowerCase()} ;`, '           skos:prefLabel ?label .', `  BIND (EXISTS { ?concept aeco:primaryTag aeco:tag-${t.toLowerCase()} } AS ?primary)`, '  FILTER (lang(?label) = "en-US")', '}'].join('\n');
+  const stdSparql = s => [sparqlPfx([P.aeco, P.skos, `@prefix ${PFX_OF[s]}: <${NS[s]}> .`]), '', `# Every concept linked to ${SRC[s]}, with the link type`, 'SELECT ?concept ?match ?target WHERE {', '  VALUES ?match { skos:exactMatch skos:closeMatch skos:broadMatch skos:narrowMatch }', '  ?concept ?match ?target .', `  FILTER (STRSTARTS(STR(?target), STR(${PFX_OF[s]}:)))`, '}'].join('\n');
+  const noneSparql = () => [sparqlPfx([P.aeco, P.skos]), '', '# Concepts with no outside link yet.', '# ISO 12006-2 and RIBA links are by name and sit outside the RDF,', '# so this query also returns concepts that only have those.', 'SELECT ?concept ?label WHERE {', '  ?concept skos:inScheme aeco:base ;', '           skos:prefLabel ?label .', '  FILTER NOT EXISTS { ?concept skos:exactMatch|skos:closeMatch|skos:broadMatch|skos:narrowMatch ?any }', '  FILTER (lang(?label) = "en-US")', '}'].join('\n');
+
+  function highlightCode(text, lang) {
+    const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const RE = {
+      json: /("(?:[^"\\]|\\.)*")(\s*:)?/g,
+      ttl: /("(?:[^"\\]|\\.)*"(?:@[A-Za-z-]+|\^\^\w+:\w+)?)|(\b(?:skos|dct|aeco|sh|ifc|wd|uc|brick|rec|bot|xsd|rdf|owl|rdfs):[\w-]*|@prefix|\ba\b)/g,
+      sparql: /("(?:[^"\\]|\\.)*"(?:@[A-Za-z-]+)?)|(\b(?:SELECT|DISTINCT|WHERE|PREFIX|FILTER|NOT|EXISTS|BIND|AS|VALUES|STRSTARTS|STR|lang)\b|\?\w+|\b(?:skos|dct|aeco|ifc|wd|uc|brick|rec|bot|rdfs):[\w-]*\*?)/g
+    }[lang];
+    return text.split('\n').map(line => {
+      if (/^\s*#/.test(line)) return '<span class="c">' + esc(line) + '</span>';
+      let out = '', m, last = 0;
+      const re = new RegExp(RE.source, 'g');
+      let body = line, tail = '';
+      const hash = lang !== 'json' ? line.search(/\s#\s/) : -1;
+      if (hash > -1 && (line.slice(0, hash).match(/"/g) || []).length % 2 === 0) { body = line.slice(0, hash); tail = line.slice(hash); }
+      while ((m = re.exec(body))) {
+        out += esc(body.slice(last, m.index));
+        if (lang === 'json') out += m[2] ? '<span class="k">' + esc(m[1]) + '</span>' + esc(m[2]) : '<span class="s">' + esc(m[1]) + '</span>';
+        else out += m[1] ? '<span class="s">' + esc(m[1]) + '</span>' : '<span class="k">' + esc(m[2]) + '</span>';
+        last = m.index + m[0].length;
+      }
+      return out + esc(body.slice(last)) + (tail ? '<span class="c">' + esc(tail) + '</span>' : '');
+    }).join('\n');
+  }
+  let dataTab = 'ttl';
+  function dataBlock(spec) {
+    const box = el('div', 'datasec');
+    const tabs = el('div', 'dtabs'); tabs.setAttribute('role', 'tablist'); tabs.setAttribute('aria-label', 'Machine-readable views');
+    const pre = el('pre', 'code'); pre.tabIndex = 0;
+    const note = el('div', 'dnote');
+    let cur = spec.some(s => s.k === dataTab) ? dataTab : spec[0].k;
+    const get = () => spec.find(s => s.k === cur);
+    const paint = () => {
+      const s = get();
+      pre.innerHTML = highlightCode(s.text(), s.lang);
+      tabs.querySelectorAll('button[role="tab"]').forEach(b => b.setAttribute('aria-selected', b.dataset.k === cur ? 'true' : 'false'));
+      note.textContent = s.note;
+    };
+    spec.forEach(s => { const b = el('button', null, s.label); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.k = s.k; b.addEventListener('click', () => { cur = dataTab = s.k; paint(); }); tabs.appendChild(b); });
+    const cp = el('button', 'copy', 'Copy'); cp.type = 'button';
+    function selectPre() { const r = document.createRange(); r.selectNodeContents(pre); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+    cp.addEventListener('click', () => { const t = get().text(); try { navigator.clipboard.writeText(t).then(() => { cp.textContent = 'Copied'; setTimeout(() => cp.textContent = 'Copy', 1400); }, selectPre); } catch (e) { selectPre(); } });
+    tabs.appendChild(cp);
+    box.appendChild(tabs); box.appendChild(pre); box.appendChild(note);
+    paint();
+    return box;
+  }
+
+  /* ---------- panel ---------- */
+  const panel = document.getElementById('panel');
+  function copyBtn(textLabel, value) {
+    const b = el('button', 'copy', textLabel); b.type = 'button';
+    b.addEventListener('click', () => { try { navigator.clipboard.writeText(value).then(() => { b.textContent = 'Copied'; setTimeout(() => b.textContent = textLabel, 1400); }, () => { b.textContent = value; }); } catch (e) { b.textContent = value; } });
+    return b;
+  }
+  function sec(title, child) { const s = el('div', 'sec'); s.appendChild(el('h3', null, title)); if (child) s.appendChild(child); return s; }
+  function kvList(rows) {
+    const kv = el('dl', 'kv');
+    rows.forEach(([k, v]) => { if (!v) return; kv.appendChild(el('dt', null, k)); const dd = el('dd'); if (typeof v === 'string') dd.textContent = v; else dd.appendChild(v); kv.appendChild(dd); });
+    return kv;
+  }
+  function pathLine(d) {
+    const pth = el('div', 'path');
+    d.ancestors().reverse().slice(1, -1).forEach((a, i) => {
+      if (i) pth.appendChild(el('span', null, '›'));
+      const b = el('button', null, nameOf(a)); b.type = 'button'; b.addEventListener('click', () => goTo(a)); pth.appendChild(b);
+    });
+    return pth;
+  }
+  function renderPanel(d, preview) {
+    panel.textContent = '';
+    if (!d) d = focus === root ? null : focus;
+    const mode = el('div', 'mode');
+    if (preview) mode.appendChild(el('span', 'chip preview', 'Preview'));
+    mode.appendChild(el('span', null, preview ? 'Click to keep this open' : (d ? 'Selected' : 'Overview')));
+    panel.appendChild(mode);
+    if (!d) return renderOverview();
+    if (d.data.g) return renderGroup(d, mode);
+    return renderConcept(d, mode);
+  }
+  function renderOverview() {
+    panel.appendChild(el('h2', null, 'Aecoware Open Taxonomy'));
+    panel.appendChild(el('p', 'def', `${fmt(TOTAL)} concepts for architecture, engineering, construction and operations, with plain definitions, US and UK labels and 5W1H routing tags.`));
+    const vks = VIEW_ORDER.filter(k => linksOn || k !== 'standards');
+    panel.appendChild(kvList([['Format', 'SKOS in Turtle and JSON-LD'], ['Validation', 'SHACL shapes, run with pySHACL'], ['Namespace', 'https://w3id.org/aeco/'], ['Outside links', linksOn ? `${fmt(LINKS.rdf)} to ${LINKS.sources} standards, plus ${fmt(LINKS.byName)} by name to ISO 12006-2 and RIBA` : 'Unplugged. Use the button above the map to add them.'], ['Views', `${vks.length === 4 ? 'Four' : 'Three'} ways to cut the same concepts. The core tree stays the one source.`]]));
+    const vl = el('div', 'kids');
+    vks.forEach(k => { const b = el('button'); b.type = 'button'; b.appendChild(el('span', null, VIEWS[k].label)); b.appendChild(el('span', 'n', k === viewKey ? 'on' : '')); b.title = VIEWS[k].desc; b.addEventListener('click', () => setDim(k, true)); vl.appendChild(b); });
+    panel.appendChild(sec('Views', vl));
+    const kids = visibleKids(root);
+    panel.appendChild(sec(`${kids.length} ${VIEWS[viewKey].col.toLowerCase()} in this view`, kidList(kids)));
+  }
+  function renderGroup(d, mode) {
+    const g = d.data.g;
+    mode.appendChild(el('span', 'chip', VIEWS[viewKey].label + ' view'));
+    if (g.kind) mode.appendChild(el('span', 'chip warn', 'Draft'));
+    const tr = el('div', 'titlerow'); tr.appendChild(el('h2', null, g.label));
+    const iri = g.kind ? 'aeco:kind-' + g.key : g.tag ? 'aeco:tag-' + g.tag.toLowerCase() : PFX_OF[g.src] ? PFX_OF[g.src] + ':' : g.src === 'none' ? 'no link' : 'by name';
+    tr.appendChild(el('span', 'code-pill', iri)); panel.appendChild(tr);
+    panel.appendChild(el('p', 'def', g.def));
+    const rows = [['Concepts', fmt(d.uniq) + (below(d) !== d.uniq ? ` (${fmt(below(d))} places with the path)` : '')]];
+    if (g.kind && linksOn) {
+      const a = el('a', null, g.kind.ifc); a.href = NS.ifc + g.kind.ifc; a.target = '_blank'; a.rel = 'noopener';
+      rows.push(['IFC kernel', a]);
+      if (g.kind.iso) rows.push(['ISO 12006-2', g.kind.iso + ' (by name)']);
+    }
+    if (g.kind) rows.push(['Branches', g.kind.branches.map(b => byCode.get(b).label).join(', ')]);
+    if (g.tag) rows.push(['As primary', fmt([...byCode.values()].filter(c => c.tags[0] === g.tag).length) + ' concepts']);
+    if (g.src && g.src !== 'none') {
+      let ex = 0; for (const ms of Object.values(DATA.m)) if (ms.some(m => m[0] === g.src && m[1] === 'exact')) ex++;
+      rows.push(['Exact links', `${fmt(ex)} of ${fmt(stdCount[g.src])} linked concepts`]);
+    }
+    panel.appendChild(kvList(rows));
+    const kids = visibleKids(d);
+    panel.appendChild(sec(matchSet ? `Inside that match (${kids.length} of ${d.children.length})` : `Inside (${kids.length})`, kidList(kids)));
+    let spec = null;
+    if (g.kind) spec = [{ k: 'ttl', label: 'Turtle (draft)', lang: 'ttl', text: () => kindTtl(g.kind), note: 'A SKOS collection over branches. The core tree does not change.' }, { k: 'sparql', label: 'SPARQL', lang: 'sparql', text: () => kindSparql(g.kind), note: 'How an agent lists every concept of this kind.' }];
+    else if (g.tag) spec = [{ k: 'ttl', label: 'Turtle', lang: 'ttl', text: () => tagTtl(g.tag), note: 'From src/tags.ttl.' }, { k: 'sparql', label: 'SPARQL', lang: 'sparql', text: () => tagSparql(g.tag), note: 'How an agent finds the concepts for this question.' }];
+    else if (NS[g.src]) spec = [{ k: 'sparql', label: 'SPARQL', lang: 'sparql', text: () => stdSparql(g.src), note: 'Links live in src/mappings-' + g.src + '.ttl.' }];
+    else if (g.src === 'none') spec = [{ k: 'sparql', label: 'SPARQL', lang: 'sparql', text: noneSparql, note: 'The gap list. Close these with new links.' }];
+    if (spec) panel.appendChild(sec('Data', dataBlock(spec)));
+    else panel.appendChild(el('p', 'note', 'Linked by name only. These links sit in a TSV file outside the RDF, because the standard text and codes are not open.'));
+  }
+  function renderConcept(d, mode) {
+    const c = d.data.c, res = DATA.v[c.code] || [];
+    const viol = res.filter(r => r[1] === 'Violation').length, warn = res.filter(r => r[1] === 'Warning').length;
+    mode.appendChild(el('span', 'chip ' + (viol ? 'warn' : 'ok'), viol ? `SHACL: ${viol} violation` : 'SHACL: conforms'));
+    if (warn) mode.appendChild(el('span', 'chip warn', `${warn} warning`));
+    if (!d.data.member) mode.appendChild(el('span', 'chip', 'Path only here'));
+    if (matchCodes) mode.appendChild(el('span', 'chip ' + (matchCodes.has(c.code) ? 'ok' : ''), matchCodes.has(c.code) ? 'Matches filters' : 'Outside filters'));
+    const pth = pathLine(d); if (pth.childNodes.length) panel.appendChild(pth);
+    const tr = el('div', 'titlerow');
+    tr.appendChild(el('h2', null, c.label)); tr.appendChild(el('span', 'code-pill', c.code));
+    tr.appendChild(copyBtn('Copy IRI', 'https://w3id.org/aeco/' + c.code)); panel.appendChild(tr);
+    panel.appendChild(el('div', 'iri', 'https://w3id.org/aeco/' + c.code));
+    panel.appendChild(el('p', 'def', c.def));
+    if (c.scope) panel.appendChild(el('p', 'note', c.scope + '.'));
+    if (!d.data.member) panel.appendChild(el('p', 'note ctxnote', `Shown here only as a path: it does not belong to ${d.group.data.g.label} itself, but holds concepts below that do.`));
+
+    const qb = el('div', 'qs');
+    c.tags.forEach((t, i) => {
+      const row = el('div', 'q'); const b = el('b'); const dot = el('i'); dot.style.background = `var(--q-${t.toLowerCase()})`; b.appendChild(dot); b.appendChild(document.createTextNode(t)); row.appendChild(b);
+      const s = el('span', null, DATA.tags[t] || ''); if (i === 0) s.appendChild(el('em', null, 'primary')); row.appendChild(s); qb.appendChild(row);
+    });
+    panel.appendChild(sec('5W1H tags', qb));
+
+    const amb = c.hidden.filter(h => (ambiguous.get(h.toLowerCase()) || []).length > 1);
+    panel.appendChild(kvList([
+      ['UK English', c.gb || 'Not set yet'],
+      ['Also called', c.alts.join(', ')],
+      ['Also in UK', c.altsGb.join(', ')],
+      ['Plain word', amb.map(h => `"${h}" is shared with ${ambiguous.get(h.toLowerCase()).length - 1} other concepts, so search asks which one is meant`).join('; ')],
+      ['Kind (draft)', (kindsOf.get(c.top.code) || []).map(k => k.label).join(', ')],
+      ['Applies under', c.std.join(', ')],
+      ['Level', String(c.level) + (c.below ? ` · ${c.below} concepts below` : '')]
+    ]));
+
+    const ts = twinsOf(d);
+    if (VIEWS[viewKey].groups && ts.length) {
+      const box = el('div', 'kids');
+      ts.forEach(t => {
+        const b = el('button'); b.type = 'button';
+        b.appendChild(el('span', null, t.ancestors().reverse().slice(1, -1).map(nameOf).join(' › ') || VIEWS[viewKey].root));
+        b.appendChild(el('span', 'n', t === d ? 'here' : t.data.member ? '' : 'path'));
+        b.addEventListener('click', () => goTo(t));
+        b.addEventListener('mouseenter', () => { if (view === 'map' && arcVisible(t.current)) { hovered = t; highlight(); } });
+        b.addEventListener('mouseleave', () => { if (view === 'map') { hovered = null; highlight(); } });
+        box.appendChild(b);
+      });
+      panel.appendChild(sec(`Places in this view (${ts.length})`, box));
+    }
+
+    if (d.children) {
+      const vk = visibleKids(d);
+      panel.appendChild(sec(`Narrower (${vk.length}${vk.length !== c.children.length ? ' of ' + c.children.length : ''})`, kidList(vk)));
+    }
+    const ms = DATA.m[c.code] || [];
+    let mbox;
+    if (ms.length) {
+      mbox = el('div', 'maps');
+      ms.forEach(([s, r, t, tl]) => {
+        const row = el('div', 'row'); row.appendChild(el('span', 'src', SRC[s] || s));
+        if (URLS[s]) { const a = el('a', null, s === 'wikidata' && tl ? `${t} ${tl}` : t); a.href = URLS[s](t); a.target = '_blank'; a.rel = 'noopener'; row.appendChild(a); }
+        else row.appendChild(el('span', 'plain', t + ' (by name)'));
+        row.appendChild(el('span', 'rel ' + (r === 'exact' ? 'exact' : 'other'), REL[r] || r)); mbox.appendChild(row);
+      });
+    } else mbox = el('div', 'empty-sec', 'No links yet.');
+    if (linksOn) panel.appendChild(sec('Same concept in other standards', mbox));
+    const rl = (related.get(c.code) || []).map(x => T.byC.get(x)).filter(Boolean);
+    if (rl.length) panel.appendChild(sec(`Related (${rl.length})`, kidList(rl, true)));
+    panel.appendChild(sec('Data', dataBlock([
+      { k: 'ttl', label: 'Turtle', lang: 'ttl', text: () => ttlPfx() + '\n' + conceptTtl(c), note: linksOn ? 'The concept as it sits in the repo, with its outside links and related links.' : 'The concept as it sits in the repo, with its related links. Outside links are unplugged.' },
+      { k: 'jsonld', label: 'JSON-LD', lang: 'json', text: () => jsonld(c), note: 'The same triples in JSON-LD, for web tools.' },
+      { k: 'shacl', label: 'SHACL report', lang: 'ttl', text: () => shaclReport(c), note: 'Validation run with pySHACL against the shapes, plus the rules SHACL cannot express.' },
+      { k: 'shapes', label: 'Shapes', lang: 'ttl', text: () => DATA.shapes, note: 'scripts/shapes.ttl: the SHACL shapes every concept must pass.' }
+    ])));
+  }
+  function kidList(list, showBranch) {
+    const box = el('div', 'kids');
+    list.forEach(n => {
+      const b = el('button'); b.type = 'button';
+      if (n.data.c && !n.data.member) b.className = 'ctx';
+      b.appendChild(el('span', null, nameOf(n)));
+      const meta = showBranch && n.data.c && n.data.c.top !== n.data.c ? n.data.c.top.label : n.children ? fmt(matchSet ? matchCount.get(n) || 0 : n.data.g ? n.uniq : below(n)) : n.data.c ? n.data.c.code : '';
+      b.appendChild(el('span', 'n', meta));
+      b.addEventListener('mouseenter', () => { if (view === 'map' && arcVisible(n.current)) { hovered = n; highlight(); } });
+      b.addEventListener('mouseleave', () => { if (view === 'map') { hovered = null; highlight(); } });
+      b.addEventListener('click', () => goTo(n));
+      box.appendChild(b);
+    });
+    return box;
+  }
+  function goTo(n) { hovered = null; select(n); if (view === 'map') zoomTo(n.children ? n : n.parent).then(highlight); }
+
+  /* ---------- search ---------- */
+  const q = document.getElementById('q'), results = document.getElementById('results');
+  const index = [];
+  for (const c of byCode.values()) index.push({ c, keys: [c.label, c.gb, ...c.alts, ...c.altsGb].filter(Boolean).map(s => s.toLowerCase()), code: c.code.toLowerCase() });
+  let active = 0, list = [];
+  const pathText = n => n.ancestors().reverse().slice(1, -1).map(nameOf).join(' › ');
+  function runSearch() {
+    const v = q.value.trim().toLowerCase();
+    if (!v) { results.hidden = true; q.setAttribute('aria-expanded', 'false'); searchHits = null; highlight(); return; }
+    const amb = ambiguous.get(v), scored = [];
+    for (const it of index) {
+      let s = -1;
+      if (it.code === v || (it.code.endsWith(v) && v.length >= 3 && /\d/.test(v))) s = 100;
+      for (const k of it.keys) { if (k === v) s = Math.max(s, 90); else if (k.startsWith(v)) s = Math.max(s, 60); else if (k.includes(' ' + v)) s = Math.max(s, 45); else if (k.includes(v)) s = Math.max(s, 30); }
+      if (amb && amb.includes(it.c.code)) s = Math.max(s, 95);
+      if (s > 0) scored.push([s, it.c]);
+    }
+    scored.sort((a, b) => b[0] - a[0] || a[1].label.length - b[1].label.length);
+    list = scored.slice(0, 9).map(x => T.byC.get(x[1].code)).filter(Boolean);
+    searchHits = scored.flatMap(x => T.occAll.get(x[1].code) || []);
+    highlight(); active = 0; results.textContent = '';
+    if (amb && amb.length > 1) { const f = el('div', 'flag'); f.appendChild(el('strong', null, `"${q.value.trim()}" fits ${amb.length} concepts.`)); f.appendChild(el('span', null, 'Pick the one you mean.')); results.appendChild(f); }
+    if (!list.length) results.appendChild(el('div', 'empty', 'No concept matches. Try a synonym or a code like aeco-01008.'));
+    list.forEach((n, i) => {
+      const b = el('button'); b.type = 'button'; b.setAttribute('role', 'option'); b.id = 'opt' + i;
+      b.appendChild(el('span', 'lab', nameOf(n))); b.appendChild(el('span', 'path', pathText(n))); b.appendChild(el('span', 'code', n.data.c.code));
+      b.addEventListener('mousedown', e => { e.preventDefault(); pick(n); });
+      results.appendChild(b);
+    });
+    paintActive(); results.hidden = false; q.setAttribute('aria-expanded', 'true');
+  }
+  function paintActive() {
+    results.querySelectorAll('button[role="option"]').forEach((b, i) => b.setAttribute('aria-selected', i === active ? 'true' : 'false'));
+    if (list.length) q.setAttribute('aria-activedescendant', 'opt' + active); else q.removeAttribute('aria-activedescendant');
+  }
+  function pick(n) { results.hidden = true; q.setAttribute('aria-expanded', 'false'); searchHits = null; goTo(n); }
+  q.addEventListener('input', runSearch);
+  q.addEventListener('focus', () => { if (q.value.trim()) runSearch(); });
+  q.addEventListener('blur', () => setTimeout(() => { results.hidden = true; q.setAttribute('aria-expanded', 'false'); }, 120));
+  q.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); active = Math.min(list.length - 1, active + 1); paintActive(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); active = Math.max(0, active - 1); paintActive(); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (list[active]) pick(list[active]); }
+    else if (e.key === 'Escape') { q.value = ''; runSearch(); q.blur(); }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && document.activeElement !== q && !/input|textarea|select/i.test(document.activeElement.tagName)) { e.preventDefault(); q.focus(); q.select(); }
+  });
+
+  /* ---------- controls ---------- */
+  document.getElementById('up').addEventListener('click', () => { if (focus.parent) zoomTo(focus.parent); });
+  document.getElementById('home').addEventListener('click', e => { e.preventDefault(); select(null); zoomTo(root); renderPanel(null, false); });
+  document.querySelectorAll('#rings button').forEach(b => b.addEventListener('click', () => {
+    RINGS = +b.dataset.r;
+    document.querySelectorAll('#rings button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+    drawCenter(); applyVisibility(true);
+  }));
+  document.querySelectorAll('#colormode button').forEach(b => b.addEventListener('click', () => {
+    colorMode = b.dataset.c;
+    document.querySelectorAll('#colormode button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+    colorize();
+  }));
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  if (mq.addEventListener) mq.addEventListener('change', colorize);
+  new MutationObserver(colorize).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  /* ---------- start ---------- */
+  document.getElementById('subline').textContent = (String(DATA.version).startsWith('0.') ? 'Draft v' : 'v') + DATA.version + ' · ' + fmt(TOTAL) + ' concepts · SKOS';
+  q.placeholder = 'Search ' + fmt(TOTAL) + ' concepts, synonyms or codes';
+  document.getElementById('f-version').textContent = 'v' + DATA.version + ', built ' + DATA.built;
+  document.getElementById('f-notice').href = DATA.repo + '/blob/main/NOTICE.md';
+  document.getElementById('f-repo').href = DATA.repo;
+  setLinks(linksOn, true);
+  bind(); colorize(); renderViewbar(); renderCount();
+  function fromHash() {
+    const h = decodeURIComponent((location.hash || '').slice(1));
+    if (!h) return false;
+    let vk = 'branches', code = h;
+    if (h.includes('/')) [vk, code] = h.split('/');
+    else if (VIEWS[h]) { vk = h; code = ''; }
+    if (!VIEWS[vk]) return false;
+    if (code && !byCode.has(code)) return false;
+    if (vk === 'standards' && !linksOn) setLinks(true, true);
+    if (vk !== viewKey) setDim(vk, false, true);
+    const n = code ? T.byC.get(code) : null;
+    focus = n ? (n.children ? n : n.parent) : root;
+    drawCenter(); drawCrumbs(); applyVisibility(false);
+    if (n) select(n, true); else renderPanel(null, false);
+    highlight();
+    return true;
+  }
+  if (!fromHash()) {
+    let sd = null; try { sd = localStorage.getItem('aot-dim'); } catch (e) {}
+    if (sd && VIEWS[sd] && sd !== viewKey) setDim(sd, false, true);
+    focus = root; drawCenter(); drawCrumbs(); applyVisibility(false); renderPanel(null, false);
+  }
+  window.addEventListener('hashchange', fromHash);
+  let saved = null; try { saved = localStorage.getItem('aot-tab'); } catch (e) {}
+  if (saved === 'cols') setView('cols');
+})();
+</script>
+</body>
+</html>

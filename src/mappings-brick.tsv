@@ -1,0 +1,64 @@
+# Mappings from the Aecoware Open Taxonomy to Brick Schema. License of the target: BSD-3-Clause.
+code	label_en_us	relation	target	target_label	note	group	added
+aeco-00462	HVAC systems	exact	HVAC_System	HVAC_System		O5	2026-10-25
+aeco-00464	Electrical systems	exact	Electrical_System	Electrical_System		O5	2026-10-25
+aeco-00630	Lighting system	exact	Lighting_System	Lighting_System		O5	2026-10-25
+aeco-00463	Fire protection systems	close	Fire_Safety_System	Fire_Safety_System		O5	2026-10-25
+aeco-00612	Domestic water system	broad	Water_System	Water_System		O5	2026-10-25
+aeco-00616	Fuel gas system	exact	Gas_System	Gas_System		O5	2026-10-25
+aeco-00620	Air distribution system	close	Air_System	Air_System		O5	2026-10-25
+aeco-00640	Access control system	close	Access_Control_Equipment	Access_Control_Equipment		O5	2026-10-25
+aeco-00641	Video surveillance system	close	Video_Surveillance_Equipment	Video_Surveillance_Equipment		O5	2026-10-25
+aeco-00642	Intrusion detection system	close	Intrusion_Detection_Equipment	Intrusion_Detection_Equipment		O5	2026-10-25
+aeco-00634	Photovoltaic system	exact	PV_Generation_System	PV_Generation_System		O5	2026-10-25
+aeco-00646	Energy metering system	narrow	Building_Meter	Building_Meter		O5	2026-10-25
+aeco-00644	Building automation system	narrow	Controller	Controller		O5	2026-10-25
+aeco-00815	Chiller	exact	Chiller	Chiller		O5	2026-10-25
+aeco-00816	Boiler	exact	Boiler	Boiler		O5	2026-10-25
+aeco-00817	Air handling unit	exact	Air_Handling_Unit	Air_Handling_Unit		O5	2026-10-25
+aeco-00818	Rooftop unit	exact	Rooftop_Unit	Rooftop_Unit		O5	2026-10-25
+aeco-00819	Fan coil unit	exact	Fan_Coil_Unit	Fan_Coil_Unit		O5	2026-10-25
+aeco-00820	Variable air volume box	exact	VAV	VAV		O5	2026-10-25
+aeco-00821	Heat pump	narrow	Packaged_Heat_Pump	Packaged_Heat_Pump		O5	2026-10-25
+aeco-00822	Cooling tower	exact	Cooling_Tower	Cooling_Tower		O5	2026-10-25
+aeco-00970	Pump	exact	Pump	Pump		O5	2026-10-25
+aeco-00814	Valve	exact	Valve	Valve		O5	2026-10-25
+aeco-00812	Water heater	exact	Water_Heater	Water_Heater		O5	2026-10-25
+aeco-00971	Air terminal	narrow	Air_Diffuser	Air_Diffuser		O5	2026-10-25
+aeco-00823	Switchboard	close	Switchgear	Switchgear		O5	2026-10-25
+aeco-00824	Panelboard	close	Breaker_Panel	Breaker_Panel		O5	2026-10-25
+aeco-00825	Transformer	exact	Transformer	Transformer		O5	2026-10-25
+aeco-00827	Luminaire	exact	Luminaire	Luminaire		O5	2026-10-25
+aeco-00972	Uninterruptible power supply	close	Energy_Storage_System	Energy_Storage_System		O5	2026-10-25
+aeco-00831	Smoke detector	exact	Smoke_Detector	Smoke_Detector		O5	2026-10-25
+aeco-00832	Fire alarm control panel	exact	Fire_Alarm_Control_Panel	Fire_Alarm_Control_Panel		O5	2026-10-25
+aeco-00834	Network switch	exact	Ethernet_Switch	Ethernet_Switch		O5	2026-10-25
+aeco-00835	Wireless access point	exact	Wireless_Access_Point	Wireless_Access_Point		O5	2026-10-25
+aeco-00836	IP camera	close	Surveillance_Camera	Surveillance_Camera		O5	2026-10-25
+aeco-00837	Card reader	exact	Access_Reader	Access_Reader		O5	2026-10-25
+aeco-00527	Level	exact	Storey	Storey		O5	2026-10-25
+aeco-00531	Room	exact	Room	Room		O5	2026-10-25
+aeco-00530	Building part	close	Wing	Wing		O5	2026-10-25
+aeco-00532	Fire compartment	close	Fire_Zone	Fire_Zone		O5	2026-10-25
+aeco-00533	HVAC zone	exact	HVAC_Zone	HVAC_Zone		O5	2026-10-25
+aeco-00547	Mechanical room	exact	Mechanical_Room	Mechanical_Room		O5	2026-10-25
+aeco-00548	Electrical room	exact	Electrical_Room	Electrical_Room		O5	2026-10-25
+aeco-00549	Telecommunications room	exact	Telecom_Room	Telecom_Room		O5	2026-10-25
+aeco-00571	Server room	exact	Server_Room	Server_Room		O5	2026-10-25
+aeco-00572	Laboratory	exact	Laboratory	Laboratory		O5	2026-10-25
+aeco-00542	Lobby	exact	Lobby	Lobby		O5	2026-10-25
+aeco-00543	Stairwell	close	Staircase	Staircase		O5	2026-10-25
+aeco-00553	Restroom	exact	Restroom	Restroom		O5	2026-10-25
+aeco-00536	Private office	exact	Private_Office	Private_Office		O5	2026-10-25
+aeco-00537	Open office area	exact	Open_Office	Open_Office		O5	2026-10-25
+aeco-00538	Meeting room	exact	Conference_Room	Conference_Room		O5	2026-10-25
+aeco-00540	Break room	exact	Break_Room	Break_Room		O5	2026-10-25
+aeco-00558	Auditorium	exact	Auditorium	Auditorium		O5	2026-10-25
+aeco-00551	Loading dock	exact	Loading_Dock	Loading_Dock		O5	2026-10-25
+aeco-00546	Atrium	exact	Atrium	Atrium		O5	2026-10-25
+aeco-00528	Basement	exact	Basement	Basement		O5	2026-10-25
+aeco-00574	Control room	exact	Control_Room	Control_Room		O5	2026-10-25
+aeco-00541	Corridor	close	Hallway	Hallway		O5	2026-10-25
+aeco-00550	Shaft	narrow	Elevator_Shaft	Elevator_Shaft		O5	2026-10-25
+aeco-00479	Parking structure	exact	Parking_Structure	Parking_Structure		O5	2026-10-25
+aeco-00400	Parcel	close	Site	Site		O5	2026-10-25

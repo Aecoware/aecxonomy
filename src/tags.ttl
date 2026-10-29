@@ -1,0 +1,33 @@
+# The 5W1H routing tags. Each base concept links 1 or 2 of them (aeco:tag), one as primary (aeco:primaryTag).
+# Agents classify a task question first, then follow concepts with the matching tag.
+@prefix aeco: <https://w3id.org/aeco/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+
+aeco:tags a skos:ConceptScheme ;
+    dct:title "5W1H routing tags"@en ;
+    skos:hasTopConcept aeco:tag-who , aeco:tag-what , aeco:tag-where , aeco:tag-when , aeco:tag-why , aeco:tag-how .
+
+aeco:tag-who a skos:Concept ; skos:inScheme aeco:tags ; skos:topConceptOf aeco:tags ;
+    skos:prefLabel "Who"@en ;
+    skos:definition "Tells which person, company or authority does or controls something."@en .
+
+aeco:tag-what a skos:Concept ; skos:inScheme aeco:tags ; skos:topConceptOf aeco:tags ;
+    skos:prefLabel "What"@en ;
+    skos:definition "Tells which thing, product or content is part of the work."@en .
+
+aeco:tag-where a skos:Concept ; skos:inScheme aeco:tags ; skos:topConceptOf aeco:tags ;
+    skos:prefLabel "Where"@en ;
+    skos:definition "Tells the place, the site or the jurisdiction and its rules."@en .
+
+aeco:tag-when a skos:Concept ; skos:inScheme aeco:tags ; skos:topConceptOf aeco:tags ;
+    skos:prefLabel "When"@en ;
+    skos:definition "Tells the time, the phase or the order of an occurrence."@en .
+
+aeco:tag-why a skos:Concept ; skos:inScheme aeco:tags ; skos:topConceptOf aeco:tags ;
+    skos:prefLabel "Why"@en ;
+    skos:definition "Tells the reason, the requirement or the purpose."@en .
+
+aeco:tag-how a skos:Concept ; skos:inScheme aeco:tags ; skos:topConceptOf aeco:tags ;
+    skos:prefLabel "How"@en ;
+    skos:definition "Tells the method, the process or the means."@en .

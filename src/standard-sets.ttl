@@ -1,0 +1,29 @@
+# Standard sets. Each base concept says which sets it applies under (aeco:appliesUnder).
+# US start list. UK sets will follow. New sets need maintainer approval.
+@prefix aeco: <https://w3id.org/aeco/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+
+aeco:standard-sets a skos:ConceptScheme ;
+    dct:title "Standard sets"@en ;
+    skos:hasTopConcept aeco:std-shared , aeco:std-aia , aeco:std-consensusdocs , aeco:std-dbia , aeco:std-ejcdc ,
+        aeco:std-icc , aeco:std-nfpa , aeco:std-osha1926 , aeco:std-ada .
+
+aeco:std-shared a skos:Concept ; skos:inScheme aeco:standard-sets ; skos:topConceptOf aeco:standard-sets ;
+    skos:prefLabel "Shared"@en ; skos:definition "Applies under any standard."@en .
+aeco:std-aia a skos:Concept ; skos:inScheme aeco:standard-sets ; skos:topConceptOf aeco:standard-sets ;
+    skos:prefLabel "AIA"@en ; skos:definition "Applies under AIA contract documents."@en .
+aeco:std-consensusdocs a skos:Concept ; skos:inScheme aeco:standard-sets ; skos:topConceptOf aeco:standard-sets ;
+    skos:prefLabel "ConsensusDocs"@en ; skos:definition "Applies under ConsensusDocs contract documents."@en .
+aeco:std-dbia a skos:Concept ; skos:inScheme aeco:standard-sets ; skos:topConceptOf aeco:standard-sets ;
+    skos:prefLabel "DBIA"@en ; skos:definition "Applies under DBIA design-build contract documents."@en .
+aeco:std-ejcdc a skos:Concept ; skos:inScheme aeco:standard-sets ; skos:topConceptOf aeco:standard-sets ;
+    skos:prefLabel "EJCDC"@en ; skos:definition "Applies under EJCDC engineering and infrastructure contract documents."@en .
+aeco:std-icc a skos:Concept ; skos:inScheme aeco:standard-sets ; skos:topConceptOf aeco:standard-sets ;
+    skos:prefLabel "ICC I-Codes"@en ; skos:definition "Applies under the International Codes of the ICC, for example the IBC."@en .
+aeco:std-nfpa a skos:Concept ; skos:inScheme aeco:standard-sets ; skos:topConceptOf aeco:standard-sets ;
+    skos:prefLabel "NFPA"@en ; skos:definition "Applies under NFPA codes and standards for fire and life safety."@en .
+aeco:std-osha1926 a skos:Concept ; skos:inScheme aeco:standard-sets ; skos:topConceptOf aeco:standard-sets ;
+    skos:prefLabel "OSHA 1926"@en ; skos:definition "Applies under OSHA 29 CFR 1926, the safety and health rules for construction."@en .
+aeco:std-ada a skos:Concept ; skos:inScheme aeco:standard-sets ; skos:topConceptOf aeco:standard-sets ;
+    skos:prefLabel "ADA"@en ; skos:definition "Applies under the ADA Standards for Accessible Design."@en .
