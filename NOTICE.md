@@ -112,7 +112,7 @@ The taxonomy is written in SKOS and Turtle, with a JSON-LD export, and checked w
 
 ## Explorer and tools
 
-- The explorer in `site/` loads D3 (ISC licence, Copyright 2010-2023 Mike Bostock) and the IBM Plex fonts (SIL Open Font License 1.1, Copyright IBM Corp.) when it runs. It does not redistribute them.
+- The explorer in `site/` loads D3 (ISC licence, Copyright 2010-2023 Mike Bostock) and the Newsreader, Inter and Geist Mono fonts (SIL Open Font License 1.1, Copyright the Newsreader Project Authors, the Inter Project Authors and the Geist Project Authors) when it runs. It does not redistribute them.
 - `scripts/` uses rdflib (BSD 3-Clause) and pySHACL (Apache License 2.0) as installed dependencies. It does not redistribute them.
 
 ## No endorsement
