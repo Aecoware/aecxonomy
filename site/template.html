@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aecoware Open Taxonomy</title>
 <meta name="description" content="Explore the Aecoware Open Taxonomy: an open SKOS taxonomy for architecture, engineering, construction and operations, with 5W1H routing tags and SHACL checks.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Cg fill='none' stroke='%2315171C' stroke-width='1.6' stroke-linejoin='round'%3E%3Cpath d='M14 2 L25 7 L14 12 L3 7 Z'/%3E%3Cpath d='M3 12 V14.5 L14 19.5 L25 14.5 V12'/%3E%3Cpath d='M3 17 V19.5 L14 24.5 L25 19.5 V17'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='61 66 232 232'%3E%3Crect x='61' y='66' width='232' height='232' fill='%23121211'/%3E%3Cg fill='%23fff'%3E%3Cpolygon points='81,114.5 223.2,114.5 273,134.2 273,155.8 127,155.8 81,136.8'/%3E%3Cpolygon points='81,191 236,165.5 273,165.5 273,187.5 125.6,208.4 81,199.5'/%3E%3Cpolygon points='81,219.5 224.6,219.5 273,228 273,249.2 125,249.2 81,239.5'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <!-- Built by scripts/build_site.py from site/template.html. Edit the template, not index.html. -->
@@ -48,7 +48,9 @@ header.top { background: var(--surface); border-bottom: 1px solid var(--line); }
 header.top .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; padding-block: 12px 0; }
 .brand { display: flex; align-items: center; gap: 12px; color: var(--ink); padding-bottom: 12px; }
 .brand:hover { text-decoration: none; }
-.brand svg g { stroke: var(--ink); }
+.brand svg { flex: none; }
+.brand svg rect { fill: var(--ink); }
+.brand svg g { fill: var(--surface); }
 .brand .name { display: flex; flex-direction: column; line-height: 1.15; }
 .brand .name b { font-size: 19px; letter-spacing: -0.015em; }
 .brand .name small { color: var(--muted); font-size: 12.5px; letter-spacing: 0.01em; }
@@ -222,7 +224,7 @@ footer.site .wrap { display: flex; flex-wrap: wrap; gap: 6px 18px; padding-block
 <header class="top">
   <div class="wrap">
     <a class="brand" href="#" id="home" aria-label="Aecoware Open Taxonomy, back to the overview">
-      <svg width="30" height="30" viewBox="0 0 28 28" aria-hidden="true"><g fill="none" stroke-width="1.4" stroke-linejoin="round"><path d="M14 2 L25 7 L14 12 L3 7 Z"></path><path d="M3 7 V9.5 L14 14.5 L25 9.5 V7"></path><path d="M3 12 V14.5 L14 19.5 L25 14.5 V12"></path><path d="M3 17 V19.5 L14 24.5 L25 19.5 V17"></path></g></svg>
+      <svg width="28" height="28" viewBox="61 66 232 232" aria-hidden="true"><rect x="61" y="66" width="232" height="232"></rect><g><polygon points="81,114.5 223.2,114.5 273,134.2 273,155.8 127,155.8 81,136.8"></polygon><polygon points="81,191 236,165.5 273,165.5 273,187.5 125.6,208.4 81,199.5"></polygon><polygon points="81,219.5 224.6,219.5 273,228 273,249.2 125,249.2 81,239.5"></polygon></g></svg>
       <span class="name"><b>Aecoware Open Taxonomy</b><small id="subline">SKOS</small></span>
     </a>
     <div class="search" role="search">
