@@ -12,7 +12,6 @@
 aeco:aeco-00400 skos:closeMatch <https://w3id.org/rec#Site> .
 aeco:aeco-00480 skos:exactMatch <https://w3id.org/rec#Hospital> .
 aeco:aeco-00484 skos:exactMatch <https://w3id.org/rec#School> .
-aeco:aeco-00491 skos:exactMatch <https://w3id.org/rec#Library> .
 aeco:aeco-00524 skos:exactMatch <https://w3id.org/rec#Campus> .
 aeco:aeco-00527 skos:exactMatch <https://w3id.org/rec#Level> .
 aeco:aeco-00528 skos:exactMatch <https://w3id.org/rec#BasementLevel> .

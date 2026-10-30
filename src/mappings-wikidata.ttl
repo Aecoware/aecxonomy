@@ -75,7 +75,6 @@ aeco:aeco-00201 skos:exactMatch <http://www.wikidata.org/entity/Q1067270> .
 aeco:aeco-00215 skos:closeMatch <http://www.wikidata.org/entity/Q1242875> .
 aeco:aeco-00217 skos:exactMatch <http://www.wikidata.org/entity/Q827792> .
 aeco:aeco-00218 skos:closeMatch <http://www.wikidata.org/entity/Q836575> .
-aeco:aeco-00220 skos:closeMatch <http://www.wikidata.org/entity/Q2281295> .
 aeco:aeco-00223 skos:closeMatch <http://www.wikidata.org/entity/Q180388> .
 aeco:aeco-00228 skos:exactMatch <http://www.wikidata.org/entity/Q2607871> .
 aeco:aeco-00229 skos:exactMatch <http://www.wikidata.org/entity/Q2291518> .
@@ -189,7 +188,6 @@ aeco:aeco-00529 skos:exactMatch <http://www.wikidata.org/entity/Q958148> .
 aeco:aeco-00530 skos:closeMatch <http://www.wikidata.org/entity/Q3305339> .
 aeco:aeco-00531 skos:exactMatch <http://www.wikidata.org/entity/Q180516> .
 aeco:aeco-00532 skos:closeMatch <http://www.wikidata.org/entity/Q86726304> .
-aeco:aeco-00534 skos:closeMatch <http://www.wikidata.org/entity/Q126901293> .
 aeco:aeco-00538 skos:closeMatch <http://www.wikidata.org/entity/Q133821658> .
 aeco:aeco-00540 skos:exactMatch <http://www.wikidata.org/entity/Q128931161> .
 aeco:aeco-00541 skos:exactMatch <http://www.wikidata.org/entity/Q1135449> .
@@ -227,7 +225,6 @@ aeco:aeco-00580 skos:closeMatch <http://www.wikidata.org/entity/Q818978> .
 aeco:aeco-00584 skos:exactMatch <http://www.wikidata.org/entity/Q1426185> .
 aeco:aeco-00585 skos:exactMatch <http://www.wikidata.org/entity/Q1129209> .
 aeco:aeco-00590 skos:closeMatch <http://www.wikidata.org/entity/Q2448108> .
-aeco:aeco-00592 skos:closeMatch <http://www.wikidata.org/entity/Q137163126> .
 aeco:aeco-00594 skos:exactMatch <http://www.wikidata.org/entity/Q12511> .
 aeco:aeco-00595 skos:closeMatch <http://www.wikidata.org/entity/Q183061> .
 aeco:aeco-00596 skos:exactMatch <http://www.wikidata.org/entity/Q1370962> .
@@ -236,7 +233,7 @@ aeco:aeco-00604 skos:exactMatch <http://www.wikidata.org/entity/Q221706> .
 aeco:aeco-00611 skos:closeMatch <http://www.wikidata.org/entity/Q2164387> .
 aeco:aeco-00619 skos:closeMatch <http://www.wikidata.org/entity/Q173725> .
 aeco:aeco-00624 skos:exactMatch <http://www.wikidata.org/entity/Q220224> .
-aeco:aeco-00630 skos:closeMatch <http://www.wikidata.org/entity/Q815414> .
+aeco:aeco-00630 skos:closeMatch <http://www.wikidata.org/entity/Q28914318> .
 aeco:aeco-00631 skos:exactMatch <http://www.wikidata.org/entity/Q1364228> .
 aeco:aeco-00634 skos:exactMatch <http://www.wikidata.org/entity/Q1897785> .
 aeco:aeco-00635 skos:exactMatch <http://www.wikidata.org/entity/Q1413030> .

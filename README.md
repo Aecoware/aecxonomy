@@ -15,7 +15,7 @@ An open SKOS taxonomy for architecture, engineering, construction and operations
 | Synonyms (alternative labels) | 2,238 |
 | Related links between concepts | 378 |
 | 5W1H routing tags | 1 or 2 on every concept |
-| Links to outside standards | 858, opt-in, plus 23 links by name only |
+| Links to outside standards | 854, opt-in, plus 23 links by name only |
 
 Each concept has:
 
@@ -67,9 +67,9 @@ The core taxonomy stands alone. Links to outside vocabularies sit in separate fi
 | IFC 4.3 | buildingSMART International | 156 | Class identifier | `src/mappings-ifc.ttl` |
 | BOT | W3C Linked Building Data Community Group | 8 (6 of 7 classes) | Class IRI | `src/mappings-bot.ttl` |
 | Brick | Brick Consortium | 62 | Class IRI | `src/mappings-brick.ttl` |
-| RealEstateCore | RealEstateCore Consortium | 40 | Class IRI | `src/mappings-rec.ttl` |
+| RealEstateCore | RealEstateCore Consortium | 39 | Class IRI | `src/mappings-rec.ttl` |
 | Uniclass 2015 | NBS | 210 | Code only, no title | `src/mappings-uniclass.ttl` |
-| Wikidata | Wikimedia community | 382 | Item ID | `src/mappings-wikidata.ttl` |
+| Wikidata | Wikimedia community | 379 | Item ID | `src/mappings-wikidata.ttl` |
 | ISO 12006-2:2015 | ISO | 14 | Class name only | `src/mappings-iso-12006-2.tsv` |
 | RIBA Plan of Work 2020 | RIBA | 9 (all 8 stages) | Stage number and name only | `src/mappings-riba-plan-of-work.tsv` |
 

@@ -70,7 +70,6 @@ aeco-00529	Mezzanine	exact	Q958148	mezzanine		W1	2026-10-25
 aeco-00530	Building part	close	Q3305339	building part		W1	2026-10-25
 aeco-00531	Room	exact	Q180516	room		W1	2026-10-25
 aeco-00532	Fire compartment	close	Q86726304	fire compartment		W1	2026-10-25
-aeco-00534	Security zone	close	Q126901293	security zone		W1	2026-10-25
 aeco-00538	Meeting room	close	Q133821658	meeting room		W1	2026-10-25
 aeco-00540	Break room	exact	Q128931161	break room		W1	2026-10-25
 aeco-00541	Corridor	exact	Q1135449	corridor		W1	2026-10-25
@@ -112,7 +111,6 @@ aeco-00467	Building automation	exact	Q1149653	building automation		W2	2026-10-25
 aeco-00584	Shallow foundation	exact	Q1426185	shallow foundation		W2	2026-10-25
 aeco-00585	Deep foundation	exact	Q1129209	deep foundation		W2	2026-10-25
 aeco-00590	Structural frame	close	Q2448108	structural system		W2	2026-10-25
-aeco-00592	Roof structure	close	Q137163126	Roof structure		W2	2026-10-25
 aeco-00594	Stair	exact	Q12511	stairs		W2	2026-10-25
 aeco-00595	Exterior wall	close	Q183061	façade		W2	2026-10-25
 aeco-00596	Curtain wall	exact	Q1370962	curtain wall		W2	2026-10-25
@@ -121,7 +119,7 @@ aeco-00604	Ceiling	exact	Q221706	ceiling		W2	2026-10-25
 aeco-00611	Platform lift	close	Q2164387	wheelchair lift		W2	2026-10-25
 aeco-00619	Cooling system	close	Q173725	air conditioning		W2	2026-10-25
 aeco-00624	Sprinkler system	exact	Q220224	fire sprinkler system		W2	2026-10-25
-aeco-00630	Lighting system	close	Q815414	lighting system		W2	2026-10-25
+aeco-00630	Lighting system	close	Q28914318	lighting system		W2	2026-10-30
 aeco-00631	Emergency power system	exact	Q1364228	emergency power system		W2	2026-10-25
 aeco-00634	Photovoltaic system	exact	Q1897785	photovoltaic system		W2	2026-10-25
 aeco-00635	Structured cabling	exact	Q1413030	structured cabling		W2	2026-10-25
@@ -240,7 +238,6 @@ aeco-00201	Value engineering	exact	Q1067270	value engineering		W3	2026-10-25
 aeco-00215	Materials management	close	Q1242875	materials management		W3	2026-10-25
 aeco-00217	Quality control	exact	Q827792	quality control		W3	2026-10-25
 aeco-00218	Quality assurance	close	Q836575	quality assurance		W3	2026-10-25
-aeco-00220	Safety inspection	close	Q2281295	safety inspection		W3	2026-10-25
 aeco-00223	Waste management	close	Q180388	waste management		W3	2026-10-25
 aeco-00228	Preventive maintenance	exact	Q2607871	preventive maintenance		W3	2026-10-25
 aeco-00229	Corrective maintenance	exact	Q2291518	corrective maintenance		W3	2026-10-25
