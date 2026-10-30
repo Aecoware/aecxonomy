@@ -143,6 +143,20 @@ main.wrap { display: flex; flex-wrap: wrap; gap: 20px; padding-block: 18px 40px;
 .cols-foot { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 14px; border-top: 1px solid var(--soft); font-size: 12.5px; color: var(--muted); }
 
 aside.panel { flex: 1 1 360px; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+/* Drag handle between the map and the panel. Below 980px the panel wraps under the map and the handle is hidden. */
+.splitter { display: none; }
+@media (min-width: 980px) {
+  main.wrap { flex-wrap: nowrap; gap: 0; }
+  .stage { flex: 1 1 0; }
+  aside.panel { box-sizing: border-box; flex: 0 0 clamp(320px, var(--panel-w, 400px), calc(100% - 460px)); }
+  .splitter { display: block; flex: 0 0 20px; align-self: stretch; position: relative; cursor: col-resize; touch-action: none; }
+  .splitter::before { content: ""; position: absolute; top: 0; bottom: 0; left: 9px; width: 2px; border-radius: 2px; transition: background 120ms ease; }
+  .splitter i { position: sticky; top: calc(50vh - 18px); display: block; width: 4px; height: 36px; margin: 120px auto 0; border-radius: 2px; background: var(--line); transition: background 120ms ease; }
+  .splitter:hover::before, .splitter.drag::before, .splitter:focus-visible::before { background: var(--accent); }
+  .splitter:hover i, .splitter.drag i, .splitter:focus-visible i { background: var(--accent); }
+  .splitter:focus-visible { outline: none; }
+  body.resizing { cursor: col-resize; user-select: none; }
+}
 .panel .mode { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); min-height: 22px; }
 .chip { font-size: 12px; padding: 1px 9px; border-radius: 999px; background: var(--soft); color: var(--ink); }
 .chip.preview, .chip.warn { background: var(--flag-bg); color: var(--flag-ink); }
@@ -292,6 +306,7 @@ footer.site .wrap { display: flex; flex-wrap: wrap; gap: 6px 18px; padding-block
     </div>
   </section>
 
+  <div class="splitter" id="splitter" role="separator" tabindex="0" aria-orientation="vertical" aria-controls="panel" aria-label="Panel width" title="Drag to resize the panel. Double-click to reset."><i></i></div>
   <aside class="panel" id="panel" aria-live="polite"></aside>
 </main>
 <footer class="site">
@@ -818,6 +833,58 @@ const DATA = /*DATA*/null;
   }
   document.getElementById('tab-map').addEventListener('click', () => setView('map'));
   document.getElementById('tab-cols').addEventListener('click', () => setView('cols'));
+
+  /* ---------- panel width ---------- */
+  // The CSS clamps --panel-w to the room left beside the map, so the code only sets it and stores what the CSS allowed.
+  const mainEl = document.querySelector('main.wrap'), panelEl = document.getElementById('panel'), splitEl = document.getElementById('splitter');
+  const PANEL_MIN = 320, PANEL_DEF = 400, STAGE_MIN = 440;
+  function syncSplit() {
+    const cs = getComputedStyle(mainEl);
+    const room = mainEl.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - splitEl.offsetWidth - STAGE_MIN;
+    splitEl.setAttribute('aria-valuemin', PANEL_MIN);
+    splitEl.setAttribute('aria-valuemax', Math.max(PANEL_MIN, Math.round(room)));
+    splitEl.setAttribute('aria-valuenow', panelEl.offsetWidth);
+  }
+  function setPanelW(w, save) {
+    mainEl.style.setProperty('--panel-w', Math.round(w) + 'px');
+    if (!save) return;
+    const real = panelEl.offsetWidth;
+    mainEl.style.setProperty('--panel-w', real + 'px');
+    syncSplit();
+    try { localStorage.setItem('aot-panel', String(real)); } catch (e) {}
+  }
+  let dragX = null;
+  splitEl.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    e.preventDefault(); splitEl.focus({ preventScroll: true });
+    splitEl.setPointerCapture(e.pointerId);
+    dragX = e.clientX + panelEl.offsetWidth;
+    splitEl.classList.add('drag'); document.body.classList.add('resizing');
+  });
+  splitEl.addEventListener('pointermove', (e) => { if (dragX !== null) setPanelW(dragX - e.clientX, false); });
+  function endDrag() {
+    if (dragX === null) return;
+    dragX = null;
+    splitEl.classList.remove('drag'); document.body.classList.remove('resizing');
+    setPanelW(panelEl.offsetWidth, true);
+  }
+  splitEl.addEventListener('pointerup', endDrag);
+  splitEl.addEventListener('pointercancel', endDrag);
+  splitEl.addEventListener('lostpointercapture', endDrag);
+  splitEl.addEventListener('dblclick', () => setPanelW(PANEL_DEF, true));
+  splitEl.addEventListener('focus', syncSplit);
+  splitEl.addEventListener('keydown', (e) => {
+    const w = panelEl.offsetWidth, step = e.shiftKey ? 80 : 20;
+    if (e.key === 'ArrowLeft') setPanelW(w + step, true);
+    else if (e.key === 'ArrowRight') setPanelW(w - step, true);
+    else if (e.key === 'Home') setPanelW(PANEL_MIN, true);
+    else if (e.key === 'End') setPanelW(99999, true);
+    else if (e.key === 'Enter') setPanelW(PANEL_DEF, true);
+    else return;
+    e.preventDefault();
+  });
+  let savedW = 0; try { savedW = parseInt(localStorage.getItem('aot-panel'), 10) || 0; } catch (e) {}
+  if (savedW >= PANEL_MIN) setPanelW(savedW, false);
 
   /* ---------- machine-readable blocks ---------- */
   const P = {
