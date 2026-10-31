@@ -119,13 +119,19 @@ header.top .wrap { display: flex; align-items: center; gap: 32px; min-height: 56
 .fcount { margin-left: auto; font-size: 13px; color: var(--stone-600); display: flex; gap: 12px; align-items: center; }
 .fcount b { color: var(--ink); font-variant-numeric: tabular-nums; }
 .linkbtn { border: 0; background: none; padding: 4px 0; font-size: 13px; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; cursor: pointer; }
-.why { position: relative; }
-.why > button { width: 24px; height: 24px; padding: 0; border: 1px solid var(--stone-300); background: var(--paper); color: var(--stone-600); font: 12px var(--mono); cursor: pointer; }
-.why > button:hover { border-color: var(--ink); color: var(--ink); }
-.why .pop { position: absolute; z-index: 35; top: 32px; left: -8px; width: min(352px, 86vw); padding: 16px; background: var(--paper); border: 1px solid var(--ink); box-shadow: 0 24px 40px -24px rgba(18, 18, 17, 0.28); }
-.why .pop dl { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 4px 12px; margin: 8px 0 0; }
-.why .pop dt { font-weight: 600; }
+/* The pop-up opens under the whole 5W1H row, from its left edge, so it stays on screen at every width. */
+#fq { position: relative; }
+.why > button { min-height: 36px; padding: 0 12px; border: 1px solid var(--stone-300); background: var(--paper); color: var(--stone-600); font: 12px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
+.why > button:hover, .why > button[aria-expanded="true"] { border-color: var(--ink); color: var(--ink); }
+/* The short version of docs/5w1h.md: why the tags, how an agent routes with them, the six definitions, and a link. */
+.why .pop { position: absolute; z-index: 35; top: calc(100% + 8px); left: 0; width: min(400px, calc(100vw - 32px)); padding: 24px; background: var(--paper); border: 1px solid var(--ink); box-shadow: 0 24px 40px -24px rgba(18, 18, 17, 0.28); }
+.why .pop p { margin: 0 0 12px; }
+.why .pop dl { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 8px 12px; margin: 16px 0; padding-top: 16px; border-top: 1px solid var(--ink); font-size: 13px; }
+.why .pop dt { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.why .pop dt i { flex: none; width: 11px; height: 11px; border: 1.5px solid var(--ink); }
 .why .pop dd { margin: 0; color: var(--stone-700); }
+.why .pop .kip { padding-top: 12px; border-top: 1px solid var(--stone-300); font-size: 13px; font-style: italic; color: var(--stone-700); }
+.why .pop .more { display: inline-block; padding-block: 4px; font-size: 13px; font-weight: 500; }
 
 /* ---- The view and the panel ---- */
 main.wrap { display: flex; flex-wrap: wrap; gap: 24px; padding-block: 32px 64px; align-items: flex-start; }
@@ -267,7 +273,8 @@ footer.site li a:hover { color: var(--ink); text-decoration: underline; }
   main.wrap { padding-block: 24px 48px; }
   .crumbs .here { font-size: 20px; }
   .tabs button, .chipbtn, .seg button, .btn.small, .check, .copy, .dtabs button { min-height: 44px; }
-  .why > button { width: 44px; height: 44px; }
+  .why > button { min-height: 44px; }
+  .why .pop { right: 0; width: auto; }
   footer.site { padding-block: 48px 32px; }
 }
 @media (prefers-reduced-motion: reduce) { .chart path.arc, .splitter::before, .splitter i { transition: none; } }
@@ -327,7 +334,7 @@ footer.site li a:hover { color: var(--ink); text-decoration: underline; }
     <div class="fgroup" id="fq">
       <span class="flabel">5W1H</span>
       <span class="why">
-        <button type="button" id="why-btn" aria-expanded="false" aria-controls="why-pop" aria-label="How the 5W1H tags work">?</button>
+        <button type="button" id="why-btn" aria-expanded="false" aria-controls="why-pop" aria-label="Why the taxonomy uses 5W1H">Why?</button>
         <div class="pop" id="why-pop" hidden></div>
       </span>
     </div>
@@ -574,10 +581,19 @@ const DATA = /*DATA*/null;
   document.getElementById('exact').addEventListener('change', e => { exactOnly = e.target.checked; onFilter(); });
   const whyBtn = document.getElementById('why-btn'), whyPop = document.getElementById('why-pop');
   (function buildWhy() {
-    whyPop.appendChild(el('div', null, 'Every concept carries one or two 5W1H tags. The first is primary. An agent first sorts a task question by these six, then follows only the concepts with the matching tag.'));
+    // The short version of docs/5w1h.md.
+    whyPop.appendChild(el('p', 'eyebrow', 'Why 5W1H'));
+    whyPop.appendChild(el('p', null, 'The tree tells what a concept is. The tags tell which question it answers. Every concept has one or two tags, and the first is primary.'));
+    whyPop.appendChild(el('p', null, 'An agent sorts a question into the six, looks only at the concepts with the matching tag and starts with the primary one. It can also show which of the six its context does not answer yet.'));
     const dl = el('dl');
-    TAGS.forEach(t => { dl.appendChild(el('dt', null, t)); dl.appendChild(el('dd', null, DATA.tags[t] || '')); });
+    TAGS.forEach(t => {
+      const dt = el('dt'), i = el('i'); i.style.background = `var(--q-${t.toLowerCase()})`;
+      dt.appendChild(i); dt.appendChild(document.createTextNode(t));
+      dl.appendChild(dt); dl.appendChild(el('dd', null, DATA.tags[t] || ''));
+    });
     whyPop.appendChild(dl);
+    whyPop.appendChild(el('p', 'kip', 'The six questions go back to Aristotle. Kipling gave them their best-known form in 1902: "Their names are What and Why and When / And How and Where and Who."'));
+    const more = el('a', 'more', 'Read why we use 5W1H'); more.href = DATA.repo + '/blob/main/docs/5w1h.md'; whyPop.appendChild(more);
   })();
   whyBtn.addEventListener('click', () => { const open = whyPop.hidden; whyPop.hidden = !open; whyBtn.setAttribute('aria-expanded', String(open)); });
   document.addEventListener('click', e => { if (!whyPop.hidden && !e.target.closest('.why')) { whyPop.hidden = true; whyBtn.setAttribute('aria-expanded', 'false'); } });

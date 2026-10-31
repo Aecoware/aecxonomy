@@ -55,7 +55,7 @@ Counts include the branch concept itself.
 - **Plain definitions.** Definitions follow the writing rules of ASD-STE100 Simplified Technical English: short sentences, one meaning for each word, 25 words or fewer in a sentence.
 - **Elements and products are two views of one item.** An element is a part in its place and what it does. A product is the same item as something you specify and buy. Related links join the two.
 - **Plain words that fit many concepts are flagged.** Words such as "wall" or "door" are hidden labels on each candidate concept. A search for them asks which concept you mean.
-- **5W1H tags route questions, they do not build the tree.** An agent sorts a task question by the six tags, then follows only the concepts with the matching tag.
+- **5W1H tags route questions, they do not build the tree.** An agent sorts a task question by the six tags, then follows only the concepts with the matching tag. [Why 5W1H](docs/5w1h.md) tells why we use the six questions, how an agent can route with them, and where they come from.
 - **Every concept passes SHACL checks** before it goes into the files.
 
 ## Linked standards (opt-in)
@@ -78,6 +78,8 @@ The links are our own judgement of meaning, not official mappings from the publi
 ## Repository layout
 
 ```
+docs/
+  5w1h.md                    why the taxonomy uses the 5W1H tags
 src/
   aeco-base.ttl              the concept scheme
   branches/*.ttl             the concepts, one file for each branch
