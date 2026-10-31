@@ -9,7 +9,7 @@ First public draft.
 ### Added
 
 - 1,073 concepts in 15 branches, with definitions, US English labels, UK English labels where the term differs, and 2,238 synonyms
-- 5W1H routing tags on every concept, with one primary tag
+- 5W1H routing tags on every concept, with one primary tag, and [docs/5w1h.md](docs/5w1h.md): why the taxonomy uses them, how an agent can route a question with them, and where the six questions come from
 - Standard sets: Shared, AIA, ConsensusDocs, DBIA, EJCDC, ICC International Codes, NFPA, OSHA 1926 and ADA
 - 378 related links, including the links between elements and products
 - Hidden labels for plain words that fit several concepts, such as "wall" and "door"
