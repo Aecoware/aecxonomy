@@ -335,7 +335,8 @@ aeco:aeco-00185 a skos:Concept ;
     skos:broader aeco:aeco-00008 ;
     skos:notation "aeco-00185" ;
     skos:prefLabel "Submittals"@en-US , "Submittals"@en-GB ;
-    skos:altLabel "submittal package"@en-US ,
+    skos:altLabel "submittal"@en-US ,
+        "submittal package"@en-US ,
         "technical submittals"@en-GB ;
     skos:definition "The information that a contractor sends for the designer's review to show how it will meet the design."@en ;
     skos:scopeNote "The review process is Submittal review"@en ;
@@ -343,7 +344,7 @@ aeco:aeco-00185 a skos:Concept ;
     aeco:tag aeco:tag-what ;
     aeco:appliesUnder aeco:std-shared ;
     dct:created "2026-10-24"^^xsd:date ;
-    dct:modified "2026-10-24"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00251 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -619,6 +620,21 @@ aeco:aeco-00264 a skos:Concept ;
     dct:created "2026-10-24"^^xsd:date ;
     dct:modified "2026-10-24"^^xsd:date .
 
+aeco:aeco-01118 a skos:Concept ;
+    skos:inScheme aeco:base ;
+    skos:broader aeco:aeco-00187 ;
+    skos:notation "aeco-01118" ;
+    skos:prefLabel "Punch item"@en-US , "Snag"@en-GB ;
+    skos:altLabel "punch list item"@en-US ,
+        "punchlist item"@en-US ,
+        "snagging item"@en-GB ;
+    skos:definition "One entry on a list of defects and missing items: a piece of work that the contractor must fix or finish before final completion."@en ;
+    aeco:primaryTag aeco:tag-what ;
+    aeco:tag aeco:tag-what ;
+    aeco:appliesUnder aeco:std-shared ;
+    dct:created "2026-11-23"^^xsd:date ;
+    dct:modified "2026-11-23"^^xsd:date .
+
 aeco:aeco-00188 a skos:Concept ;
     skos:inScheme aeco:base ;
     skos:broader aeco:aeco-00008 ;
@@ -655,14 +671,16 @@ aeco:aeco-00266 a skos:Concept ;
     skos:broader aeco:aeco-00188 ;
     skos:notation "aeco-00266" ;
     skos:prefLabel "Look-ahead schedule"@en-US , "Short-term programme"@en-GB ;
-    skos:altLabel "3-week look-ahead schedule"@en-US ,
+    skos:altLabel "3-week look-ahead"@en-US ,
+        "3-week look-ahead schedule"@en-US ,
+        "look-ahead"@en-US ,
         "short-interval schedule"@en-US ;
     skos:definition "A short plan of the next few weeks of activities, taken from the master plan."@en ;
     aeco:primaryTag aeco:tag-what ;
     aeco:tag aeco:tag-what , aeco:tag-when ;
     aeco:appliesUnder aeco:std-shared ;
     dct:created "2026-10-24"^^xsd:date ;
-    dct:modified "2026-10-24"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00267 a skos:Concept ;
     skos:inScheme aeco:base ;

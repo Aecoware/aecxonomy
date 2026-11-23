@@ -1,0 +1,55 @@
+# Field words: words people use on site and in project records, and the concepts each one must find.
+# scripts/taxo.py check looks each word up in every label (preferred, alternative, hidden, US and UK).
+# Case, hyphens and extra spaces do not count. The word must find exactly the codes in "expect".
+# A row with status "gap" is a known gap: it warns and does not block. Remove the mark when it passes.
+# source: "strategy" for the language problems the Aecoware strategy names; "field" for common site usage.
+word	expect	status	source	note
+completion	aeco-00048 aeco-00049 aeco-01117		strategy	Same word, three milestones
+substantial completion	aeco-00048		field
+practical completion	aeco-00048		field	UK term
+final completion	aeco-00049		field
+mechanical completion	aeco-01117		field
+look-ahead	aeco-00266		strategy	Different words, same schedule
+3-week look-ahead	aeco-00266		field
+short-interval schedule	aeco-00266		strategy	Different words, same schedule
+PCO	aeco-00146		strategy	Different words, same notice
+COR	aeco-00146		strategy	Different words, same notice
+CE	aeco-00146		strategy	Different words, same notice
+change event	aeco-00146		strategy	Different words, same notice
+change order request	aeco-00146		field
+CO	aeco-00172 aeco-00335		strategy	Change order or certificate of occupancy
+C of O	aeco-00335		field
+PM	aeco-00108 aeco-00228		field	Project manager or preventive maintenance
+RFI	aeco-00255		field
+CCD	aeco-00147		field
+NTP	aeco-00047		field
+submittal	aeco-00185		field
+punch list	aeco-00263		field
+snagging list	aeco-00263		field	UK term
+punch item	aeco-01118		field
+snag	aeco-01118		field	UK term
+AHJ	aeco-00114		field
+as-builts	aeco-00271		field
+O&M manual	aeco-00272		field
+wall	aeco-00586 aeco-00595 aeco-00602 aeco-00656 aeco-01010 aeco-01017		field	Plain word, six candidates
+door	aeco-00598 aeco-00603		field	Plain word, two candidates
+slab	aeco-00587 aeco-01012		field	Plain word, two candidates
+roof	aeco-00592 aeco-00599		field	Plain word, two candidates
+pay app	aeco-00150		field
+SOV	aeco-00149		field
+GC	aeco-00102		field
+daily log	aeco-00260		field
+site diary	aeco-00260		field	UK term
+near miss	aeco-00059		field
+defect	aeco-01047		field
+retainage	aeco-00151		field
+retention	aeco-00151		field	UK term
+LDs	aeco-00162		field
+GMP	aeco-00136		field
+T&M	aeco-00138		field
+approve	aeco-01092		field	An action
+sign off	aeco-01092		field	An action
+revise and resubmit	aeco-01094		field	An action
+clash		gap	field	A conflict between elements in a model. Only "clash detection" exists, on Design coordination
+MEP		gap	field	Mechanical, electrical and plumbing: several candidates
+IFC		gap	field	Industry Foundation Classes, or issued for construction

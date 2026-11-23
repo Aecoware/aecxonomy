@@ -377,8 +377,10 @@ aeco:aeco-00146 a skos:Concept ;
     skos:broader aeco:aeco-00084 ;
     skos:notation "aeco-00146" ;
     skos:prefLabel "Potential change order"@en-US ;
-    skos:altLabel "COR"@en-US ,
+    skos:altLabel "CE"@en-US ,
+        "COR"@en-US ,
         "PCO"@en-US ,
+        "change event"@en-US ,
         "change order request"@en-US ;
     skos:definition "A notice that extra cost or time may come from an event, before the parties agree on an amendment."@en ;
     skos:scopeNote "US practice"@en ;
@@ -386,7 +388,7 @@ aeco:aeco-00146 a skos:Concept ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
     dct:created "2026-10-24"^^xsd:date ;
-    dct:modified "2026-10-24"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00147 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -422,14 +424,14 @@ aeco:aeco-00172 a skos:Concept ;
     skos:broader aeco:aeco-00084 ;
     skos:notation "aeco-00172" ;
     skos:prefLabel "Change order"@en-US ;
-    skos:altLabel "CO"@en-US ;
+    skos:hiddenLabel "CO"@en-US ;
     skos:definition "A signed amendment to the agreement that adjusts the scope, price or time of the work."@en ;
     skos:scopeNote "Signed by both parties. Close UK concepts: the JCT variation, instructed by one party and valued after, and the NEC4 compensation event. 'Variation order' is shorthand in UK and FIDIC practice, not a JCT or NEC term."@en ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-aia , aeco:std-consensusdocs ;
     dct:created "2026-10-24"^^xsd:date ;
-    dct:modified "2026-10-28"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00173 a skos:Concept ;
     skos:inScheme aeco:base ;

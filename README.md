@@ -2,7 +2,7 @@
 
 An open SKOS taxonomy for architecture, engineering, construction and operations (AECO). It gives people and AI agents one shared set of terms for the built environment.
 
-**Status:** draft v0.1.0. Codes stay stable from v1.0.0. Before v1.0.0, a concept can still move or change.
+**Status:** draft v0.1.0. Codes are permanent from v0.1.0: a code never changes its meaning, and a concept is never deleted. Before v1.0.0, a concept can still move in the tree, and its labels and definition can still improve.
 
 [Explore the taxonomy](https://aecoware.github.io/aecxonomy/) · [Cite it](CITATION.cff) · [Propose a change](CONTRIBUTING.md) · [Licence and credits](NOTICE.md)
 
@@ -10,9 +10,9 @@ An open SKOS taxonomy for architecture, engineering, construction and operations
 
 | Item | Count |
 |---|---|
-| Concepts | 1,073 |
-| Top branches | 15 |
-| Synonyms (alternative labels) | 2,238 |
+| Concepts | 1,118 |
+| Top branches | 16 |
+| Synonyms (alternative labels) | 2,288 |
 | Related links between concepts | 378 |
 | 5W1H routing tags | 1 or 2 on every concept |
 | Links to outside standards | 854, opt-in, plus 23 links by name only |
@@ -26,7 +26,7 @@ Each concept has:
 - the standard sets it applies under, for example Shared or OSHA 1926
 - a creation date and a change date
 
-## The 15 branches
+## The 16 branches
 
 | Code | Branch | Concepts |
 |---|---|---|
@@ -37,24 +37,27 @@ Each concept has:
 | aeco-00005 | Processes and services | 90 |
 | aeco-00006 | Phases | 24 |
 | aeco-00007 | Roles and organizations | 55 |
-| aeco-00008 | Information | 85 |
+| aeco-00008 | Information | 86 |
 | aeco-00009 | Properties | 78 |
 | aeco-00010 | Regulations and permits | 73 |
 | aeco-00011 | Contracts and commercial | 62 |
 | aeco-00012 | Requirements and decisions | 40 |
-| aeco-00013 | Events and risks | 38 |
+| aeco-00013 | Events and risks | 39 |
 | aeco-00014 | Site and environment | 40 |
 | aeco-00015 | Products and equipment | 117 |
+| aeco-01074 | Actions | 43 |
 
-Counts include the branch concept itself.
+Counts include the branch concept itself. Actions is outside the ISO 12006-2 groups, like Regulations and permits. Its code is higher because codes are given in order and never reused.
 
 ## Design rules
 
 - **One concept, one parent.** The tree is at most 3 levels deep. Elements and systems, and Products and equipment, go to 4 levels.
-- **Codes are opaque and never reused.** A label can change. The code stays.
+- **Codes are opaque, permanent and never reused.** A label can change. The code and its meaning stay. When a meaning must change, the old concept is deprecated (`owl:deprecated`), points to its replacement (`dct:isReplacedBy`) and stays in the files. Software that stores a code can trust it.
 - **Plain definitions.** Definitions follow the writing rules of ASD-STE100 Simplified Technical English: short sentences, one meaning for each word, 25 words or fewer in a sentence.
 - **Elements and products are two views of one item.** An element is a part in its place and what it does. A product is the same item as something you specify and buy. Related links join the two.
-- **Plain words that fit many concepts are flagged.** Words such as "wall" or "door" are hidden labels on each candidate concept. A search for them asks which concept you mean.
+- **Plain words that fit many concepts are flagged.** Words such as "wall" or "door", and short forms such as "CO" or "PM", are hidden labels on each candidate concept. A search for them asks which concept you mean.
+- **Field words are tested.** `scripts/field-words.tsv` lists words that people use on site and in project records, such as "completion", "look-ahead" and "PCO", with the concepts each one must find. The check fails when a word finds the wrong concepts. Known gaps are marked and only warn.
+- **Actions are verbs that combine with things.** The Actions branch names steps in work, such as Submit, Approve and Close. A record of work names one action and the thing it acts on: Approve + Change order. An activity concept such as Approve change order (`aeco-00989`) points to both, with `aeco:actionType` and `aeco:actsOn`.
 - **5W1H tags route questions, they do not build the tree.** An agent sorts a task question by the six tags, then follows only the concepts with the matching tag. [Why 5W1H](docs/5w1h.md) tells why we use the six questions, how an agent can route with them, and where they come from.
 - **Every concept passes SHACL checks** before it goes into the files.
 
@@ -90,6 +93,7 @@ src/
   mappings-<source>.tsv      the same links as tables, for review
 scripts/
   shapes.ttl                 the SHACL shapes
+  field-words.tsv            field words and the concepts each one must find
   taxo.py                    the checks, and maintainer tools
   build_site.py              builds the explorer and the merged data files
 site/
@@ -146,7 +150,7 @@ python3 scripts/build_site.py
 
 ## Versions
 
-We use semantic versions. A minor version adds concepts. A patch fixes wording. A major version removes or changes the meaning of a concept. From v1.0.0, a removed concept stays in the files as deprecated, with a link to its replacement. See [CHANGELOG.md](CHANGELOG.md).
+We use semantic versions. A minor version adds concepts or labels. A patch fixes wording. A major version deprecates concepts or changes the structure of the tree. No version changes the meaning of a code or deletes a concept: from v0.1.0, a concept that goes out of use stays in the files as deprecated, with a link to its replacement, and `scripts/taxo.py check` enforces this. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Contributing
 

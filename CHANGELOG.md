@@ -2,6 +2,25 @@
 
 All notable changes to the Aecoware Open Taxonomy are listed here. The format follows Keep a Changelog (https://keepachangelog.com), and versions follow Semantic Versioning (https://semver.org).
 
+## [Unreleased]
+
+### Added
+
+- The Actions branch (`aeco-01074`): 37 actions in 5 groups, such as Submit, Review, Approve, Return, Close and Share. A record of work names one action and the thing it acts on.
+- `aeco:actionType` and `aeco:actsOn`: the 25 activity concepts, such as Approve change order, point to their action and the thing it acts on.
+- Mechanical completion (`aeco-01117`) and Punch item (`aeco-01118`, "Snag" in UK English).
+- `scripts/field-words.tsv` and its check: 49 field words, each with the concepts it must find. Three known gaps (clash, MEP, IFC) warn until they are fixed.
+- Checks for deprecated concepts: the replacement must exist and must not be deprecated itself.
+
+### Changed
+
+- Codes are permanent from v0.1.0, not from v1.0.0. A code never changes its meaning, and a concept is never deleted.
+- "completion" is now a hidden label on Substantial, Final and Mechanical completion. Substantial completion has the UK label "Practical completion".
+- "look-ahead" and "3-week look-ahead" find Look-ahead schedule. "3-week look-ahead" moved there from Look-ahead planning.
+- "CE" and "change event" find Potential change order.
+- "CO" and "PM" are hidden labels on each of their two candidates, so neither candidate ranks first.
+- "submittal" finds Submittals.
+
 ## [0.1.0] - 2026-11-01
 
 First public draft.
