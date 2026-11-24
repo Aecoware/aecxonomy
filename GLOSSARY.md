@@ -39,12 +39,24 @@ _Avoid_: Standard, regime
 
 ### The explorer
 
+**Grouping**:
+What concepts sit under at the top level of the explorer, for example branches, 5W1H tags or outside standards.
+_Avoid_: View, lens
+
 **Layout**:
-How the explorer shows the tree of branches, for example as an outline or as columns.
-_Avoid_: View, mode, grouping
+How the explorer shows a grouping: as the map or as columns.
+_Avoid_: View, mode
+
+**Map**:
+The explorer's zoomable drawing of a whole grouping.
+_Avoid_: Chart, sunburst
+
+**Map type**:
+How the map is drawn: as an icicle, a sunburst or a territory map.
+_Avoid_: Variant, style
 
 **Filter**:
-A 5W1H tag, an outside standard or a standard set that narrows which concepts the explorer shows, with a count next to each value. A concept counts under every value it has.
+A 5W1H tag or an outside standard that narrows which concepts the explorer shows. A concept counts under every tag it has.
 _Avoid_: Facet
 
 **Concept page**:
