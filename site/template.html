@@ -154,6 +154,9 @@ main.wrap { display: flex; flex-wrap: wrap; gap: 24px; padding-block: 32px 64px;
 .chart path.arc { cursor: pointer; transition: opacity 140ms ease; }
 .chart text { font-family: var(--sans); pointer-events: none; user-select: none; }
 .chart .center-hit { cursor: pointer; }
+.load { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; min-height: 320px; padding: 24px; text-align: center; color: var(--stone-600); }
+.load[hidden] { display: none; }
+.load p { margin: 0; }
 /* The legend's items are the tags' definitions, so it is text, not labels. */
 .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; color: var(--stone-600); }
 .legend span { display: inline-flex; align-items: center; gap: 8px; }
@@ -366,7 +369,9 @@ footer.site li a:hover { color: var(--ink); text-decoration: underline; }
       </div>
       <button type="button" class="btn outline small" id="up">Zoom out</button>
     </div>
-    <div class="chart" id="chart"><div class="tip" id="tip" hidden></div></div>
+    <div class="chart" id="chart"><div class="tip" id="tip" hidden></div>
+      <div class="load" id="load"><p id="load-msg" role="status">Loading the taxonomy…</p><button type="button" class="btn outline small" id="load-retry" hidden>Try again</button></div>
+    </div>
     <div class="legend" id="legend" hidden></div>
     <div class="hint" aria-hidden="true">
       <span><b>Scroll up</b> over a branch to zoom in, <b>scroll down</b> to zoom out</span>
@@ -412,8 +417,9 @@ footer.site li a:hover { color: var(--ink); text-decoration: underline; }
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>
-const DATA = /*DATA*/null;
-(function () {
+const FILES = /*FILES*/null;
+const getJson = url => fetch(url).then(r => { if (!r.ok) throw new Error(url + ': ' + r.status); return r.json(); });
+function start(DATA) {
   'use strict';
   const TAGS = ['Who', 'What', 'Where', 'When', 'Why', 'How'];
   const SRC = { ifc: 'IFC 4.3', uniclass: 'Uniclass 2015', wikidata: 'Wikidata', brick: 'Brick', rec: 'RealEstateCore', bot: 'BOT', iso: 'ISO 12006-2', riba: 'RIBA Plan of Work' };
@@ -998,7 +1004,12 @@ const DATA = /*DATA*/null;
   const OUT_PFX = Object.keys(PFX_OF).map(s => `@prefix ${PFX_OF[s]}: <${NS[s]}> .`);
   const ttlPfx = () => [P.aeco, P.skos, P.dct, P.xsd].concat(linksOn ? OUT_PFX : []).join('\n') + '\n';
   const MATCH_LINE = / skos:(exact|close|broad|narrow)Match /;
-  const conceptTtl = c => DATA.ttl[c.code].split('\n').filter(l => linksOn || !MATCH_LINE.test(l)).join('\n').replace(/\n+$/, '');
+  // Each concept's Turtle and the shapes are most of the data, so they load the first time a selected concept shows them.
+  // A hover preview never starts the download: it shows the Turtle only once it is here.
+  let turtle = null, turtleLoad = null;
+  const loadTurtle = () => turtleLoad || (turtleLoad = getJson(FILES.turtle).then(t => (turtle = t), e => { turtleLoad = null; throw e; }));
+  const fromTurtle = (preview, f) => () => turtle ? f(turtle) : preview ? '# Click the concept to load its Turtle.' : loadTurtle().then(f);
+  const conceptTtl = (t, c) => t.ttl[c.code].split('\n').filter(l => linksOn || !MATCH_LINE.test(l)).join('\n').replace(/\n+$/, '');
   const sparqlPfx = list => list.map(x => x.replace('@prefix', 'PREFIX').replace(/ \.$/, '')).join('\n');
   function jsonld(c) {
     const o = { '@context': { aeco: 'https://w3id.org/aeco/', skos: 'http://www.w3.org/2004/02/skos/core#', dct: 'http://purl.org/dc/terms/' }, '@id': 'aeco:' + c.code, '@type': 'skos:Concept', 'skos:inScheme': { '@id': 'aeco:base' } };
@@ -1081,14 +1092,16 @@ const DATA = /*DATA*/null;
     const get = () => spec.find(s => s.k === cur);
     const paint = () => {
       const s = get();
-      pre.innerHTML = highlightCode(s.text(), s.lang);
       tabs.querySelectorAll('button[role="tab"]').forEach(b => b.setAttribute('aria-selected', b.dataset.k === cur ? 'true' : 'false'));
       note.textContent = s.note;
+      pre.textContent = 'Loading…';
+      Promise.resolve(s.text()).then(t => { if (get() === s) pre.innerHTML = highlightCode(t, s.lang); },
+        () => { if (get() === s) pre.textContent = 'This did not load. Pick the tab again to retry.'; });
     };
     spec.forEach(s => { const b = el('button', null, s.label); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.k = s.k; b.addEventListener('click', () => { cur = dataTab = s.k; paint(); }); tabs.appendChild(b); });
     const cp = el('button', 'copy', 'Copy'); cp.type = 'button';
     function selectPre() { const r = document.createRange(); r.selectNodeContents(pre); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
-    cp.addEventListener('click', () => { const t = get().text(); try { navigator.clipboard.writeText(t).then(() => { cp.textContent = 'Copied'; setTimeout(() => cp.textContent = 'Copy', 1400); }, selectPre); } catch (e) { selectPre(); } });
+    cp.addEventListener('click', () => { Promise.resolve(get().text()).then(t => navigator.clipboard.writeText(t)).then(() => { cp.textContent = 'Copied'; setTimeout(() => cp.textContent = 'Copy', 1400); }, selectPre); });
     tabs.appendChild(cp);
     box.appendChild(tabs); box.appendChild(pre); box.appendChild(note);
     paint();
@@ -1125,7 +1138,7 @@ const DATA = /*DATA*/null;
     panel.appendChild(mode);
     if (!d) return renderOverview();
     if (d.data.g) return renderGroup(d, mode);
-    return renderConcept(d, mode);
+    return renderConcept(d, mode, preview);
   }
   function renderOverview() {
     panel.appendChild(el('h2', null, 'Aecoware Open Taxonomy'));
@@ -1169,7 +1182,7 @@ const DATA = /*DATA*/null;
     if (spec) panel.appendChild(sec('Data', dataBlock(spec)));
     else panel.appendChild(el('p', 'note', 'Linked by name only. These links sit in a TSV file outside the RDF, because the standard text and codes are not open.'));
   }
-  function renderConcept(d, mode) {
+  function renderConcept(d, mode, preview) {
     const c = d.data.c, res = DATA.v[c.code] || [];
     const viol = res.filter(r => r[1] === 'Violation').length, warn = res.filter(r => r[1] === 'Warning').length;
     mode.appendChild(el('span', 'chip ' + (viol ? 'warn' : 'ok'), viol ? `SHACL: ${viol} violation` : 'SHACL: conforms'));
@@ -1237,10 +1250,10 @@ const DATA = /*DATA*/null;
     const rl = (related.get(c.code) || []).map(x => T.byC.get(x)).filter(Boolean);
     if (rl.length) panel.appendChild(sec(`Related (${rl.length})`, kidList(rl, true)));
     panel.appendChild(sec('Data', dataBlock([
-      { k: 'ttl', label: 'Turtle', lang: 'ttl', text: () => ttlPfx() + '\n' + conceptTtl(c), note: linksOn ? 'The concept as it sits in the repo, with its outside links and related links.' : 'The concept as it sits in the repo, with its related links. Outside links are unplugged.' },
+      { k: 'ttl', label: 'Turtle', lang: 'ttl', text: fromTurtle(preview, t => ttlPfx() + '\n' + conceptTtl(t, c)), note: linksOn ? 'The concept as it sits in the repo, with its outside links and related links.' : 'The concept as it sits in the repo, with its related links. Outside links are unplugged.' },
       { k: 'jsonld', label: 'JSON-LD', lang: 'json', text: () => jsonld(c), note: 'The same triples in JSON-LD, for web tools.' },
       { k: 'shacl', label: 'SHACL report', lang: 'ttl', text: () => shaclReport(c), note: 'Validation run with pySHACL against the shapes, plus the rules SHACL cannot express.' },
-      { k: 'shapes', label: 'Shapes', lang: 'ttl', text: () => DATA.shapes, note: 'scripts/shapes.ttl: the SHACL shapes every concept must pass.' }
+      { k: 'shapes', label: 'Shapes', lang: 'ttl', text: fromTurtle(preview, t => t.shapes), note: 'scripts/shapes.ttl: the SHACL shapes every concept must pass.' }
     ])));
   }
   function kidList(list, showBranch) {
@@ -1361,6 +1374,18 @@ const DATA = /*DATA*/null;
   window.addEventListener('hashchange', fromHash);
   let saved = null; try { saved = localStorage.getItem('aot-tab'); } catch (e) {}
   if (saved === 'cols') setView('cols');
+}
+
+/* ---------- load the data, then start ---------- */
+(function boot() {
+  'use strict';
+  const box = document.getElementById('load'), msg = document.getElementById('load-msg'), retry = document.getElementById('load-retry');
+  getJson(FILES.data).then(data => { start(data); box.hidden = true; }).catch(() => {
+    msg.textContent = 'The taxonomy did not load. Check your connection, then try again. The downloads above still work.';
+    retry.hidden = false;
+  });
+  // A reload also fetches the scripts again, in case one of those failed rather than the data.
+  retry.addEventListener('click', () => location.reload());
 })();
 </script>
 </body>

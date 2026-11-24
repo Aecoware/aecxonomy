@@ -3,8 +3,11 @@ site/index.html
 site/aeco.ttl
 site/aeco.jsonld
 site/aeco-mappings.ttl
+site/explorer-data.json
+site/explorer-turtle.json
 
 __pycache__/
+.pytest_cache/
 *.pyc
 .DS_Store
 .obsidian/

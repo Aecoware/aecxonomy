@@ -1,0 +1,7 @@
+# What the checks, the build and the tests need:
+#   python3 -m pip install -r tests/requirements.txt
+#   python3 -m playwright install chromium
+rdflib
+pyshacl
+pytest==8.4.2
+playwright==1.60.0
