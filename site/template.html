@@ -416,8 +416,21 @@ body.px-c.vc-sub .hero { display: none; }
 .vc-concept .px-nav .kids { max-height: none; }
 .vc-body { grid-area: body; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 
+/* The Map tab: today's sunburst inside each layout, with the concept beside it */
+.va-main.va-mapmode { grid-template-columns: minmax(0, 1fr) minmax(320px, 420px); }
+.va-mapmode .va-treebox { display: none; }
+.vb-map, .vc-map { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 420px); gap: 24px; align-items: start; }
+.vb-mapside, .vc-mapside { min-width: 0; position: sticky; top: calc(var(--px-top, 85px) + 16px); }
+.vb-mappv { min-width: 0; max-height: calc(100vh - var(--px-top, 85px) - 32px); background: var(--paper); border: 1px solid var(--ink); }
+.px-card { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 16px; background: var(--paper); border: 1px solid var(--ink); }
+.px-card h2 { margin: 0; font: 400 24px/1.15 var(--serif); letter-spacing: -0.01em; }
+.px-cardpath { font-size: 13px; color: var(--stone-600); }
+
 @media (max-width: 900px) {
   body.px { padding-bottom: 96px; }
+  .va-main.va-mapmode, .vb-map, .vc-map { grid-template-columns: minmax(0, 1fr); }
+  .vb-mapside, .vc-mapside { position: static; }
+  .vb-mappv { max-height: none; }
   .px-check { min-height: 44px; }
   /* A */
   .va-ftoggle { display: inline-flex; }
@@ -716,9 +729,12 @@ const DATA = /*DATA*/null;
   }
   function computeMatches() {
     matchCount = new Map();
-    if (!fTags.size && !fStd.size) { matchCodes = null; matchSet = null; return; }
-    matchCodes = new Set();
-    for (const c of byCode.values()) if (conceptMatches(c)) matchCodes.add(c.code);
+    if (PROTO) { if (!M) { matchCodes = null; matchSet = null; return; } matchCodes = M; }   // the prototype's three filters drive the map
+    else {
+      if (!fTags.size && !fStd.size) { matchCodes = null; matchSet = null; return; }
+      matchCodes = new Set();
+      for (const c of byCode.values()) if (conceptMatches(c)) matchCodes.add(c.code);
+    }
     matchSet = new Set();
     root.eachAfter(d => {
       let n = 0;
@@ -955,6 +971,7 @@ const DATA = /*DATA*/null;
     if (selected) path.filter(d => d === selected).raise();
   }
   function writeHash() {
+    if (PROTO && PX.noHash) return;
     const code = selected && selected.data.c ? selected.data.c.code : '';
     const h = [viewKey !== 'branches' ? viewKey : '', code].filter(Boolean).join('/');
     try { history.replaceState(null, '', h ? '#' + h : location.pathname + location.search); } catch (e) {}
@@ -963,6 +980,7 @@ const DATA = /*DATA*/null;
     selected = d; markSelected(); renderPanel(d, false);
     if (view === 'cols') colsRender();
     if (!quiet) writeHash();
+    if (PROTO && !PX.syncing && PX.onMap) PX.onMap(d && d.data.c ? d.data.c : null);   // a click in the map picks the layout's concept
   }
   function twinsOf(d) { return d.data.c ? (T.occAll.get(d.data.c.code) || [d]) : [d]; }
   function highlight() {
@@ -1108,8 +1126,10 @@ const DATA = /*DATA*/null;
     if (v === 'cols') colsRender();
     else if (selected) { const t = selected.children ? selected : selected.parent; if (t !== focus) { focus = t; drawCenter(); drawCrumbs(); applyVisibility(false); highlight(); } }
   }
-  document.getElementById('tab-map').addEventListener('click', () => setView('map'));
-  document.getElementById('tab-cols').addEventListener('click', () => setView('cols'));
+  if (!PROTO) {
+    document.getElementById('tab-map').addEventListener('click', () => setView('map'));
+    document.getElementById('tab-cols').addEventListener('click', () => setView('cols'));
+  }
 
   /* ---------- panel width ---------- */
   // The CSS clamps --panel-w to the room left beside the map, so the code only sets it and stores what the CSS allowed.
@@ -1290,6 +1310,7 @@ const DATA = /*DATA*/null;
     return pth;
   }
   function renderPanel(d, preview) {
+    if (PROTO) return;   // each layout shows the concept itself
     panel.textContent = '';
     if (!d) d = focus === root ? null : focus;
     const mode = el('div', 'mode');
@@ -1509,7 +1530,8 @@ const DATA = /*DATA*/null;
      concept content of today's panel plus siblings. Each variant places these its own way.
      Without ?variant= the page is today's explorer.
      ========================================================================================================== */
-  const PX = { paints: [], api: null, searchRefresh: () => {} };
+  // map: the Map tab is on (?map=1). syncing: the layout is moving the map, so the map must not answer. noHash: C owns the hash.
+  const PX = { paints: [], api: null, searchRefresh: () => {}, map: new URLSearchParams(location.search).get('map') === '1', syncing: false, noHash: false, onMap: null, paintTabs: () => {} };
   const STD_SETS = ['Shared', 'AIA', 'ConsensusDocs', 'DBIA', 'EJCDC', 'ICC I-Codes', 'NFPA', 'OSHA 1926', 'ADA'];
   const FACETS = [
     { k: 'tag', label: '5W1H tag', vals: TAGS, name: v => v, dot: v => `var(--q-${v.toLowerCase()})`, title: v => DATA.tags[v] },
@@ -1545,12 +1567,68 @@ const DATA = /*DATA*/null;
   const hashCode = () => { const h = decodeURIComponent(location.hash.slice(1)), k = h.split('/').pop(); return byCode.has(k) ? byCode.get(k) : null; };
   function setF(k, v, on) { if (on) F[k].add(v); else F[k].delete(v); filtersChanged(); }
   function clearF() { FACETS.forEach(f => F[f.k].clear()); filtersChanged(); }
-  function filtersChanged() { recompute(); PX.paints.forEach(p => p()); PX.api.refresh(); PX.searchRefresh(); }
+  function filtersChanged() {
+    recompute(); PX.paints.forEach(p => p());
+    if (MAPX.ready) { computeMatches(); highlight(); drawCenter(); }
+    PX.api.refresh(); PX.searchRefresh();
+  }
   // Bring a variant's main area under the sticky header when it is off screen, or when its top scrolled away.
   function reveal(node, force) {
     const top = phone() ? 0 : parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--px-top')) || 0;
     const y = node.getBoundingClientRect().top;
     if (force || y > innerHeight * 0.55 || y < top) window.scrollTo(0, y + scrollY - top - 8);
+  }
+
+  /* ---- the map: today's sunburst, kept as a Map tab in every layout. It shares the layout's filters and concept. ---- */
+  const MAPX = { ready: false };
+  const mapStage = document.getElementById('view-map');   // the old stage: zoom path, colour and rings, the chart, the hints
+  function mapInit() {
+    if (MAPX.ready) return;
+    MAPX.ready = true;
+    computeMatches(); bind(); colorize(); drawCenter(); drawCrumbs(); applyVisibility(false); highlight();
+  }
+  function mapAttach(parent, before) {
+    mapStage.hidden = false;
+    if (mapStage.parentNode !== parent || (before && mapStage.nextSibling !== before)) parent.insertBefore(mapStage, before || null);
+    mapInit();
+  }
+  // Show the layout's concept in the map, and zoom to it, without the map answering back.
+  function mapShow(c) {
+    mapInit();
+    const n = c ? T.byC.get(c.code) || null : null;
+    if (n === selected) return;
+    PX.syncing = true; select(n, true); PX.syncing = false;
+    zoomTo(n ? (n.children ? n : n.parent) : root);
+  }
+  // A short card for the concept picked in the map, with one button to open it in full.
+  function summaryCard(c, label, onOpen) {
+    const card = el('div', 'px-card');
+    if (!c) { card.appendChild(el('p', 'note', 'Click a branch in the map to zoom in, then click a concept to pick it.')); return card; }
+    const t = el('div', 'titlerow'), b = el('button', 'btn small', label);
+    t.append(el('h2', null, c.label), el('span', 'code-pill', c.code));
+    b.type = 'button'; b.addEventListener('click', () => onOpen(c));
+    card.append(el('div', 'px-cardpath', pathOf(c) || 'A branch'), t, el('p', 'note', c.def), b);
+    return card;
+  }
+  // The header tabs, as today's Map and Columns tabs: the layout's own name, then Map.
+  function modeTabs() {
+    const tabs = document.querySelector('header.top .tabs'), tm = document.getElementById('tab-map'), tl = document.getElementById('tab-cols');
+    tl.textContent = { A: 'Outline', B: 'Columns', C: 'List' }[VARIANT]; tm.textContent = 'Map';
+    tabs.append(tl, tm);
+    tl.setAttribute('aria-controls', 'px-host'); tm.setAttribute('aria-controls', 'px-host');
+    tl.addEventListener('click', () => pxSetMode(false));
+    tm.addEventListener('click', () => pxSetMode(true));
+    PX.paintTabs = () => { tm.setAttribute('aria-selected', String(PX.map)); tl.setAttribute('aria-selected', String(!PX.map)); };
+    PX.paintTabs();
+  }
+  function pxSetMode(on) {
+    if (PX.map === on) return;
+    PX.map = on; PX.paintTabs();
+    const u = new URL(location.href);
+    if (on) u.searchParams.set('map', '1'); else u.searchParams.delete('map');
+    try { history.replaceState(history.state, '', u.pathname + u.search + u.hash); } catch (e) {}
+    if (!on) mapStage.hidden = true;
+    PX.api.setMode(on);
   }
 
   /* ---- filter widgets: the model above is shared; each variant places them its own way ---- */
@@ -1907,8 +1985,21 @@ const DATA = /*DATA*/null;
       chainOf(c).slice(0, -1).forEach(a => exp.add(a.code));
       sel = cursor = c;
       drawTree(false); drawDetail(); setHash(c.code);
+      if (PX.map) mapShow(c);
       if (phone()) openSheet(); else { reveal(main, true); scrollRow(c); }
     }
+    // The Map tab puts the chart where the outline was. The concept stays beside it, or in the sheet on a phone.
+    function setMode(on) {
+      main.classList.toggle('va-mapmode', on);
+      if (on) { mapAttach(main, det); mapShow(sel); }
+      else if (sel) scrollRow(sel);
+    }
+    PX.onMap = c => {
+      sel = cursor = c;
+      if (c) chainOf(c).slice(0, -1).forEach(a => exp.add(a.code));
+      drawTree(false); drawDetail();
+      if (phone() && c && !c.children.length) openSheet(); else drawPeek();
+    };
     tree.addEventListener('click', e => {
       const it = e.target.closest('.va-row'); if (!it) return;
       const c = byCode.get(it.dataset.code);
@@ -1950,11 +2041,12 @@ const DATA = /*DATA*/null;
       if (M && M.size <= 60) for (const code of M) chainOf(byCode.get(code)).slice(0, -1).forEach(a => exp.add(a.code));
       drawTree(false); drawDetail(); drawPeek();
     }
-    function home() { sel = cursor = null; exp.clear(); det.classList.remove('open'); document.body.classList.remove('px-lock'); drawTree(false); drawDetail(); drawPeek(); setHash(''); window.scrollTo(0, 0); }
+    function home() { sel = cursor = null; exp.clear(); det.classList.remove('open'); document.body.classList.remove('px-lock'); drawTree(false); drawDetail(); drawPeek(); setHash(''); if (PX.map) mapShow(null); window.scrollTo(0, 0); }
     dropdownSearch(open);
     const start = hashCode();
     if (start) open(start); else { drawTree(false); drawDetail(); }
-    return { refresh, home, open };
+    if (PX.map) setMode(true);
+    return { refresh, home, open, setMode };
   }
 
   /* ---------- Variant B: Columns. Columns are the main layout; one column, step by step, on a phone. ---------- */
@@ -1970,7 +2062,27 @@ const DATA = /*DATA*/null;
     const main = el('div', 'wrap vb-main');
     host.append(bar, main);
 
-    function draw(focusIt) { if (phone()) drawSteps(); else drawCols(focusIt); }
+    // The Map tab puts the chart where the columns were, with the concept beside it. On a phone the concept is a card
+    // under the chart, and its Details button opens the concept as a step, as in the list.
+    const mapWrap = el('div', 'vb-map'), mapSide = el('div', 'vb-mapside');
+    mapWrap.appendChild(mapSide);
+    function draw(focusIt) {
+      if (PX.map && !(phone() && step && sel)) return drawMap();
+      if (phone()) drawSteps(); else drawCols(focusIt);
+    }
+    function drawMap() {
+      if (mapWrap.parentNode !== main) { main.textContent = ''; main.appendChild(mapWrap); }
+      mapAttach(mapWrap, mapSide);
+      mapSide.textContent = '';
+      if (phone()) mapSide.appendChild(summaryCard(sel, 'Details ›', () => { step = true; draw(); reveal(main); }));
+      else {
+        const pv = el('section', 'panel vb-preview vb-mappv'); pv.setAttribute('aria-label', 'Concept');
+        if (sel) { const p = conceptParts(sel, c => pick(c)); pv.append(p.head, p.facts, p.nav, p.more); } else overview(pv);
+        mapSide.appendChild(pv);
+      }
+      mapShow(sel);
+    }
+    PX.onMap = c => { sel = c; step = false; draw(); };
     function pick(c, focusIt) { sel = c; step = !!c && !c.children.length; draw(focusIt); setHash(c ? c.code : ''); }
     function drawCols(focusIt) {
       main.textContent = '';
@@ -2073,7 +2185,7 @@ const DATA = /*DATA*/null;
     dropdownSearch(open);
     const start = hashCode();
     if (start) open(start); else draw();
-    return { refresh: () => draw(), home: () => { pick(null); window.scrollTo(0, 0); }, open };
+    return { refresh: () => draw(), home: () => { pick(null); window.scrollTo(0, 0); }, open, setMode: () => draw() };
   }
 
   /* ---------- Variant C: Search-first. Search and the branch list lead; each concept is its own page. ---------- */
@@ -2163,9 +2275,25 @@ const DATA = /*DATA*/null;
       box.append(p.head, p.nav, body);
       page.appendChild(box);
     }
+    // The Map tab shows the chart in place of the pages, with a card for the concept picked in it. The card opens
+    // the concept's page. Typing a search goes back to the pages. The map never writes the hash: here the hash is the page.
+    PX.noHash = true;
+    const mapWrap = el('div', 'vc-map'), mapSide = el('div', 'vc-mapside');
+    let mapSel = null;
+    mapWrap.appendChild(mapSide);
+    function paintSide() { mapSide.textContent = ''; mapSide.appendChild(summaryCard(mapSel, 'Open its page ›', c => { pxSetMode(false); go(c.code); })); }
+    function drawMapPage(c) {
+      if (c) mapSel = c;
+      const head = el('div', 'vc-intro');
+      head.append(el('h2', 'vc-h', 'The map'), el('p', 'note', 'Click a branch to zoom in. Pick a concept, then open its page.'));
+      page.append(head, mapWrap);
+      mapAttach(mapWrap, mapSide); paintSide(); mapShow(mapSel);
+    }
+    PX.onMap = c => { mapSel = c; paintSide(); };
     let last = null;
     function route() {
       const h = decodeURIComponent(location.hash.slice(1)), kind = h.startsWith('search=') ? 'search' : hashCode() ? 'concept' : 'home';
+      if (PX.map && kind !== 'search') { document.body.classList.remove('vc-sub'); page.textContent = ''; drawMapPage(hashCode()); last = 'map'; return; }
       document.body.classList.toggle('vc-sub', kind !== 'home');   // the hero belongs to the home page only
       page.textContent = '';
       if (kind === 'search') { const s = h.slice(7); if (document.activeElement !== q) q.value = s; drawResults(s); }
@@ -2182,6 +2310,7 @@ const DATA = /*DATA*/null;
     window.addEventListener('hashchange', route);
     // Typing shows the results page: the first key adds a history entry, the rest replace it.
     q.addEventListener('input', () => {
+      if (PX.map && q.value.trim()) pxSetMode(false);
       const s = q.value, on = location.hash.startsWith('#search=');
       if (!s.trim()) go('', on); else go('search=' + encodeURIComponent(s), on);
     });
@@ -2197,7 +2326,12 @@ const DATA = /*DATA*/null;
       else if (e.key === 'ArrowUp') { e.preventDefault(); (hs[i - 1] || q).focus(); }
     });
     route();
-    return { refresh: () => { const y = scrollY; route(); window.scrollTo(0, y); }, home: () => { q.value = ''; go(''); }, open: c => go(c.code) };
+    return {
+      refresh: () => { const y = scrollY; route(); window.scrollTo(0, y); },
+      home: () => { q.value = ''; mapSel = null; if (PX.map) mapShow(null); go(''); },
+      open: c => go(c.code),
+      setMode: () => route()
+    };
   }
 
   /* ---------- the variant bar: ← and → cycle the variants; it shows only with ?variant= ---------- */
@@ -2216,7 +2350,7 @@ const DATA = /*DATA*/null;
     window.addEventListener('keydown', e => {
       if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-      if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable], [role="tree"], [role="listbox"], .vb-cols, pre, .dtabs')) return;
+      if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable], [role="tree"], [role="listbox"], .vb-cols, .chart, pre, .dtabs')) return;
       go(e.key === 'ArrowLeft' ? -1 : 1);
     });
   }
@@ -2226,7 +2360,7 @@ const DATA = /*DATA*/null;
     document.body.classList.add('px', 'px-' + VARIANT.toLowerCase());
     document.querySelector('.filters').hidden = true;
     document.querySelector('main.wrap').hidden = true;
-    document.querySelector('header.top .tabs').hidden = true;
+    modeTabs();
     const host = el('div', 'px-host');
     document.querySelector('main.wrap').before(host);
     const syncTop = () => document.documentElement.style.setProperty('--px-top', (phone() ? 0 : document.querySelector('.topbar').offsetHeight) + 'px');
