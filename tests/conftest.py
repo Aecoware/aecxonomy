@@ -50,6 +50,7 @@ def taxonomy():
             "definition": str(g.value(s, SKOS.definition) or ""),
             "parent": str(parent).rsplit("/", 1)[1] if parent else "",
             "shared": (s, AECO.appliesUnder, AECO["std-shared"]) in g,
+            "primary_tag": str(g.value(s, AECO.primaryTag)).rsplit("tag-", 1)[1],  # "who", "what", ...
         }
     return out
 

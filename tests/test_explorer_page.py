@@ -1,16 +1,9 @@
 """The built explorer, used the way a person uses it, at a desktop size and a phone size."""
 from playwright.sync_api import expect
 
+from explorer import expect_loaded, open_concept
+
 DATA_REQUEST = "**/explorer-data.json*"
-
-
-def expect_loaded(page, taxonomy):
-    expect(page.locator("#st-concepts")).to_have_text(f"{len(taxonomy):,}")
-
-
-def open_concept(page, code, search_for=None):
-    page.get_by_role("searchbox").fill(search_for or code)
-    page.get_by_role("option").filter(has_text=code).click()
 
 
 def test_search_finds_a_concept_and_the_side_panel_shows_it_with_its_warnings(page, taxonomy):
