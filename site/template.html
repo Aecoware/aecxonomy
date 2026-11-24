@@ -278,6 +278,18 @@ footer.site li a:hover { color: var(--ink); text-decoration: underline; }
   footer.site { padding-block: 48px 32px; }
 }
 @media (prefers-reduced-motion: reduce) { .chart path.arc, .splitter::before, .splitter i { transition: none; } }
+
+/* ==== PROTOTYPE: map variants, only on branch prototype/explorer-map. Behind ?variant=. ==== */
+body.px { padding-bottom: 80px; }
+/* The switcher is the prototype's own tool, so it breaks the house style on purpose: yellow, round, floating. */
+.px-bar { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 100; display: flex; align-items: center; gap: 4px; padding: 4px; background: #ffd400; color: #121211; border: 2px solid #121211; border-radius: 999px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); font: 500 15px var(--sans); white-space: nowrap; }
+.px-bar button { width: 40px; height: 40px; border: 0; border-radius: 999px; background: #121211; color: #ffd400; font-size: 19px; cursor: pointer; }
+.px-bar button:focus-visible { outline: 2px solid #121211; outline-offset: 2px; }
+.px-bar-lab { padding: 0 12px; }
+.px-bar-lab small { margin-right: 8px; font: 12px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.px-bar-lab b { margin-right: 4px; }
+.chart .mx-canvas { display: block; touch-action: manipulation; }
+.chart .mx-canvas:focus-visible { outline: 2px solid var(--ink); outline-offset: -4px; }
 </style>
 </head>
 <body>
@@ -415,6 +427,9 @@ footer.site li a:hover { color: var(--ink); text-decoration: underline; }
 const DATA = /*DATA*/null;
 (function () {
   'use strict';
+  // PROTOTYPE (branch prototype/explorer-map only): ?variant= swaps today's SVG sunburst for another way to draw the map.
+  const VARIANT = (() => { const v = new URLSearchParams(location.search).get('variant'); return v == null ? '' : v.trim().toUpperCase(); })();
+  let MAP = null;   // the variant's renderer; null draws today's sunburst
   const TAGS = ['Who', 'What', 'Where', 'When', 'Why', 'How'];
   const SRC = { ifc: 'IFC 4.3', uniclass: 'Uniclass 2015', wikidata: 'Wikidata', brick: 'Brick', rec: 'RealEstateCore', bot: 'BOT', iso: 'ISO 12006-2', riba: 'RIBA Plan of Work' };
   const SRC_ORDER = ['ifc', 'bot', 'brick', 'rec', 'uniclass', 'wikidata', 'iso', 'riba'];
@@ -664,6 +679,7 @@ const DATA = /*DATA*/null;
   const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let path = gArcs.selectAll('path'), label = gLabels.selectAll('text');
   function bind() {
+    if (MAP) return MAP.bind();
     const nodes = root.descendants().slice(1);
     path = gArcs.selectAll('path').data(nodes, d => d.key).join(
       enter => enter.append('path').attr('class', 'arc').attr('fill-opacity', 0).attr('pointer-events', 'none').attr('d', d => arc(d.current))
@@ -682,20 +698,23 @@ const DATA = /*DATA*/null;
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const clamp = v => Math.max(0.12, Math.min(0.92, v));
   let INK = '#121211', SURF = '#ffffff';
+  let FILL = () => '#cccccc', ALPHA = () => 1;   // the colour and the opacity of each node, shared with the prototype maps
   function colorize() {
     const L = parseFloat(css('--arc-l')), step = parseFloat(css('--arc-step')), S = parseFloat(css('--arc-s'));
     INK = css('--ink'); SURF = css('--paper');
     const q = {}; TAGS.forEach(t => q[t] = css('--q-' + t.toLowerCase()));
     const v = VIEWS[viewKey], gcol = new Map(), off = v.groups ? 1 : 0;
     if (v.groups) v.groups.forEach((g, i) => gcol.set(g.key, g.tag ? q[g.tag] : g.key === 'none' ? d3.interpolateRgb(css('--stone-600'), SURF)(0.45) : d3.hsl((i * 360 / v.groups.length + 215) % 360, Math.min(0.62, S + 0.12), clamp(L - 0.1)).formatHex()));
-    path.attr('fill', d => {
+    FILL = d => {
       if (d.data.g) return gcol.get(d.data.g.key);
       const c = d.data.c, dc = d.depth - off;
       let col;
       if (colorMode === 'question') { const base = d3.hsl(q[c.tags[0]] || '#999999'); base.l = clamp(base.l + (dc - 1) * step * 0.6); col = base.formatHex(); }
       else col = d3.hsl((branchIndex.get(c.top.code) * 24 + 205) % 360, S, clamp(L + (dc - 1) * step)).formatHex();
       return d.data.member ? col : d3.interpolateRgb(col, SURF)(0.62);
-    });
+    };
+    if (MAP) { renderLegend(); return MAP.paint(); }
+    path.attr('fill', FILL);
     label.attr('fill', INK);
     centerT1.attr('fill', INK); centerT2.attr('fill', css('--stone-600'));
     markSelected(); renderLegend();
@@ -720,6 +739,7 @@ const DATA = /*DATA*/null;
   }
   function applyVisibility(animate) {
     effR = effRings(focus);
+    if (MAP) return MAP.render(animate && !reduced());
     const newW = R / (effR + 1);
     computeTargets();
     const t = animate ? svg.transition().duration(reduced() ? 0 : 640).ease(d3.easeCubicInOut) : null;
@@ -743,6 +763,7 @@ const DATA = /*DATA*/null;
     return t.end().catch(() => {}).then(() => { busy = false; });
   }
   function drawCenter() {
+    if (MAP) return MAP.paint();
     const r = R / (effRings(focus) + 1) - 4;
     centerHit.attr('r', r);
     const name = focus === root ? VIEWS[viewKey].root : nameOf(focus);
@@ -778,6 +799,7 @@ const DATA = /*DATA*/null;
     return applyVisibility(view === 'map');
   }
   function markSelected() {
+    if (MAP) return MAP.paint();
     path.attr('stroke', d => d === selected ? INK : SURF).attr('stroke-width', d => d === selected ? 2.2 : 0.75);
     if (selected) path.filter(d => d === selected).raise();
   }
@@ -792,18 +814,22 @@ const DATA = /*DATA*/null;
     if (!quiet) writeHash();
   }
   function twinsOf(d) { return d.data.c ? (T.occAll.get(d.data.c.code) || [d]) : [d]; }
-  function highlight() {
+  function alphaFn() {
     if (hovered) {
       const ts = twinsOf(hovered), anc = new Set();
       ts.forEach(t => t.ancestors().forEach(a => anc.add(a)));
-      path.attr('opacity', d => (anc.has(d) || d.ancestors().some(a => ts.includes(a))) ? 1 : 0.3);
-      return;
+      return d => (anc.has(d) || d.ancestors().some(a => ts.includes(a))) ? 1 : 0.3;
     }
     const set = searchHits ? new Set(searchHits) : matchSet;
-    if (!set) { path.attr('opacity', 1); return; }
+    if (!set) return () => 1;
     const keep = new Set();
     set.forEach(n => n.ancestors().forEach(a => keep.add(a)));
-    path.attr('opacity', d => set.has(d) ? 1 : keep.has(d) ? 0.5 : 0.12);
+    return d => set.has(d) ? 1 : keep.has(d) ? 0.5 : 0.12;
+  }
+  function highlight() {
+    ALPHA = alphaFn();
+    if (MAP) return MAP.paint();
+    path.attr('opacity', ALPHA);
   }
   function otherPlaces(d) { return twinsOf(d).filter(t => t !== d && t.group && t.group.data.g).map(t => t.group.data.g.label); }
   function showTip(event, d) {
@@ -835,6 +861,7 @@ const DATA = /*DATA*/null;
   centerHit.on('click', () => { if (focus.parent) zoomTo(focus.parent); });
   let acc = 0, lastStep = 0;
   chartEl.addEventListener('wheel', (event) => {
+    if (MAP) return;   // the prototype maps leave the wheel to the page
     // Take the wheel only when it can zoom, so the page still scrolls past the map.
     const inward = event.deltaY < 0, step = inward && hovered ? hovered.ancestors().reverse()[focus.depth + 1] : null;
     if (inward ? !(step && step.children) : !focus.parent) { acc = 0; return; }
@@ -850,7 +877,8 @@ const DATA = /*DATA*/null;
       if (next && next.children) zoomTo(next);
     } else if (acc > 40) { acc = 0; lastStep = now; if (focus.parent) zoomTo(focus.parent); }
   }, { passive: false });
-  svg.on('keydown', (event) => {
+  svg.on('keydown', mapKey);
+  function mapKey(event) {
     const k = event.key;
     const cur = selected && selected.parent === focus ? selected : (focus.children ? focus.children[0] : null);
     if (!cur) return;
@@ -859,7 +887,7 @@ const DATA = /*DATA*/null;
     else if (k === 'ArrowUp') { event.preventDefault(); select(sibs[(i - 1 + sibs.length) % sibs.length]); }
     else if (k === 'ArrowRight' || k === 'Enter') { event.preventDefault(); if (cur.children) zoomTo(cur).then(() => select(cur.children[0])); }
     else if (k === 'ArrowLeft' || k === 'Escape') { event.preventDefault(); if (focus.parent) { const back = focus; zoomTo(focus.parent).then(() => select(back)); } }
-  });
+  }
 
   /* ---------- switch view: the same concepts, re-cut ---------- */
   function setDim(vk, animate, keepHash) {
@@ -1323,6 +1351,525 @@ const DATA = /*DATA*/null;
     colorize();
   }));
 
+  /* ==========================================================================================================
+     PROTOTYPE: map variants. Throwaway code. It lives only on the branch prototype/explorer-map.
+     Question: what is a better way to draw the taxonomy than today's SVG sunburst?
+     Each variant is a renderer for the chart box. The rest of the page stays today's: filters, groupings, search,
+     the zoom path, the side panel and the keyboard. Without ?variant= the page draws today's sunburst.
+     A renderer has make() -> { bind(), render(animate) -> Promise, paint() } and reads the page's state:
+     root, focus, selected, hovered, FILL(d), ALPHA(d), RINGS. It calls the page's own select(), zoomTo(),
+     showTip(), hideTip() and renderPanel(), so every variant behaves the same outside the chart.
+     ========================================================================================================== */
+  const MAPS = {};
+  // A canvas sized to its box and to the screen's pixel ratio, with cached text widths.
+  function canvasBox(label) {
+    svg.style('display', 'none');
+    const cv = document.createElement('canvas'), ctx = cv.getContext('2d');
+    cv.className = 'mx-canvas'; cv.tabIndex = 0;
+    cv.setAttribute('role', 'application'); cv.setAttribute('aria-label', label);
+    chartEl.insertBefore(cv, tip);
+    cv.addEventListener('keydown', mapKey);
+    const box = { cv, ctx, w: 0, h: 0 };
+    box.size = (w, h) => {
+      const r = window.devicePixelRatio || 1;
+      box.w = w; box.h = h; cv.width = Math.round(w * r); cv.height = Math.round(h * r);
+      cv.style.width = w + 'px'; cv.style.height = h + 'px';
+      ctx.setTransform(r, 0, 0, r, 0, 0);
+    };
+    const widths = new Map();
+    box.textW = (s, font) => { const k = font + '|' + s; let w = widths.get(k); if (w === undefined) { ctx.font = font; w = ctx.measureText(s).width; widths.set(k, w); } return w; };
+    // The longest start of s that fits in max px, with an ellipsis; '' when not even 3 letters fit.
+    box.fit = (s, font, max) => {
+      if (box.textW(s, font) <= max) return s;
+      let lo = 0, hi = s.length;
+      while (lo < hi) { const m = (lo + hi + 1) >> 1; if (box.textW(s.slice(0, m).trimEnd() + '…', font) <= max) lo = m; else hi = m - 1; }
+      return lo >= 3 ? s.slice(0, lo).trimEnd() + '…' : '';
+    };
+    return box;
+  }
+  // Pointer handling shared by the canvas maps: hover previews in the panel and the tooltip, a click calls onClick.
+  function wirePointer(box, hit, onClick) {
+    let raf = 0, last = null;
+    box.cv.addEventListener('pointermove', e => {
+      last = e;
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const r = box.cv.getBoundingClientRect(), d = hit(last.clientX - r.left, last.clientY - r.top);
+        box.cv.style.cursor = d ? 'pointer' : 'default';
+        if (d !== hovered) {
+          hovered = d; highlight();
+          if (d) { showTip(last, d); renderPanel(d, true); } else { hideTip(); renderPanel(selected, false); }
+        } else if (d) moveTip(last);
+      });
+    });
+    box.cv.addEventListener('click', e => {
+      const r = box.cv.getBoundingClientRect(), d = hit(e.clientX - r.left, e.clientY - r.top);
+      hovered = null; hideTip();
+      onClick(d, e);
+    });
+  }
+  // A tween on requestAnimationFrame: step(t) for t from 0 to 1, eased.
+  function tween(ms, step) {
+    return new Promise(res => {
+      if (!ms) { step(1); res(); return; }
+      const t0 = performance.now();
+      const tick = now => { const t = Math.min(1, (now - t0) / ms); step(d3.easeCubicInOut(t)); if (t < 1) requestAnimationFrame(tick); else res(); };
+      requestAnimationFrame(tick);
+    });
+  }
+  // Calls fn(width) now and whenever the chart box changes width.
+  const watchSize = fn => {
+    let w = Math.round(chartEl.clientWidth) || 600;
+    fn(w);
+    new ResizeObserver(es => { const nw = Math.round(es[0].contentRect.width); if (nw && nw !== w) { w = nw; fn(nw); } }).observe(chartEl);
+  };
+  const nameFont = (wt, px) => `${wt} ${px}px Inter, ui-sans-serif, system-ui, sans-serif`;
+  const setHint = parts => { const h = document.querySelector('.hint'); h.textContent = ''; parts.forEach(([b, t]) => { const s = el('span'); s.appendChild(el('b', null, b)); s.appendChild(document.createTextNode(' ' + t)); h.appendChild(s); }); };
+
+  // The count line under a focus name, as the old centre text.
+  const focusCount = f => matchSet ? `${fmt(matchCount.get(f) || 0)} ${(matchCount.get(f) || 0) === 1 ? 'match' : 'matches'}` : f === root ? `${fmt(TOTAL)} concepts` : `${fmt(below(f))} below`;
+  // Words of s in lines no wider than max px, at most n lines.
+  function wrap(box, s, font, max, n) {
+    const out = []; let cur = '';
+    for (const w of s.split(' ')) { const t = cur ? cur + ' ' + w : w; if (box.textW(t, font) > max && cur) { out.push(cur); cur = w; } else cur = t; }
+    if (cur) out.push(cur);
+    if (out.length > n) { out.length = n; out[n - 1] = box.fit(out[n - 1] + '…', font, max) || out[n - 1]; }
+    return out;
+  }
+
+  /* ---------- A: the sunburst, redrawn on a canvas ----------
+     Same geometry and colours as today. Draws only what shows; a zoom moves the camera, not every node; labels
+     are measured, horizontal where the arc is wide enough and along the radius otherwise, at 12 px on every screen. */
+  MAPS.A = { name: 'Sunburst, redrawn', make() {
+    const box = canvasBox('Sunburst map of the taxonomy. Arrow keys move, Enter zooms in, Escape zooms out.');
+    const F1 = nameFont(600, 12), F2 = nameFont(400, 12), FC = '400 19px Newsreader, Georgia, serif', FN = nameFont(400, 12);
+    let cam = null, Rp = 0, cx = 0, cy = 0, drawn = [], bound = false, moving = false;
+    const arcG = d3.arc().startAngle(g => g.a0).endAngle(g => g.a1).innerRadius(g => g.r0).outerRadius(g => Math.max(g.r0, g.r1 - 1.5))
+      .padAngle(g => Math.min((g.a1 - g.a0) / 2, 0.004)).padRadius(() => Rp * 0.6).context(box.ctx);
+    if (chartEl.clientWidth < 520) { RINGS = 2; document.querySelectorAll('#rings button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.r === '2'))); }
+    watchSize(w => { const s = Math.min(w, 820); box.size(w, s); cx = w / 2; cy = s / 2; Rp = s / 2 - 2; if (cam) draw(cam, true); });
+    const camOf = f => ({ x0: f.x0, x1: f.x1, d: f.depth, n: effRings(f) });
+    function geom(d, c) {
+      const span = c.x1 - c.x0, rw = Rp / (c.n + 1), cl = v => Math.max(0, Math.min(1, v));
+      return { a0: cl((d.x0 - c.x0) / span) * 2 * Math.PI, a1: cl((d.x1 - c.x0) / span) * 2 * Math.PI, r0: (d.depth - c.d) * rw, r1: Math.min(Rp, (d.depth - c.d + 1) * rw) };
+    }
+    function draw(c, withLabels) {
+      const ctx = box.ctx, rw = Rp / (c.n + 1);
+      if (Rp < 40) return;
+      ctx.clearRect(0, 0, box.w, box.h);
+      ctx.save(); ctx.translate(cx, cy);
+      drawn = [];
+      root.each(d => {
+        if (d.depth <= c.d - 1e-6 || d.depth > c.d + c.n + 0.999 || d.x1 <= c.x0 || d.x0 >= c.x1 || d === root) return;
+        const g = geom(d, c);
+        if (g.a1 - g.a0 < 1e-4 || g.r0 >= Rp || g.r1 <= rw * 0.98) return;
+        drawn.push([d, g]);
+        ctx.beginPath(); arcG(g);
+        ctx.globalAlpha = ALPHA(d); ctx.fillStyle = FILL(d); ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+      const sel = selected && drawn.find(x => x[0] === selected);
+      if (sel) { ctx.beginPath(); arcG(sel[1]); ctx.lineWidth = 2.2; ctx.strokeStyle = INK; ctx.stroke(); }
+      ctx.beginPath(); ctx.arc(0, 0, rw - 2, 0, 2 * Math.PI); ctx.fillStyle = SURF; ctx.fill();
+      if (withLabels) {
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = INK;
+        for (const [d, g] of drawn) {
+          const mid = (g.a0 + g.a1) / 2, rm = (g.r0 + g.r1) / 2, band = g.r1 - g.r0, th = g.a1 - g.a0;
+          const chord = 2 * rm * Math.sin(Math.min(th, Math.PI) / 2), sx = Math.abs(Math.sin(mid)), cs = Math.abs(Math.cos(mid));
+          const font = d.depth === Math.round(c.d) + 1 ? F1 : F2, name = nameOf(d);
+          ctx.globalAlpha = Math.max(0.4, ALPHA(d)); ctx.font = font;
+          // Horizontal at the middle of the arc when a box W x H fits inside its slanted band, else along the radius,
+          // never upside down. The band is `chord` thick across and `band` long along the radius, which is at
+          // sx (cos) and cs (sin) to the horizontal: so W*cs + H*sx <= chord and W*sx + H*cs <= band.
+          const H = 15, availW = Math.min(cs > 0.01 ? (chord - H * sx) / cs : (chord >= H ? Infinity : 0), sx > 0.01 ? (band - H * cs) / sx : (band >= H ? Infinity : 0)) - 6;
+          if (availW >= 40) { const t = box.fit(name, font, Math.min(availW, 220)); if (t === name || (t && availW >= 72)) { ctx.fillText(t, rm * Math.sin(mid), -rm * Math.cos(mid)); continue; } }
+          if (rm * th < 13) continue;
+          const t = box.fit(name, font, band - 10);
+          if (!t) continue;
+          ctx.save(); ctx.rotate(mid - Math.PI / 2); ctx.translate(rm, 0); if (mid > Math.PI) ctx.rotate(Math.PI); ctx.fillText(t, 0, 0); ctx.restore();
+        }
+        ctx.globalAlpha = 1;
+        const lines = wrap(box, focus === root ? VIEWS[viewKey].root : nameOf(focus), FC, rw * 1.6, 3);
+        ctx.font = FC; ctx.fillStyle = INK;
+        lines.forEach((l, i) => ctx.fillText(l, 0, (i - (lines.length - 1) / 2) * 22 - 8));
+        ctx.font = FN; ctx.fillStyle = css('--stone-600');
+        ctx.fillText(focusCount(focus) + (focus === root ? '' : ' · click to go up'), 0, (lines.length - 1) * 11 + 16);
+      }
+      ctx.restore();
+    }
+    function hit(x, y) {
+      if (!cam) return null;
+      const dx = x - cx, dy = y - cy, r = Math.hypot(dx, dy), rw = Rp / (cam.n + 1);
+      if (r < rw || r > Rp) return null;
+      let a = Math.atan2(dx, -dy); if (a < 0) a += 2 * Math.PI;
+      const f = drawn.find(([, g]) => r >= g.r0 && r < g.r1 && a >= g.a0 && a < g.a1);
+      return f ? f[0] : null;
+    }
+    wirePointer(box, hit, (d, e) => {
+      if (d) { select(d); zoomTo(d.children ? d : d.parent); return; }
+      const r = box.cv.getBoundingClientRect(), dist = Math.hypot(e.clientX - r.left - cx, e.clientY - r.top - cy);
+      if (cam && dist < Rp / (cam.n + 1) && focus.parent) zoomTo(focus.parent);
+    });
+    setHint([['Click', 'a branch to zoom in'], ['Click the centre', 'to go up'], ['Hover', 'to preview'], ['Arrow keys', 'when the map is selected']]);
+    return {
+      bind() { bound = true; cam = null; },
+      render(animate) {
+        if (!bound) return Promise.resolve();
+        const to = camOf(focus);
+        if (!animate || !cam) { cam = to; draw(cam, true); return Promise.resolve(); }
+        const from = cam, i = d3.interpolateObject(from, to);
+        moving = busy = true;
+        return tween(420, t => { cam = i(t); draw(cam, t === 1); }).then(() => { moving = busy = false; cam = to; draw(cam, true); });
+      },
+      paint() { if (bound && cam && !moving) draw(cam, true); }
+    };
+  } };
+
+  /* ---------- B: a zoomable icicle ----------
+     The same partition as the sunburst, laid out in straight columns: one column per level, left to right, each
+     concept as tall as its share of the leaves. Every label is horizontal. The focus is the narrow column on the
+     left; click it to go up. "Rings" sets how many levels show to its right. */
+  MAPS.B = { name: 'Icicle', make() {
+    const box = canvasBox('Icicle map of the taxonomy. Arrow keys move, Enter zooms in, Escape zooms out.');
+    const F1 = nameFont(600, 13), F2 = nameFont(400, 13), FN = '400 12px "Geist Mono", ui-monospace, monospace';
+    let cam = null, drawn = [], bound = false, moving = false, focusW = 0, FF = '';
+    if (chartEl.clientWidth < 520) { RINGS = 2; document.querySelectorAll('#rings button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.r === '2'))); }
+    watchSize(w => { box.size(w, w < 520 ? 560 : Math.min(720, Math.max(560, Math.round(window.innerHeight * 0.72)))); focusW = w < 520 ? 76 : Math.min(168, Math.round(w * 0.18)); FF = `400 ${w < 520 ? 15 : 19}px Newsreader, Georgia, serif`; if (cam) { cam = camOf(focus); draw(cam, true); } });
+    // The vertical layout for a focus, as a map from partition position to pixels. The focus's children share the
+    // height by their leaves, but none is shorter than the floor, so every one of them gets a readable, tappable
+    // label (the research note's advice). Inside a child everything keeps its proportion. Outside the focus the
+    // map runs on in a straight line, so a zoom can blend two layouts.
+    function warpFor(f) {
+      const H = box.h, kids = f.children || [], floor = box.w < 520 ? 30 : 20, w = kids.map(k => k.x1 - k.x0), h = w.map(() => 0), fixed = new Set();
+      if (kids.length * floor < H) {
+        for (let it = 0; it < 8; it++) {
+          const free = H - fixed.size * floor, sw = w.reduce((s, v, i) => fixed.has(i) ? s : s + v, 0);
+          let changed = false;
+          w.forEach((v, i) => { if (fixed.has(i)) { h[i] = floor; return; } h[i] = free * v / sw; if (h[i] < floor) { fixed.add(i); changed = true; } });
+          if (!changed) break;
+        }
+      } else w.forEach((v, i) => { h[i] = H * v / (f.x1 - f.x0); });
+      const segs = []; let acc = 0;
+      kids.forEach((k, i) => { segs.push([k.x0, k.x1, acc, acc + h[i]]); acc += h[i]; });
+      const s = H / (f.x1 - f.x0);
+      return x => {
+        if (x <= f.x0 || !segs.length) return (x - f.x0) * s;
+        if (x >= f.x1) return H + (x - f.x1) * s;
+        for (const [a, b, y0, y1] of segs) if (x <= b + 1e-12) return y0 + (x - a) / (b - a || 1) * (y1 - y0);
+        return H;
+      };
+    }
+    const camOf = f => ({ W: warpFor(f), d: f.depth, n: effRings(f) });
+    // Column k (0 = the focus) starts at colX(k); the levels share the width right of the focus column.
+    function geom(d, c) {
+      const colW = (box.w - focusW) / c.n, k = d.depth - c.d;
+      const x0 = k <= 0 ? k * focusW : focusW + (k - 1) * colW, x1 = k <= 0 ? x0 + focusW : x0 + colW;
+      return { x0, x1, y0: c.W(d.x0), y1: c.W(d.x1) };
+    }
+    function draw(c, withLabels) {
+      const ctx = box.ctx;
+      ctx.clearRect(0, 0, box.w, box.h);
+      drawn = [];
+      root.each(d => {
+        if (d === root && c.d > 0.001) return;
+        if (d.depth < c.d - 1 || d.depth > c.d + c.n + 0.999) return;
+        const g = geom(d, c);
+        if (g.x1 <= 0 || g.x0 >= box.w || g.y1 <= 0 || g.y0 >= box.h || g.y1 - g.y0 < 0.3) return;
+        drawn.push([d, g]);
+        ctx.globalAlpha = d === root ? 1 : ALPHA(d); ctx.fillStyle = d === root ? css('--ground') : FILL(d);
+        ctx.fillRect(g.x0, g.y0, g.x1 - g.x0 - 1, Math.max(0.5, g.y1 - g.y0 - (g.y1 - g.y0 > 3 ? 1 : 0)));
+      });
+      ctx.globalAlpha = 1;
+      const sel = selected && drawn.find(x => x[0] === selected);
+      if (sel) { const g = sel[1]; ctx.lineWidth = 2; ctx.strokeStyle = INK; ctx.strokeRect(g.x0 + 1, g.y0 + 1, g.x1 - g.x0 - 3, Math.max(2, g.y1 - g.y0 - 3)); }
+      if (!withLabels) return;
+      ctx.textBaseline = 'middle'; ctx.fillStyle = INK;
+      for (const [d, g] of drawn) {
+        const h = g.y1 - g.y0, w = g.x1 - g.x0 - 16;
+        if (h < 15 || w < 24) continue;
+        const isFocus = d === focus, name = d === root ? VIEWS[viewKey].root : nameOf(d);
+        ctx.globalAlpha = Math.max(0.45, d === root ? 1 : ALPHA(d));
+        if (isFocus) {
+          // The focus column: its name, wrapped, and how much is under it; a click goes up.
+          const lines = wrap(box, name, FF, w, 4);
+          ctx.font = FF; lines.forEach((l, i) => ctx.fillText(l, g.x0 + 8, 24 + i * 22));
+          ctx.font = FN; ctx.fillStyle = css('--stone-600');
+          ctx.fillText(box.fit(focusCount(d), FN, w) || '', g.x0 + 8, 24 + lines.length * 22 + 4);
+          if (d.parent) ctx.fillText(box.fit('‹ click to go up', FN, w) || '', g.x0 + 8, 24 + lines.length * 22 + 22);
+          ctx.fillStyle = INK;
+          continue;
+        }
+        if (d.depth < c.d) continue;
+        const font = d.depth === Math.round(c.d) + 1 ? F1 : F2, meta = d.children ? fmt(matchSet ? matchCount.get(d) || 0 : below(d)) : '';
+        const mw = meta ? box.textW(meta, FN) + 10 : 0;
+        const t = box.fit(name, font, w - (w - mw > 60 ? mw : 0));
+        if (!t) continue;
+        const y = h > 44 ? g.y0 + 15 : g.y0 + h / 2;
+        ctx.font = font; ctx.fillText(t, g.x0 + 8, y);
+        if (meta && w - mw > 60 && box.textW(t, font) + mw <= w) { ctx.font = FN; ctx.fillStyle = css('--stone-600'); ctx.textAlign = 'right'; ctx.fillText(meta, g.x1 - 9, y); ctx.textAlign = 'left'; ctx.fillStyle = INK; }
+      }
+      ctx.globalAlpha = 1;
+    }
+    function hit(x, y) { const f = drawn.find(([, g]) => x >= g.x0 && x < g.x1 && y >= g.y0 && y < g.y1); return f ? f[0] : null; }
+    wirePointer(box, (x, y) => { const d = hit(x, y); return d && d !== root && d !== focus && d.depth > focus.depth ? d : null; }, (d, e) => {
+      if (d) { select(d); zoomTo(d.children ? d : d.parent); return; }
+      const r = box.cv.getBoundingClientRect(), x = e.clientX - r.left;
+      if (x < focusW && focus.parent) zoomTo(focus.parent);
+    });
+    setHint([['Click', 'a concept to open it'], ['Click the left column', 'to go up'], ['Hover', 'to preview'], ['Arrow keys', 'when the map is selected']]);
+    return {
+      bind() { bound = true; cam = null; },
+      render(animate) {
+        if (!bound) return Promise.resolve();
+        const to = camOf(focus);
+        if (!animate || !cam) { cam = to; draw(cam, true); return Promise.resolve(); }
+        const from = cam;
+        moving = busy = true;
+        return tween(420, t => { cam = { W: x => from.W(x) * (1 - t) + to.W(x) * t, d: from.d + (to.d - from.d) * t, n: from.n + (to.n - from.n) * t }; draw(cam, false); })
+          .then(() => { moving = busy = false; cam = to; draw(cam, true); });
+      },
+      paint() { if (bound && cam && !moving) draw(cam, true); }
+    };
+  } };
+
+  /* ---------- C: a SpaceTree ----------
+     A left-to-right node-link tree (Plaisant et al. 2002). It opens only the path down to the focus: every level
+     shows the children of the open concept above it, each closed concept shows a wedge as big as what is under it,
+     and the tree slides to keep the focus in view. Every label is horizontal and full size. */
+  MAPS.C = { name: 'SpaceTree', make() {
+    const box = canvasBox('Tree map of the taxonomy. Arrow keys move, Enter opens, Escape goes up.');
+    const F1 = nameFont(600, 13), F2 = nameFont(400, 13), FN = '400 11px "Geist Mono", ui-monospace, monospace';
+    let lay = new Map(), shown = [], bound = false, moving = false, colW = 200, boxW = 168, rowH = 32, padL = 12;
+    document.getElementById('rings').hidden = true; document.getElementById('rings-label').hidden = true;
+    watchSize(w => { box.size(w, w < 520 ? 600 : 640); colW = w < 520 ? Math.max(150, Math.round(w * 0.5)) : Math.max(170, Math.min(230, Math.round((w - 24) / 4.2))); boxW = colW - 34; if (bound) { lay = layout(); draw(lay, 1); } });
+    // The open path: the focus and its ancestors. Each shows its children; everything else is closed.
+    function layout() {
+      const open = new Set(focus.ancestors());
+      const kids = d => open.has(d) ? d.children || [] : [];
+      const h = d3.hierarchy(root, kids);
+      d3.tree().nodeSize([rowH, colW]).separation((a, b) => a.parent === b.parent ? 1 : 1.35)(h);
+      const out = new Map();
+      h.each(n => out.set(n.data, { x: n.y, y: n.x }));
+      // Scroll the tree so the focus column sits about a third in, and fit it to the height.
+      const f = out.get(focus), dx = Math.min(padL, box.w * (box.w < 520 ? 0.06 : 0.3) - f.x);
+      // Fit and centre on the columns that are on screen after the slide, not on those that slid off.
+      const ys = [...out.values()].filter(p => p.x + dx + boxW > 0 && p.x + dx < box.w).map(p => p.y), lo = Math.min(...ys), hi = Math.max(...ys);
+      const fitK = Math.min(1, (box.h - 48) / Math.max(1, hi - lo));
+      const cy = (lo + hi) / 2;
+      out.forEach(p => { p.x = p.x + dx; p.y = box.h / 2 + (p.y - cy) * fitK; });
+      return out;
+    }
+    const meta = d => d.children ? fmt(matchSet ? matchCount.get(d) || 0 : below(d)) : '';
+    function draw(L, t, from) {
+      const ctx = box.ctx;
+      ctx.clearRect(0, 0, box.w, box.h);
+      const pos = d => { const b = L.get(d); if (!from) return b; const a = from.get(d) || (d.parent && from.get(d.parent)) || b; return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }; };
+      shown = [];
+      const nodes = [...L.keys()];
+      // Links first, as soft curves from the right edge of the parent box to the left edge of the child.
+      ctx.lineWidth = 1; ctx.strokeStyle = css('--stone-300');
+      for (const d of nodes) {
+        if (!d.parent || !L.has(d.parent)) continue;
+        const a = pos(d.parent), b = pos(d), x0 = a.x + boxW, mx = (x0 + b.x) / 2;
+        ctx.globalAlpha = Math.min(1, ALPHA(d) + 0.2);
+        ctx.beginPath(); ctx.moveTo(x0, a.y); ctx.bezierCurveTo(mx, a.y, mx, b.y, b.x, b.y); ctx.stroke();
+      }
+      for (const d of nodes) {
+        const p = pos(d);
+        if (p.x + boxW < -20 || p.x > box.w + 20 || p.y < -20 || p.y > box.h + 20) continue;
+        const onPath = d === focus || focus.ancestors().includes(d), h = 24;
+        shown.push([d, { x0: p.x, x1: p.x + boxW, y0: p.y - h / 2, y1: p.y + h / 2 }]);
+        ctx.globalAlpha = d === root ? 1 : ALPHA(d);
+        ctx.fillStyle = d === root ? css('--ground') : FILL(d);
+        ctx.fillRect(p.x, p.y - h / 2, boxW, h);
+        if (onPath) { ctx.lineWidth = 1; ctx.strokeStyle = INK; ctx.strokeRect(p.x + 0.5, p.y - h / 2 + 0.5, boxW - 1, h - 1); }
+        if (d === selected) { ctx.lineWidth = 2.5; ctx.strokeStyle = INK; ctx.strokeRect(p.x + 1, p.y - h / 2 + 1, boxW - 2, h - 2); }
+        // A closed concept with children: a wedge whose height grows with what is under it.
+        if (d.children && !L.has(d.children[0])) {
+          const n = below(d), wh = Math.min(22, 4 + Math.sqrt(n) * 2.2), wl = Math.min(26, 8 + Math.sqrt(n) * 1.6);
+          ctx.fillStyle = FILL(d); ctx.beginPath(); ctx.moveTo(p.x + boxW + 2, p.y); ctx.lineTo(p.x + boxW + 2 + wl, p.y - wh / 2); ctx.lineTo(p.x + boxW + 2 + wl, p.y + wh / 2); ctx.closePath(); ctx.fill();
+        }
+        if (t === 1) {
+          const name = d === root ? VIEWS[viewKey].root : nameOf(d), m = d === root ? fmt(matchSet ? matchCount.get(d) || 0 : TOTAL) : meta(d);
+          const mw = m ? box.textW(m, FN) + 8 : 0, font = onPath ? F1 : F2;
+          ctx.globalAlpha = Math.max(0.45, d === root ? 1 : ALPHA(d)); ctx.textBaseline = 'middle'; ctx.fillStyle = INK; ctx.font = font;
+          ctx.fillText(box.fit(name, font, boxW - 14 - mw) || '…', p.x + 7, p.y + 0.5);
+          if (m) { ctx.font = FN; ctx.fillStyle = css('--stone-600'); ctx.textAlign = 'right'; ctx.fillText(m, p.x + boxW - 6, p.y + 0.5); ctx.textAlign = 'left'; }
+        }
+      }
+      ctx.globalAlpha = 1;
+    }
+    function hit(x, y) { const f = shown.find(([, g]) => x >= g.x0 && x < g.x1 + 24 && y >= g.y0 - 3 && y < g.y1 + 3); return f ? f[0] : null; }
+    wirePointer(box, (x, y) => { const d = hit(x, y); return d === root ? null : d; }, d => {
+      if (!d) return;
+      if (d === root) { if (focus !== root) zoomTo(root); return; }
+      // A click on the open focus closes it; on anything else it opens there.
+      if (d === focus && d.parent) { select(d); zoomTo(d.parent); return; }
+      select(d); zoomTo(d.children ? d : d.parent);
+    });
+    setHint([['Click', 'a concept to open it'], ['Click an open one', 'to close it'], ['Hover', 'to preview'], ['Arrow keys', 'when the map is selected']]);
+    return {
+      bind() { bound = true; lay = new Map(); },
+      render(animate) {
+        if (!bound) return Promise.resolve();
+        const from = lay; lay = layout();
+        if (!animate || !from.size) { draw(lay, 1); return Promise.resolve(); }
+        moving = busy = true;
+        return tween(380, t => draw(lay, t, from)).then(() => { moving = busy = false; draw(lay, 1); });
+      },
+      paint() { if (bound && lay.size && !moving) draw(lay, 1); }
+    };
+  } };
+
+  /* ---------- D: a Voronoi territory map ----------
+     The focus is a round territory cut into regions (its children) and districts (their children), each as large
+     as its share of the leaves, with straight labels. A click on a region zooms into it; a click outside the
+     circle goes up. The cells come from d3-voronoi-treemap, loaded from a CDN only for this variant, and are
+     seeded by the focus, so a branch always looks the same. */
+  MAPS.D = { name: 'Territory map', make() {
+    const box = canvasBox('Territory map of the taxonomy. Arrow keys move, Enter zooms in, Escape zooms out.');
+    const FR = nameFont(600, 14), FD = nameFont(400, 11.5), FN = '400 11px "Geist Mono", ui-monospace, monospace';
+    let ready = false, failed = false, bound = false, lay = null, moving = false, S = 0, shown = [];
+    const cache = new Map();
+    document.getElementById('rings').hidden = true; document.getElementById('rings-label').hidden = true;
+    const SRC = ['d3-weighted-voronoi@1.1.3/build/d3-weighted-voronoi.js', 'd3-voronoi-map@2.1.1/build/d3-voronoi-map.js', 'd3-voronoi-treemap@1.1.2/build/d3-voronoi-treemap.js'];
+    const load = src => new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/' + src; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+    SRC.reduce((p, s) => p.then(() => load(s)), Promise.resolve())
+      .then(() => { ready = true; if (bound) api.render(false); })
+      .catch(() => { failed = true; message('The map library did not load. Check the connection and reload.'); });
+    watchSize(w => { const s = Math.min(w, 760); box.size(w, s); S = s; cache.clear(); if (ready && bound) { lay = layoutFor(focus); draw(lay, 1); } else message(failed ? 'The map library did not load.' : 'Drawing the map…'); });
+    function message(t) { const ctx = box.ctx; ctx.clearRect(0, 0, box.w, box.h); ctx.font = nameFont(400, 15); ctx.fillStyle = css('--stone-600'); ctx.textAlign = 'center'; ctx.fillText(t, box.w / 2, box.h / 2); ctx.textAlign = 'left'; }
+    // A small seeded random generator, so the same focus gives the same cells.
+    function seeded(s) { let h = 2166136261; for (const ch of s) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return () => { h += 0x6D2B79F5; let t = h; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+    function layoutFor(f) {
+      const key = viewKey + '|' + f.key;
+      if (cache.has(key)) return cache.get(key);
+      const cx = box.w / 2, cy = S / 2, r = S / 2 - 6, n = 72;
+      const clip = d3.range(n).map(i => [cx + r * Math.cos(-2 * Math.PI * i / n), cy + r * Math.sin(-2 * Math.PI * i / n)]);
+      // Two levels under the focus: its children (regions) and theirs (districts). A cell weighs its leaves.
+      const h = d3.hierarchy(f, d => (d === f || d.parent === f) && d.children ? d.children : null);
+      h.sum(d => (d !== f && d.parent !== f) || !d.children ? d.value || 1 : 0);
+      d3.voronoiTreemap().clip(clip).prng(seeded(key)).maxIterationCount(70).convergenceRatio(0.015)(h);
+      const out = { f, cells: [] };
+      h.each(n2 => { if (n2.depth) out.cells.push({ d: n2.data, level: n2.depth, poly: n2.polygon }); });
+      out.cells.sort((a, b) => b.level - a.level);   // districts first, so a hit finds the smallest cell
+      cache.set(key, out);
+      return out;
+    }
+    // The widest horizontal run of a polygon through the point (x, y): where a straight label can sit.
+    function runAt(poly, x, y) {
+      const xs = [];
+      for (let i = 0; i < poly.length; i++) {
+        const [x1, y1] = poly[i], [x2, y2] = poly[(i + 1) % poly.length];
+        if ((y1 <= y && y2 > y) || (y2 <= y && y1 > y)) xs.push(x1 + (y - y1) / (y2 - y1) * (x2 - x1));
+      }
+      xs.sort((a, b) => a - b);
+      for (let i = 0; i + 1 < xs.length; i += 2) if (x >= xs[i] && x <= xs[i + 1]) return [xs[i], xs[i + 1]];
+      return null;
+    }
+    const pathOf = (ctx, poly) => { ctx.beginPath(); poly.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath(); };
+    function draw(L, alpha, withLabels = true) {
+      const ctx = box.ctx;
+      ctx.globalAlpha = 1;
+      shown = L.cells;
+      // Inside one branch every region has the same colour, so neighbours get a slightly different shade.
+      const regions = L.cells.filter(c => c.level === 1).map(c => c.d), shade = d => { const i = regions.indexOf(d.parent === L.f ? d : d.parent); const c = d3.hsl(FILL(d)); c.l = Math.max(0.1, Math.min(0.95, c.l + ((i % 3) - 1) * 0.045)); return c.formatHex(); };
+      for (const c of [...L.cells].reverse()) {   // regions under districts
+        pathOf(ctx, c.poly);
+        ctx.globalAlpha = alpha * ALPHA(c.d); ctx.fillStyle = shade(c.d); ctx.fill();
+        ctx.globalAlpha = alpha; ctx.strokeStyle = SURF; ctx.lineWidth = c.level === 1 ? 4 : 1.2; ctx.stroke();
+      }
+      const sel = L.cells.find(c => c.d === selected);
+      if (sel) { pathOf(ctx, sel.poly); ctx.globalAlpha = alpha; ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.stroke(); }
+      if (!withLabels) { ctx.globalAlpha = 1; return; }
+      ctx.textBaseline = 'middle'; ctx.textAlign = 'center'; ctx.lineJoin = 'round';
+      const taken = [];
+      // Regions, largest first: name and count at the centre of the cell, wrapped to the cell's width, with a
+      // paper halo. A label that would cover one already placed is left out; hover still names the region.
+      const byArea = L.cells.filter(c => c.level === 1).sort((a, b) => Math.abs(d3.polygonArea(b.poly)) - Math.abs(d3.polygonArea(a.poly)));
+      for (const c of byArea) {
+        const [x, y] = d3.polygonCentroid(c.poly), run = runAt(c.poly, x, y);
+        if (!run) continue;
+        const w = Math.min(run[1] - run[0] - 14, 200), lines = wrap(box, nameOf(c.d), FR, w, 2), m = c.d.children ? (matchSet ? `${fmt(matchCount.get(c.d) || 0)} match` : `${fmt(below(c.d))} below`) : c.d.data.c ? c.d.data.c.code : '';
+        if (w < 34 || !lines.length) continue;
+        const top = y - (lines.length * 17 + 13) / 2 + 8, lw = Math.max(...lines.map(l => box.textW(l, FR))), bb = [x - lw / 2 - 2, top - 9, x + lw / 2 + 2, top + lines.length * 17 + 7];
+        if (taken.some(b => bb[0] < b[2] && bb[2] > b[0] && bb[1] < b[3] && bb[3] > b[1])) continue;
+        ctx.globalAlpha = Math.max(0.5, alpha * ALPHA(c.d)); ctx.font = FR; ctx.strokeStyle = SURF; ctx.lineWidth = 3.5; ctx.fillStyle = INK;
+        lines.forEach((l, i) => { ctx.strokeText(l, x, top + i * 17); ctx.fillText(l, x, top + i * 17); });
+        ctx.font = FN; ctx.fillStyle = css('--stone-700'); ctx.strokeText(m, x, top + lines.length * 17 + 1); ctx.fillText(m, x, top + lines.length * 17 + 1);
+        taken.push(bb);
+      }
+      // Districts: a small name where it fits and does not cover a region's label.
+      ctx.font = FD;
+      for (const c of L.cells) {
+        if (c.level !== 2) continue;
+        const [x, y] = d3.polygonCentroid(c.poly), run = runAt(c.poly, x, y), area = Math.abs(d3.polygonArea(c.poly));
+        if (!run || area < 1600) continue;
+        const t = box.fit(nameOf(c.d), FD, Math.min(run[1] - run[0] - 10, 150));
+        if (!t) continue;
+        const tw = box.textW(t, FD), bb = [x - tw / 2, y - 7, x + tw / 2, y + 7];
+        if (taken.some(b => bb[0] < b[2] && bb[2] > b[0] && bb[1] < b[3] && bb[3] > b[1])) continue;
+        ctx.globalAlpha = Math.max(0.4, alpha * ALPHA(c.d)); ctx.fillStyle = css('--stone-700'); ctx.fillText(t, x, y);
+        taken.push(bb);
+      }
+      ctx.globalAlpha = 1; ctx.textAlign = 'left';
+    }
+    function hit(x, y) { const c = shown.find(c2 => d3.polygonContains(c2.poly, [x, y])); return c ? c.d : null; }
+    wirePointer(box, hit, d => {
+      if (!d) { if (focus.parent) zoomTo(focus.parent); return; }
+      select(d);
+      zoomTo(d.parent === focus ? (d.children ? d : focus) : d.parent);   // a district opens its region
+    });
+    setHint([['Click', 'a region to zoom in'], ['Click outside the circle', 'to go up'], ['Hover', 'to preview'], ['Arrow keys', 'when the map is selected']]);
+    const api = {
+      bind() { bound = true; lay = null; cache.clear(); },
+      render(animate) {
+        if (!bound || !ready) return Promise.resolve();
+        const from = lay, to = layoutFor(focus);
+        lay = to;
+        if (!animate || !from || from.f === to.f) { box.ctx.clearRect(0, 0, box.w, box.h); draw(to, 1); return Promise.resolve(); }
+        // Zoom: the old map grows from the region that opens (or shrinks toward the centre going up) and fades,
+        // while the new one fades in.
+        const snap = document.createElement('canvas'); snap.width = box.cv.width; snap.height = box.cv.height; snap.getContext('2d').drawImage(box.cv, 0, 0);
+        const into = from.cells.find(c => c.d === to.f), up = !into, k = 2.4;
+        const [px, py] = into ? d3.polygonCentroid(into.poly) : [box.w / 2, S / 2];
+        moving = busy = true;
+        return tween(460, t => {
+          const ctx = box.ctx, s = up ? 1 - (1 - 1 / k) * t : 1 + (k - 1) * t;
+          ctx.clearRect(0, 0, box.w, box.h);
+          ctx.save(); ctx.globalAlpha = 1 - t; ctx.translate(px, py); ctx.scale(s, s); ctx.translate(-px, -py);
+          ctx.drawImage(snap, 0, 0, box.w, box.h); ctx.restore();
+          draw(to, t, false);
+        }).then(() => { moving = busy = false; box.ctx.clearRect(0, 0, box.w, box.h); draw(to, 1); });
+      },
+      paint() { if (bound && ready && lay && !moving) { box.ctx.clearRect(0, 0, box.w, box.h); draw(lay, 1); } }
+    };
+    return api;
+  } };
+
+  /* ---------- the variant bar: ← and → cycle the variants; it shows only with ?variant= ---------- */
+  function protoBar() {
+    const KEYS = Object.keys(MAPS), cur = VARIANT;
+    const bar = el('nav', 'px-bar'), prev = el('button', null, '←'), next = el('button', null, '→'), lab = el('span', 'px-bar-lab');
+    bar.setAttribute('aria-label', 'Prototype maps');
+    prev.type = next.type = 'button';
+    prev.setAttribute('aria-label', 'Previous map'); next.setAttribute('aria-label', 'Next map');
+    lab.append(el('small', null, 'Prototype'), el('b', null, cur), document.createTextNode(' ' + MAPS[cur].name));
+    const go = d => { const u = new URL(location.href); u.searchParams.set('variant', KEYS[(KEYS.indexOf(cur) + d + KEYS.length) % KEYS.length]); location.href = u.href; };
+    prev.addEventListener('click', () => go(-1));
+    next.addEventListener('click', () => go(1));
+    bar.append(prev, lab, next);
+    document.body.appendChild(bar);
+    document.body.classList.add('px');
+    window.addEventListener('keydown', e => {
+      if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable], .chart, .cols-wrap, pre, .dtabs')) return;
+      go(e.key === 'ArrowLeft' ? -1 : 1);
+    });
+  }
+
   /* ---------- start ---------- */
   document.getElementById('subline').textContent = (String(DATA.version).startsWith('0.') ? 'Draft v' : 'v') + DATA.version + ' · SKOS';
   document.getElementById('lead-n').textContent = fmt(TOTAL);
@@ -1335,6 +1882,7 @@ const DATA = /*DATA*/null;
   document.getElementById('f-notice').href = DATA.repo + '/blob/main/NOTICE.md';
   document.getElementById('f-repo').href = DATA.repo;
   setLinks(linksOn, true);
+  if (MAPS[VARIANT]) { MAP = MAPS[VARIANT].make(); protoBar(); try { localStorage.setItem('aot-tab', 'map'); } catch (e) {} }   // open on the map
   bind(); colorize(); renderViewbar(); renderCount();
   function fromHash() {
     const h = decodeURIComponent((location.hash || '').slice(1));
