@@ -279,15 +279,7 @@ footer.site li a:hover { color: var(--ink); text-decoration: underline; }
 }
 @media (prefers-reduced-motion: reduce) { .chart path.arc, .splitter::before, .splitter i { transition: none; } }
 
-/* ==== PROTOTYPE: map variants, only on branch prototype/explorer-map. Behind ?variant=. ==== */
-body.px { padding-bottom: 80px; }
-/* The switcher is the prototype's own tool, so it breaks the house style on purpose: yellow, round, floating. */
-.px-bar { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 100; display: flex; align-items: center; gap: 4px; padding: 4px; background: #ffd400; color: #121211; border: 2px solid #121211; border-radius: 999px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); font: 500 15px var(--sans); white-space: nowrap; }
-.px-bar button { width: 40px; height: 40px; border: 0; border-radius: 999px; background: #121211; color: #ffd400; font-size: 19px; cursor: pointer; }
-.px-bar button:focus-visible { outline: 2px solid #121211; outline-offset: 2px; }
-.px-bar-lab { padding: 0 12px; }
-.px-bar-lab small { margin-right: 8px; font: 12px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
-.px-bar-lab b { margin-right: 4px; }
+/* ==== PROTOTYPE (branch prototype/explorer-map): the three canvas maps ==== */
 .chart .mx-canvas { display: block; touch-action: manipulation; }
 .chart .mx-canvas:focus-visible { outline: 2px solid var(--ink); outline-offset: -4px; }
 </style>
@@ -365,6 +357,8 @@ body.px { padding-bottom: 80px; }
   <section class="stage" id="view-map" role="tabpanel" aria-labelledby="tab-map">
     <div class="bar">
       <nav class="crumbs" id="crumbs" aria-label="Zoom path"></nav>
+      <span class="ctl-label" id="mapstyle-label">Map</span>
+      <div class="seg" role="group" aria-labelledby="mapstyle-label" id="mapstyle"></div>
       <span class="ctl-label" id="color-label">Colour</span>
       <div class="seg" role="group" aria-labelledby="color-label" id="colormode">
         <button type="button" data-c="branch" aria-pressed="true">Branch</button>
@@ -427,9 +421,9 @@ body.px { padding-bottom: 80px; }
 const DATA = /*DATA*/null;
 (function () {
   'use strict';
-  // PROTOTYPE (branch prototype/explorer-map only): ?variant= swaps today's SVG sunburst for another way to draw the map.
-  const VARIANT = (() => { const v = new URLSearchParams(location.search).get('variant'); return v == null ? '' : v.trim().toUpperCase(); })();
-  let MAP = null;   // the variant's renderer; null draws today's sunburst
+  // PROTOTYPE (branch prototype/explorer-map only): the map is drawn by one of three canvas renderers, picked with
+  // the Map switch. MAP is the renderer in use; null would draw the old SVG sunburst, which nothing picks now.
+  let MAP = null;
   const TAGS = ['Who', 'What', 'Where', 'When', 'Why', 'How'];
   const SRC = { ifc: 'IFC 4.3', uniclass: 'Uniclass 2015', wikidata: 'Wikidata', brick: 'Brick', rec: 'RealEstateCore', bot: 'BOT', iso: 'ISO 12006-2', riba: 'RIBA Plan of Work' };
   const SRC_ORDER = ['ifc', 'bot', 'brick', 'rec', 'uniclass', 'wikidata', 'iso', 'riba'];
@@ -1352,11 +1346,13 @@ const DATA = /*DATA*/null;
   }));
 
   /* ==========================================================================================================
-     PROTOTYPE: map variants. Throwaway code. It lives only on the branch prototype/explorer-map.
+     PROTOTYPE: three ways to draw the map. Throwaway code. It lives only on the branch prototype/explorer-map.
      Question: what is a better way to draw the taxonomy than today's SVG sunburst?
-     Each variant is a renderer for the chart box. The rest of the page stays today's: filters, groupings, search,
-     the zoom path, the side panel and the keyboard. Without ?variant= the page draws today's sunburst.
-     A renderer has make() -> { bind(), render(animate) -> Promise, paint() } and reads the page's state:
+     Verdict (docs/research/explorer-map.md): the icicle is the main map; the sunburst and the territory map stay
+     as options. The Map switch above the chart picks one, and the page remembers it.
+     Each map is a renderer for the chart box. The rest of the page stays today's: filters, groupings, search,
+     the zoom path, the side panel and the keyboard.
+     A renderer has make() -> { bind(), render(animate) -> Promise, paint(), destroy() } and reads the page's state:
      root, focus, selected, hovered, FILL(d), ALPHA(d), RINGS. It calls the page's own select(), zoomTo(),
      showTip(), hideTip() and renderPanel(), so every variant behaves the same outside the chart.
      ========================================================================================================== */
@@ -1385,6 +1381,9 @@ const DATA = /*DATA*/null;
       while (lo < hi) { const m = (lo + hi + 1) >> 1; if (box.textW(s.slice(0, m).trimEnd() + '…', font) <= max) lo = m; else hi = m - 1; }
       return lo >= 3 ? s.slice(0, lo).trimEnd() + '…' : '';
     };
+    // Size the canvas now and whenever the box changes width; destroy() stops that and removes the canvas.
+    box.watch = fn => { box.ro = watchSize(fn); };
+    box.destroy = () => { if (box.ro) box.ro.disconnect(); cv.remove(); };
     return box;
   }
   // Pointer handling shared by the canvas maps: hover previews in the panel and the tooltip, a click calls onClick.
@@ -1422,7 +1421,9 @@ const DATA = /*DATA*/null;
   const watchSize = fn => {
     let w = Math.round(chartEl.clientWidth) || 600;
     fn(w);
-    new ResizeObserver(es => { const nw = Math.round(es[0].contentRect.width); if (nw && nw !== w) { w = nw; fn(nw); } }).observe(chartEl);
+    const ro = new ResizeObserver(es => { const nw = Math.round(es[0].contentRect.width); if (nw && nw !== w) { w = nw; fn(nw); } });
+    ro.observe(chartEl);
+    return ro;
   };
   const nameFont = (wt, px) => `${wt} ${px}px Inter, ui-sans-serif, system-ui, sans-serif`;
   const setHint = parts => { const h = document.querySelector('.hint'); h.textContent = ''; parts.forEach(([b, t]) => { const s = el('span'); s.appendChild(el('b', null, b)); s.appendChild(document.createTextNode(' ' + t)); h.appendChild(s); }); };
@@ -1438,17 +1439,17 @@ const DATA = /*DATA*/null;
     return out;
   }
 
-  /* ---------- A: the sunburst, redrawn on a canvas ----------
+  /* ---------- Sunburst: today's map, redrawn on a canvas ----------
      Same geometry and colours as today. Draws only what shows; a zoom moves the camera, not every node; labels
      are measured, horizontal where the arc is wide enough and along the radius otherwise, at 12 px on every screen. */
-  MAPS.A = { name: 'Sunburst, redrawn', make() {
+  MAPS.sunburst = { name: 'Sunburst', make() {
     const box = canvasBox('Sunburst map of the taxonomy. Arrow keys move, Enter zooms in, Escape zooms out.');
     const F1 = nameFont(600, 12), F2 = nameFont(400, 12), FC = '400 19px Newsreader, Georgia, serif', FN = nameFont(400, 12);
     let cam = null, Rp = 0, cx = 0, cy = 0, drawn = [], bound = false, moving = false;
     const arcG = d3.arc().startAngle(g => g.a0).endAngle(g => g.a1).innerRadius(g => g.r0).outerRadius(g => Math.max(g.r0, g.r1 - 1.5))
       .padAngle(g => Math.min((g.a1 - g.a0) / 2, 0.004)).padRadius(() => Rp * 0.6).context(box.ctx);
     if (chartEl.clientWidth < 520) { RINGS = 2; document.querySelectorAll('#rings button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.r === '2'))); }
-    watchSize(w => { const s = Math.min(w, 820); box.size(w, s); cx = w / 2; cy = s / 2; Rp = s / 2 - 2; if (cam) draw(cam, true); });
+    box.watch(w => { const s = Math.min(w, 820); box.size(w, s); cx = w / 2; cy = s / 2; Rp = s / 2 - 2; if (cam) draw(cam, true); });
     const camOf = f => ({ x0: f.x0, x1: f.x1, d: f.depth, n: effRings(f) });
     function geom(d, c) {
       const span = c.x1 - c.x0, rw = Rp / (c.n + 1), cl = v => Math.max(0, Math.min(1, v));
@@ -1522,20 +1523,21 @@ const DATA = /*DATA*/null;
         moving = busy = true;
         return tween(420, t => { cam = i(t); draw(cam, t === 1); }).then(() => { moving = busy = false; cam = to; draw(cam, true); });
       },
-      paint() { if (bound && cam && !moving) draw(cam, true); }
+      paint() { if (bound && cam && !moving) draw(cam, true); },
+      destroy() { bound = false; box.destroy(); }
     };
   } };
 
-  /* ---------- B: a zoomable icicle ----------
+  /* ---------- Icicle, the main map: a zoomable icicle ----------
      The same partition as the sunburst, laid out in straight columns: one column per level, left to right, each
      concept as tall as its share of the leaves. Every label is horizontal. The focus is the narrow column on the
      left; click it to go up. "Rings" sets how many levels show to its right. */
-  MAPS.B = { name: 'Icicle', make() {
+  MAPS.icicle = { name: 'Icicle', make() {
     const box = canvasBox('Icicle map of the taxonomy. Arrow keys move, Enter zooms in, Escape zooms out.');
     const F1 = nameFont(600, 13), F2 = nameFont(400, 13), FN = '400 12px "Geist Mono", ui-monospace, monospace';
     let cam = null, drawn = [], bound = false, moving = false, focusW = 0, FF = '';
     if (chartEl.clientWidth < 520) { RINGS = 2; document.querySelectorAll('#rings button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.r === '2'))); }
-    watchSize(w => { box.size(w, w < 520 ? 560 : Math.min(720, Math.max(560, Math.round(window.innerHeight * 0.72)))); focusW = w < 520 ? 76 : Math.min(168, Math.round(w * 0.18)); FF = `400 ${w < 520 ? 15 : 19}px Newsreader, Georgia, serif`; if (cam) { cam = camOf(focus); draw(cam, true); } });
+    box.watch(w => { box.size(w, w < 520 ? 560 : Math.min(720, Math.max(560, Math.round(window.innerHeight * 0.72)))); focusW = w < 520 ? 76 : Math.min(168, Math.round(w * 0.18)); FF = `400 ${w < 520 ? 15 : 19}px Newsreader, Georgia, serif`; if (cam) { cam = camOf(focus); draw(cam, true); } });
     // The vertical layout for a focus, as a map from partition position to pixels. The focus's children share the
     // height by their leaves, but none is shorter than the floor, so every one of them gets a readable, tappable
     // label (the research note's advice). Inside a child everything keeps its proportion. Outside the focus the
@@ -1629,116 +1631,35 @@ const DATA = /*DATA*/null;
         return tween(420, t => { cam = { W: x => from.W(x) * (1 - t) + to.W(x) * t, d: from.d + (to.d - from.d) * t, n: from.n + (to.n - from.n) * t }; draw(cam, false); })
           .then(() => { moving = busy = false; cam = to; draw(cam, true); });
       },
-      paint() { if (bound && cam && !moving) draw(cam, true); }
+      paint() { if (bound && cam && !moving) draw(cam, true); },
+      destroy() { bound = false; box.destroy(); }
     };
   } };
 
-  /* ---------- C: a SpaceTree ----------
-     A left-to-right node-link tree (Plaisant et al. 2002). It opens only the path down to the focus: every level
-     shows the children of the open concept above it, each closed concept shows a wedge as big as what is under it,
-     and the tree slides to keep the focus in view. Every label is horizontal and full size. */
-  MAPS.C = { name: 'SpaceTree', make() {
-    const box = canvasBox('Tree map of the taxonomy. Arrow keys move, Enter opens, Escape goes up.');
-    const F1 = nameFont(600, 13), F2 = nameFont(400, 13), FN = '400 11px "Geist Mono", ui-monospace, monospace';
-    let lay = new Map(), shown = [], bound = false, moving = false, colW = 200, boxW = 168, rowH = 32, padL = 12;
-    document.getElementById('rings').hidden = true; document.getElementById('rings-label').hidden = true;
-    watchSize(w => { box.size(w, w < 520 ? 600 : 640); colW = w < 520 ? Math.max(150, Math.round(w * 0.5)) : Math.max(170, Math.min(230, Math.round((w - 24) / 4.2))); boxW = colW - 34; if (bound) { lay = layout(); draw(lay, 1); } });
-    // The open path: the focus and its ancestors. Each shows its children; everything else is closed.
-    function layout() {
-      const open = new Set(focus.ancestors());
-      const kids = d => open.has(d) ? d.children || [] : [];
-      const h = d3.hierarchy(root, kids);
-      d3.tree().nodeSize([rowH, colW]).separation((a, b) => a.parent === b.parent ? 1 : 1.35)(h);
-      const out = new Map();
-      h.each(n => out.set(n.data, { x: n.y, y: n.x }));
-      // Scroll the tree so the focus column sits about a third in, and fit it to the height.
-      const f = out.get(focus), dx = Math.min(padL, box.w * (box.w < 520 ? 0.06 : 0.3) - f.x);
-      // Fit and centre on the columns that are on screen after the slide, not on those that slid off.
-      const ys = [...out.values()].filter(p => p.x + dx + boxW > 0 && p.x + dx < box.w).map(p => p.y), lo = Math.min(...ys), hi = Math.max(...ys);
-      const fitK = Math.min(1, (box.h - 48) / Math.max(1, hi - lo));
-      const cy = (lo + hi) / 2;
-      out.forEach(p => { p.x = p.x + dx; p.y = box.h / 2 + (p.y - cy) * fitK; });
-      return out;
-    }
-    const meta = d => d.children ? fmt(matchSet ? matchCount.get(d) || 0 : below(d)) : '';
-    function draw(L, t, from) {
-      const ctx = box.ctx;
-      ctx.clearRect(0, 0, box.w, box.h);
-      const pos = d => { const b = L.get(d); if (!from) return b; const a = from.get(d) || (d.parent && from.get(d.parent)) || b; return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }; };
-      shown = [];
-      const nodes = [...L.keys()];
-      // Links first, as soft curves from the right edge of the parent box to the left edge of the child.
-      ctx.lineWidth = 1; ctx.strokeStyle = css('--stone-300');
-      for (const d of nodes) {
-        if (!d.parent || !L.has(d.parent)) continue;
-        const a = pos(d.parent), b = pos(d), x0 = a.x + boxW, mx = (x0 + b.x) / 2;
-        ctx.globalAlpha = Math.min(1, ALPHA(d) + 0.2);
-        ctx.beginPath(); ctx.moveTo(x0, a.y); ctx.bezierCurveTo(mx, a.y, mx, b.y, b.x, b.y); ctx.stroke();
-      }
-      for (const d of nodes) {
-        const p = pos(d);
-        if (p.x + boxW < -20 || p.x > box.w + 20 || p.y < -20 || p.y > box.h + 20) continue;
-        const onPath = d === focus || focus.ancestors().includes(d), h = 24;
-        shown.push([d, { x0: p.x, x1: p.x + boxW, y0: p.y - h / 2, y1: p.y + h / 2 }]);
-        ctx.globalAlpha = d === root ? 1 : ALPHA(d);
-        ctx.fillStyle = d === root ? css('--ground') : FILL(d);
-        ctx.fillRect(p.x, p.y - h / 2, boxW, h);
-        if (onPath) { ctx.lineWidth = 1; ctx.strokeStyle = INK; ctx.strokeRect(p.x + 0.5, p.y - h / 2 + 0.5, boxW - 1, h - 1); }
-        if (d === selected) { ctx.lineWidth = 2.5; ctx.strokeStyle = INK; ctx.strokeRect(p.x + 1, p.y - h / 2 + 1, boxW - 2, h - 2); }
-        // A closed concept with children: a wedge whose height grows with what is under it.
-        if (d.children && !L.has(d.children[0])) {
-          const n = below(d), wh = Math.min(22, 4 + Math.sqrt(n) * 2.2), wl = Math.min(26, 8 + Math.sqrt(n) * 1.6);
-          ctx.fillStyle = FILL(d); ctx.beginPath(); ctx.moveTo(p.x + boxW + 2, p.y); ctx.lineTo(p.x + boxW + 2 + wl, p.y - wh / 2); ctx.lineTo(p.x + boxW + 2 + wl, p.y + wh / 2); ctx.closePath(); ctx.fill();
-        }
-        if (t === 1) {
-          const name = d === root ? VIEWS[viewKey].root : nameOf(d), m = d === root ? fmt(matchSet ? matchCount.get(d) || 0 : TOTAL) : meta(d);
-          const mw = m ? box.textW(m, FN) + 8 : 0, font = onPath ? F1 : F2;
-          ctx.globalAlpha = Math.max(0.45, d === root ? 1 : ALPHA(d)); ctx.textBaseline = 'middle'; ctx.fillStyle = INK; ctx.font = font;
-          ctx.fillText(box.fit(name, font, boxW - 14 - mw) || '…', p.x + 7, p.y + 0.5);
-          if (m) { ctx.font = FN; ctx.fillStyle = css('--stone-600'); ctx.textAlign = 'right'; ctx.fillText(m, p.x + boxW - 6, p.y + 0.5); ctx.textAlign = 'left'; }
-        }
-      }
-      ctx.globalAlpha = 1;
-    }
-    function hit(x, y) { const f = shown.find(([, g]) => x >= g.x0 && x < g.x1 + 24 && y >= g.y0 - 3 && y < g.y1 + 3); return f ? f[0] : null; }
-    wirePointer(box, (x, y) => { const d = hit(x, y); return d === root ? null : d; }, d => {
-      if (!d) return;
-      if (d === root) { if (focus !== root) zoomTo(root); return; }
-      // A click on the open focus closes it; on anything else it opens there.
-      if (d === focus && d.parent) { select(d); zoomTo(d.parent); return; }
-      select(d); zoomTo(d.children ? d : d.parent);
-    });
-    setHint([['Click', 'a concept to open it'], ['Click an open one', 'to close it'], ['Hover', 'to preview'], ['Arrow keys', 'when the map is selected']]);
-    return {
-      bind() { bound = true; lay = new Map(); },
-      render(animate) {
-        if (!bound) return Promise.resolve();
-        const from = lay; lay = layout();
-        if (!animate || !from.size) { draw(lay, 1); return Promise.resolve(); }
-        moving = busy = true;
-        return tween(380, t => draw(lay, t, from)).then(() => { moving = busy = false; draw(lay, 1); });
-      },
-      paint() { if (bound && lay.size && !moving) draw(lay, 1); }
-    };
-  } };
+  // d3-voronoi-treemap 1.1.2 and the two libraries under it, loaded once, in order, the first time the territory shows.
+  let voronoiLoad = null;
+  function voronoiLibs() {
+    if (d3.voronoiTreemap) return Promise.resolve();
+    const load = src => new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/' + src; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+    voronoiLoad = voronoiLoad || ['d3-weighted-voronoi@1.1.3/build/d3-weighted-voronoi.js', 'd3-voronoi-map@2.1.1/build/d3-voronoi-map.js', 'd3-voronoi-treemap@1.1.2/build/d3-voronoi-treemap.js']
+      .reduce((p, src) => p.then(() => load(src)), Promise.resolve());
+    return voronoiLoad;
+  }
 
-  /* ---------- D: a Voronoi territory map ----------
+  /* ---------- Territory: a Voronoi territory map ----------
      The focus is a round territory cut into regions (its children) and districts (their children), each as large
      as its share of the leaves, with straight labels. A click on a region zooms into it; a click outside the
-     circle goes up. The cells come from d3-voronoi-treemap, loaded from a CDN only for this variant, and are
+     circle goes up. The cells come from d3-voronoi-treemap, loaded from a CDN the first time this map shows, and are
      seeded by the focus, so a branch always looks the same. */
-  MAPS.D = { name: 'Territory map', make() {
+  MAPS.territory = { name: 'Territory', make() {
     const box = canvasBox('Territory map of the taxonomy. Arrow keys move, Enter zooms in, Escape zooms out.');
     const FR = nameFont(600, 14), FD = nameFont(400, 11.5), FN = '400 11px "Geist Mono", ui-monospace, monospace';
     let ready = false, failed = false, bound = false, lay = null, moving = false, S = 0, shown = [];
     const cache = new Map();
-    document.getElementById('rings').hidden = true; document.getElementById('rings-label').hidden = true;
-    const SRC = ['d3-weighted-voronoi@1.1.3/build/d3-weighted-voronoi.js', 'd3-voronoi-map@2.1.1/build/d3-voronoi-map.js', 'd3-voronoi-treemap@1.1.2/build/d3-voronoi-treemap.js'];
-    const load = src => new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/' + src; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
-    SRC.reduce((p, s) => p.then(() => load(s)), Promise.resolve())
+    voronoiLibs()
       .then(() => { ready = true; if (bound) api.render(false); })
-      .catch(() => { failed = true; message('The map library did not load. Check the connection and reload.'); });
-    watchSize(w => { const s = Math.min(w, 760); box.size(w, s); S = s; cache.clear(); if (ready && bound) { lay = layoutFor(focus); draw(lay, 1); } else message(failed ? 'The map library did not load.' : 'Drawing the map…'); });
+      .catch(() => { failed = true; if (bound) message('The map library did not load. Check the connection and reload.'); });
+    box.watch(w => { const s = Math.min(w, 760); box.size(w, s); S = s; cache.clear(); if (ready && bound) { lay = layoutFor(focus); draw(lay, 1); } else message(failed ? 'The map library did not load.' : 'Drawing the map…'); });
     function message(t) { const ctx = box.ctx; ctx.clearRect(0, 0, box.w, box.h); ctx.font = nameFont(400, 15); ctx.fillStyle = css('--stone-600'); ctx.textAlign = 'center'; ctx.fillText(t, box.w / 2, box.h / 2); ctx.textAlign = 'left'; }
     // A small seeded random generator, so the same focus gives the same cells.
     function seeded(s) { let h = 2166136261; for (const ch of s) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return () => { h += 0x6D2B79F5; let t = h; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
@@ -1843,31 +1764,30 @@ const DATA = /*DATA*/null;
           draw(to, t, false);
         }).then(() => { moving = busy = false; box.ctx.clearRect(0, 0, box.w, box.h); draw(to, 1); });
       },
-      paint() { if (bound && ready && lay && !moving) { box.ctx.clearRect(0, 0, box.w, box.h); draw(lay, 1); } }
+      paint() { if (bound && ready && lay && !moving) { box.ctx.clearRect(0, 0, box.w, box.h); draw(lay, 1); } },
+      destroy() { bound = false; box.destroy(); }
     };
     return api;
   } };
 
-  /* ---------- the variant bar: ← and → cycle the variants; it shows only with ?variant= ---------- */
-  function protoBar() {
-    const KEYS = Object.keys(MAPS), cur = VARIANT;
-    const bar = el('nav', 'px-bar'), prev = el('button', null, '←'), next = el('button', null, '→'), lab = el('span', 'px-bar-lab');
-    bar.setAttribute('aria-label', 'Prototype maps');
-    prev.type = next.type = 'button';
-    prev.setAttribute('aria-label', 'Previous map'); next.setAttribute('aria-label', 'Next map');
-    lab.append(el('small', null, 'Prototype'), el('b', null, cur), document.createTextNode(' ' + MAPS[cur].name));
-    const go = d => { const u = new URL(location.href); u.searchParams.set('variant', KEYS[(KEYS.indexOf(cur) + d + KEYS.length) % KEYS.length]); location.href = u.href; };
-    prev.addEventListener('click', () => go(-1));
-    next.addEventListener('click', () => go(1));
-    bar.append(prev, lab, next);
-    document.body.appendChild(bar);
-    document.body.classList.add('px');
-    window.addEventListener('keydown', e => {
-      if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
-      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-      if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable], .chart, .cols-wrap, pre, .dtabs')) return;
-      go(e.key === 'ArrowLeft' ? -1 : 1);
-    });
+  /* ---------- the Map switch: Icicle (the main map), then Sunburst, then Territory ---------- */
+  const MAP_ORDER = ['icicle', 'sunburst', 'territory'];
+  const mapSeg = document.getElementById('mapstyle');
+  MAP_ORDER.forEach(k => { const b = el('button', null, MAPS[k].name); b.type = 'button'; b.dataset.m = k; b.addEventListener('click', () => setMapStyle(k)); mapSeg.appendChild(b); });
+  // Make the renderer for map k. The caller binds and draws it.
+  function useMap(k) {
+    if (MAP) MAP.destroy();
+    hovered = null; hideTip();
+    MAP = MAPS[k].make(); MAP.key = k;
+    const rings = k !== 'territory';   // the territory always shows two levels
+    document.getElementById('rings').hidden = !rings; document.getElementById('rings-label').hidden = !rings;
+    mapSeg.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === k)));
+    try { localStorage.setItem('aot-map', k); } catch (e) {}
+  }
+  function setMapStyle(k) {
+    if (!MAPS[k] || (MAP && MAP.key === k)) return;
+    useMap(k);
+    bind(); applyVisibility(false); highlight();
   }
 
   /* ---------- start ---------- */
@@ -1882,7 +1802,11 @@ const DATA = /*DATA*/null;
   document.getElementById('f-notice').href = DATA.repo + '/blob/main/NOTICE.md';
   document.getElementById('f-repo').href = DATA.repo;
   setLinks(linksOn, true);
-  if (MAPS[VARIANT]) { MAP = MAPS[VARIANT].make(); protoBar(); try { localStorage.setItem('aot-tab', 'map'); } catch (e) {} }   // open on the map
+  { // ?map= in a link wins, then the map picked last time, then the icicle.
+    let k = new URLSearchParams(location.search).get('map');
+    if (!MAPS[k]) { try { k = localStorage.getItem('aot-map'); } catch (e) {} }
+    useMap(MAPS[k] ? k : 'icicle');
+  }
   bind(); colorize(); renderViewbar(); renderCount();
   function fromHash() {
     const h = decodeURIComponent((location.hash || '').slice(1));

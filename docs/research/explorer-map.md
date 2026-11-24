@@ -46,7 +46,7 @@ Ruled out for this taxonomy:
 - **Hyperbolic tree.** It was slower when the target was hard to guess ([Pirolli et al. 2003](https://doi.org/10.1145/606658.606660)).
 - **Fisheye views.** Distortion likely hurts size judgements and makes targets hard to hit ([Cockburn et al. 2008](https://www.microsoft.com/en-us/research/wp-content/uploads/2008/01/cockburn-ComputingSurveys09.pdf)).
 
-## The four maps in the prototype
+## The four maps first prototyped
 
 All four draw on a canvas. They draw only what shows, keep labels at 12–14 px on every screen, and leave the mouse wheel to the page. The rest of the page stays today's: groupings, colour switch, filters, search, zoom path, side panel and keyboard.
 
@@ -79,7 +79,9 @@ python3 scripts/build_site.py
 python3 -m http.server 8781 --bind 127.0.0.1 --directory site
 ```
 
-Open <http://127.0.0.1:8781/?variant=A>. The yellow bar at the bottom, or ← and → outside the map, switch between A, B, C and D. Without `?variant=` the page is today's explorer. The build needs `rdflib` and `pyshacl`.
+Open <http://127.0.0.1:8781/>. The Map switch above the chart picks Icicle, Sunburst or Territory. `?map=sunburst` or `?map=territory` in a link opens that map. The build needs `rdflib` and `pyshacl`.
+
+The four maps as first built, with `?variant=A` to `D` and a yellow switcher bar, are in commit 5c9596b on this branch.
 
 ## Open questions
 
@@ -89,4 +91,10 @@ Open <http://127.0.0.1:8781/?variant=A>. The yellow bar at the bottom, or ← an
 
 ## Verdict
 
-To fill in after judging: which map, why, and which parts to take from the others.
+The owner chose on 24 November 2026:
+
+- **The icicle is the main map**, and the explorer opens on it. It has the best evidence for finding things and comparing sizes. Every label is horizontal, and every child of the focus is named.
+- **The sunburst and the territory map stay as options**, for fun. A Map switch above the chart offers Icicle, then Sunburst, then Territory, and the page remembers the choice. The sunburst is the canvas version, not today's SVG.
+- **The SpaceTree is dropped.**
+
+The prototype now works that way. The old SVG sunburst code is still in `site/template.html`, but nothing draws it. A real build should remove it, and should rewrite the three maps properly rather than reuse the prototype code.
