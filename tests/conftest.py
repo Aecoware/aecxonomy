@@ -78,8 +78,11 @@ def base_url(site):
 
 @pytest.fixture(scope="session")
 def browser():
+    # Chromium draws with its software GPU, SwiftShader, as phones and laptops draw with a real GPU. Without any GPU,
+    # as on CI, headless Chromium copies the whole canvas on the main thread in every frame. No user's browser does
+    # that, and the frame-time test would measure the copy instead of the map.
     with sync_playwright() as p:
-        b = p.chromium.launch()
+        b = p.chromium.launch(args=["--use-angle=swiftshader"])
         yield b
         b.close()
 
