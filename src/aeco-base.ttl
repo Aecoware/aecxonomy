@@ -13,7 +13,7 @@ aeco:base a skos:ConceptScheme ;
     dct:title "Aecoware Open Taxonomy"@en ;
     dct:description "An open base vocabulary for architecture, engineering, construction and operations. People and agents use it to name, find and link AECO concepts."@en ;
     dct:created "2026-10-24"^^xsd:date ;
-    dct:modified "2026-10-28"^^xsd:date ;
+    dct:modified "2026-11-23"^^xsd:date ;
     skos:hasTopConcept aeco:aeco-00001 ,
         aeco:aeco-00002 ,
         aeco:aeco-00003 ,
@@ -28,7 +28,8 @@ aeco:base a skos:ConceptScheme ;
         aeco:aeco-00012 ,
         aeco:aeco-00013 ,
         aeco:aeco-00014 ,
-        aeco:aeco-00015 .
+        aeco:aeco-00015 ,
+        aeco:aeco-01074 .
 
 aeco:primaryTag a owl:ObjectProperty ;
     rdfs:label "primary 5W1H tag"@en ;
@@ -52,3 +53,13 @@ aeco:group a owl:DatatypeProperty ;
 aeco:depthLimit a owl:DatatypeProperty ;
     rdfs:label "depth limit"@en ;
     rdfs:comment "For a top branch: the maximum number of levels in the base, the top branch included."@en .
+
+aeco:actionType a owl:ObjectProperty ;
+    rdfs:label "action type"@en ;
+    rdfs:comment "For a concept that names one action on one thing, such as Approve change order: the action, a concept in the Actions branch."@en ;
+    rdfs:range skos:Concept .
+
+aeco:actsOn a owl:ObjectProperty ;
+    rdfs:label "acts on"@en ;
+    rdfs:comment "For a concept that names one action on one thing: the thing that the action acts on, such as Change order."@en ;
+    rdfs:range skos:Concept .

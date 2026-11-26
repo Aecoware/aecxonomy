@@ -32,6 +32,10 @@ aeco:ConceptShape a sh:NodeShape ;
         sh:message "Exactly one primary 5W1H tag." ] ;
     sh:property [ sh:path aeco:appliesUnder ; sh:minCount 1 ; sh:class skos:Concept ;
         sh:message "Every concept names its standard set: Shared, or a named set." ] ;
+    sh:property [ sh:path aeco:actionType ; sh:maxCount 1 ; sh:class skos:Concept ;
+        sh:message "An activity has at most one action type." ] ;
+    sh:property [ sh:path aeco:actsOn ; sh:maxCount 1 ; sh:class skos:Concept ;
+        sh:message "An activity acts on at most one thing." ] ;
     sh:or ( [ sh:path skos:topConceptOf ; sh:minCount 1 ] [ sh:path skos:broader ; sh:minCount 1 ] ) ;
     sh:message "No orphans: a concept is a top branch or has a broader concept." .
 

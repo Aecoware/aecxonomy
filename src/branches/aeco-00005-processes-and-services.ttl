@@ -425,14 +425,13 @@ aeco:aeco-00213 a skos:Concept ;
     skos:broader aeco:aeco-00177 ;
     skos:notation "aeco-00213" ;
     skos:prefLabel "Look-ahead planning"@en-US , "Short-term planning"@en-GB ;
-    skos:altLabel "3-week look-ahead"@en-US ,
-        "short-interval planning"@en-US ;
+    skos:altLabel "short-interval planning"@en-US ;
     skos:definition "The detailed plan of the next few weeks of work, at the level of crews and tasks."@en ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how , aeco:tag-when ;
     aeco:appliesUnder aeco:std-shared ;
     dct:created "2026-10-24"^^xsd:date ;
-    dct:modified "2026-10-24"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00214 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -940,8 +939,10 @@ aeco:aeco-00975 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01081 ;
+    aeco:actsOn aeco:aeco-00255 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00976 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -955,8 +956,10 @@ aeco:aeco-00976 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01096 ;
+    aeco:actsOn aeco:aeco-00255 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00977 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -969,8 +972,10 @@ aeco:aeco-00977 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01113 ;
+    aeco:actsOn aeco:aeco-00255 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00978 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -984,8 +989,10 @@ aeco:aeco-00978 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01082 ;
+    aeco:actsOn aeco:aeco-00185 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00979 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -998,8 +1005,10 @@ aeco:aeco-00979 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01090 ;
+    aeco:actsOn aeco:aeco-00185 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00980 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1013,8 +1022,10 @@ aeco:aeco-00980 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01094 ;
+    aeco:actsOn aeco:aeco-00185 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00981 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1030,8 +1041,10 @@ aeco:aeco-00981 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01083 ;
+    aeco:actsOn aeco:aeco-00237 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00982 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1045,8 +1058,10 @@ aeco:aeco-00982 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01083 ;
+    aeco:actsOn aeco:aeco-00249 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00983 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1059,8 +1074,10 @@ aeco:aeco-00983 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01083 ;
+    aeco:actsOn aeco:aeco-00257 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00984 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1075,8 +1092,10 @@ aeco:aeco-00984 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how , aeco:tag-when ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01082 ;
+    aeco:actsOn aeco:aeco-00258 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00985 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1089,8 +1108,10 @@ aeco:aeco-00985 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how , aeco:tag-why ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01109 ;
+    aeco:actsOn aeco:aeco-00298 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00986 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1105,8 +1126,10 @@ aeco:aeco-00986 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01081 ;
+    aeco:actsOn aeco:aeco-00189 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00974 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1135,8 +1158,10 @@ aeco:aeco-00987 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01098 ;
+    aeco:actsOn aeco:aeco-00027 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00988 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1150,8 +1175,10 @@ aeco:aeco-00988 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01100 ;
+    aeco:actsOn aeco:aeco-00146 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00989 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1165,8 +1192,10 @@ aeco:aeco-00989 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01092 ;
+    aeco:actsOn aeco:aeco-00172 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00990 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1180,8 +1209,10 @@ aeco:aeco-00990 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01083 ;
+    aeco:actsOn aeco:aeco-00147 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00991 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1196,8 +1227,10 @@ aeco:aeco-00991 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how , aeco:tag-when ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01081 ;
+    aeco:actsOn aeco:aeco-00150 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00992 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1212,8 +1245,10 @@ aeco:aeco-00992 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01102 ;
+    aeco:actsOn aeco:aeco-00150 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00993 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1227,8 +1262,10 @@ aeco:aeco-00993 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how , aeco:tag-when ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01098 ;
+    aeco:actsOn aeco:aeco-00290 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00994 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1242,8 +1279,10 @@ aeco:aeco-00994 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01109 ;
+    aeco:actsOn aeco:aeco-00262 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00995 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1259,8 +1298,10 @@ aeco:aeco-00995 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01080 ;
+    aeco:actsOn aeco:aeco-01118 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00996 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1275,8 +1316,10 @@ aeco:aeco-00996 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01113 ;
+    aeco:actsOn aeco:aeco-01118 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00997 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1290,8 +1333,10 @@ aeco:aeco-00997 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how , aeco:tag-when ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01081 ;
+    aeco:actsOn aeco:aeco-00260 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00998 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1305,8 +1350,10 @@ aeco:aeco-00998 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how ;
     aeco:appliesUnder aeco:std-osha1926 , aeco:std-shared ;
+    aeco:actionType aeco:aeco-01089 ;
+    aeco:actsOn aeco:aeco-00029 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00999 a skos:Concept ;
     skos:inScheme aeco:base ;
@@ -1320,5 +1367,7 @@ aeco:aeco-00999 a skos:Concept ;
     aeco:primaryTag aeco:tag-how ;
     aeco:tag aeco:tag-how , aeco:tag-when ;
     aeco:appliesUnder aeco:std-shared ;
+    aeco:actionType aeco:aeco-01102 ;
+    aeco:actsOn aeco:aeco-00048 ;
     dct:created "2026-10-25"^^xsd:date ;
-    dct:modified "2026-10-25"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .

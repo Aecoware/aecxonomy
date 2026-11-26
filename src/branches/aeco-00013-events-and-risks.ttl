@@ -69,27 +69,43 @@ aeco:aeco-00048 a skos:Concept ;
     skos:inScheme aeco:base ;
     skos:broader aeco:aeco-00026 ;
     skos:notation "aeco-00048" ;
-    skos:prefLabel "Substantial completion"@en-US ;
+    skos:prefLabel "Substantial completion"@en-US , "Practical completion"@en-GB ;
     skos:altLabel "date of substantial completion"@en-US ;
+    skos:hiddenLabel "completion"@en-US ;
     skos:definition "The milestone at which the work is complete enough for the owner to use the asset for its purpose."@en ;
     skos:scopeNote "Close to practical completion under JCT"@en ;
     aeco:primaryTag aeco:tag-when ;
     aeco:tag aeco:tag-when ;
     aeco:appliesUnder aeco:std-aia , aeco:std-consensusdocs , aeco:std-dbia , aeco:std-ejcdc ;
     dct:created "2026-10-24"^^xsd:date ;
-    dct:modified "2026-10-28"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00049 a skos:Concept ;
     skos:inScheme aeco:base ;
     skos:broader aeco:aeco-00026 ;
     skos:notation "aeco-00049" ;
     skos:prefLabel "Final completion"@en-US ;
+    skos:hiddenLabel "completion"@en-US ;
     skos:definition "The milestone at which all work, including punch list items and closeout documents, is done and the last payment is due."@en ;
     aeco:primaryTag aeco:tag-when ;
     aeco:tag aeco:tag-when ;
     aeco:appliesUnder aeco:std-aia , aeco:std-consensusdocs , aeco:std-dbia , aeco:std-ejcdc ;
     dct:created "2026-10-24"^^xsd:date ;
-    dct:modified "2026-10-24"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
+
+aeco:aeco-01117 a skos:Concept ;
+    skos:inScheme aeco:base ;
+    skos:broader aeco:aeco-00026 ;
+    skos:notation "aeco-01117" ;
+    skos:prefLabel "Mechanical completion"@en-US , "Mechanical completion"@en-GB ;
+    skos:altLabel "mechanically complete"@en-US ;
+    skos:hiddenLabel "completion"@en-US ;
+    skos:definition "The milestone at which the systems are installed and checked without load, so that commissioning can start."@en ;
+    aeco:primaryTag aeco:tag-when ;
+    aeco:tag aeco:tag-when ;
+    aeco:appliesUnder aeco:std-shared ;
+    dct:created "2026-11-23"^^xsd:date ;
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00027 a skos:Concept ;
     skos:inScheme aeco:base ;

@@ -459,14 +459,14 @@ aeco:aeco-00108 a skos:Concept ;
     skos:broader aeco:aeco-00077 ;
     skos:notation "aeco-00108" ;
     skos:prefLabel "Project manager"@en-US , "Project manager"@en-GB ;
-    skos:altLabel "PM"@en-US ;
+    skos:hiddenLabel "PM"@en-US ;
     skos:definition "The person who is responsible for the scope, time, cost and quality of the work for one party."@en ;
     skos:scopeNote "Each party can have one: owner, designer, contractor"@en ;
     aeco:primaryTag aeco:tag-who ;
     aeco:tag aeco:tag-who ;
     aeco:appliesUnder aeco:std-shared ;
     dct:created "2026-10-24"^^xsd:date ;
-    dct:modified "2026-10-24"^^xsd:date .
+    dct:modified "2026-11-23"^^xsd:date .
 
 aeco:aeco-00109 a skos:Concept ;
     skos:inScheme aeco:base ;

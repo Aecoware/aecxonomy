@@ -6,8 +6,10 @@ Needs Python 3.9+, rdflib and pyshacl.
 
   python3 scripts/taxo.py check
       Runs the SHACL shapes in scripts/shapes.ttl, plus the checks SHACL cannot do:
-      sentence length, unique labels, depth limits, children per concept, shared labels.
-      Exit code 1 when a blocking check fails.
+      sentence length, unique labels, depth limits, children per concept, shared labels,
+      deprecated concepts and their replacements, actions and the things they act on,
+      and the field words in scripts/field-words.tsv: each word must find exactly the
+      concepts listed for it. Exit code 1 when a blocking check fails.
 
   python3 scripts/build_site.py
       Builds the explorer and the merged data files in site/.
@@ -70,6 +72,8 @@ CSV_FIELDS = ["temp_id", "code", "parent", "level", "session", "batch", "rev", "
               "group", "depth_limit", "change_note", "refs", "decision", "comment", "edits", "decided_at", "applied_rev"]
 MAX_WORDS = 25
 TODAY = dt.date.today().isoformat()
+ACTIONS = "aeco-01074"  # the Actions branch: verbs such as Approve, Submit and Close
+FIELD_WORDS = ROOT / "scripts" / "field-words.tsv"
 
 PREFIXES = """@prefix aeco: <https://w3id.org/aeco/> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
@@ -145,6 +149,8 @@ def load():
             "modified": str(g.value(s, DCTERMS.modified) or TODAY),
             "deprecated": bool(g.value(s, OWL.deprecated)),
             "replaced_by": str(repl).replace(NS, "") if repl else "",
+            "action_type": str(g.value(s, AECO.actionType) or "").replace(NS, ""),
+            "acts_on": str(g.value(s, AECO.actsOn) or "").replace(NS, ""),
         }
     return out
 
@@ -168,6 +174,10 @@ def block(c):
         L.append("    aeco:tag " + " , ".join(f"aeco:{tag_iri(t)}" for t in c["tags"]) + " ;")
     if c["std"]:
         L.append("    aeco:appliesUnder " + " , ".join(f"aeco:{STD.get(s, slug(s))}" for s in c["std"]) + " ;")
+    if c.get("action_type"):
+        L.append(f"    aeco:actionType aeco:{c['action_type']} ;")
+    if c.get("acts_on"):
+        L.append(f"    aeco:actsOn aeco:{c['acts_on']} ;")
     if c["group"]:
         L.append(f'    aeco:group "{c["group"]}" ;')
     if c["depth_limit"]:
@@ -226,6 +236,10 @@ def render(concepts):
              'aeco:group a owl:DatatypeProperty ;\n    rdfs:label "framework group"@en ;\n    rdfs:comment "For a top branch: Results, Process, Resources or Properties after the ISO 12006-2 framework, or Added for a branch outside it."@en .',
              "",
              'aeco:depthLimit a owl:DatatypeProperty ;\n    rdfs:label "depth limit"@en ;\n    rdfs:comment "For a top branch: the maximum number of levels in the base, the top branch included."@en .',
+             "",
+             'aeco:actionType a owl:ObjectProperty ;\n    rdfs:label "action type"@en ;\n    rdfs:comment "For a concept that names one action on one thing, such as Approve change order: the action, a concept in the Actions branch."@en ;\n    rdfs:range skos:Concept .',
+             "",
+             'aeco:actsOn a owl:ObjectProperty ;\n    rdfs:label "acts on"@en ;\n    rdfs:comment "For a concept that names one action on one thing: the thing that the action acts on, such as Change order."@en ;\n    rdfs:range skos:Concept .',
              ""]
     (SRC / "aeco-base.ttl").write_text("\n".join(base))
 
@@ -348,6 +362,43 @@ def ancestors(concepts, code):
     return out
 
 
+# ---------- field words ----------
+def norm_word(text):
+    """Compare words the way people type them: case, hyphens and extra spaces do not count."""
+    return re.sub(r"\s+", " ", re.sub(r"[-_/]", " ", str(text).lower())).strip()
+
+
+def read_field_words():
+    if not FIELD_WORDS.exists():
+        return []
+    with open(FIELD_WORDS, newline="", encoding="utf-8") as fh:
+        return list(csv.DictReader((l for l in fh if not l.startswith("#")), delimiter="\t"))
+
+
+def field_word_findings(cs):
+    """Each field word must find exactly the concepts listed for it, through any label."""
+    names = {}
+    for code, c in cs.items():
+        if c["deprecated"]:
+            continue
+        for s in [c["label_en_us"], c["label_en_gb"]] + c["alt_en_us"] + c["alt_en_gb"] + c["hidden"]:
+            if s:
+                names.setdefault(norm_word(s), set()).add(code)
+    show = lambda codes: ", ".join(f"{k} {cs[k]['label_en_us']}" if k in cs else f"{k} (not in the base)" for k in sorted(codes)) or "nothing"
+    out = []
+    for r in read_field_words():
+        want = set((r.get("expect") or "").split())
+        got = names.get(norm_word(r["word"]), set())
+        if (r.get("status") or "").strip() == "gap":  # a known gap warns until someone fixes it
+            if want and got == want:
+                out.append(("WARN", r["word"], "Field word", "This known gap passes now. Remove its gap mark."))
+            else:
+                out.append(("WARN", r["word"], "Field word", f"Known gap. Finds {show(got)}." + (f" Expected {show(want)}." if want else "")))
+        elif got != want:
+            out.append(("BLOCK", r["word"], "Field word", f"Finds {show(got)}. Expected {show(want)}."))
+    return out
+
+
 # ---------- checks ----------
 def check(verbose=True, all_findings=False):
     """Return the blocking findings, or every finding when all_findings is true."""
@@ -366,8 +417,14 @@ def check(verbose=True, all_findings=False):
     lab_index = {}
     for code, c in cs.items():
         if c["deprecated"]:
+            # A code never changes its meaning and is never deleted. A deprecated concept stays and names its replacement.
+            repl = cs.get(c["replaced_by"])
             if not c["replaced_by"]:
                 found.append(("BLOCK", code, "Deprecated", "A deprecated concept points to its replacement."))
+            elif not repl:
+                found.append(("BLOCK", code, "Deprecated", f"The replacement {c['replaced_by']} is not in the base."))
+            elif repl["deprecated"]:
+                found.append(("BLOCK", code, "Deprecated", f"The replacement {c['replaced_by']} is deprecated too. Point to the current concept."))
             continue
         for i, s in enumerate(sentences(c["definition"]), 1):
             n = len(s.split())
@@ -448,6 +505,22 @@ def check(verbose=True, all_findings=False):
         for t, codes in exact.items():
             if len(set(codes)) > 1:
                 found.append(("BLOCK", ", ".join(sorted(set(codes))), "Mapping", f"{src}:{t} is an exact match of more than one concept. Keep one, make the others close."))
+    # An activity concept such as Approve change order names one action and the one thing it acts on.
+    actions = set(descendants(cs, ACTIONS)) if ACTIONS in cs else set()
+    for code, c in cs.items():
+        at, on = c.get("action_type"), c.get("acts_on")
+        if not at and not on:
+            continue
+        if not (at and on):
+            found.append(("BLOCK", code, "Action", "An activity names both its action (actionType) and the thing it acts on (actsOn)."))
+            continue
+        if at not in actions or any(o["parent"] == at for o in cs.values()):
+            found.append(("BLOCK", code, "Action", f"actionType {at} is not an action in the Actions branch."))
+        if on not in cs or on == ACTIONS or on in actions:
+            found.append(("BLOCK", code, "Action", f"actsOn {on} is not a concept outside the Actions branch."))
+        elif cs[on]["deprecated"]:
+            found.append(("WARN", code, "Action", f"actsOn {on} is deprecated. Move it to the replacement."))
+    found += field_word_findings(cs)
     found = sorted(set(found))
     if all_findings:
         return found
@@ -540,6 +613,7 @@ def apply(csv_path, reviews_dir):
                 "std": split_list(r["standard_sets"]), "scope_note": r["scope_note"], "group": r["group"],
                 "depth_limit": int(r["depth_limit"]) if r["depth_limit"] else None,
                 "created": old.get("created", TODAY), "modified": TODAY, "deprecated": False, "replaced_by": "",
+                "action_type": old.get("action_type", ""), "acts_on": old.get("acts_on", ""),
             }
         log.append(r)
     render(concepts)
