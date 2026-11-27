@@ -151,6 +151,8 @@ main.wrap { display: flex; flex-wrap: wrap; gap: 24px; padding-block: 32px 64px;
 .vseg button { font-weight: 500; }
 /* A control and its label wrap to a new line together. */
 .ctl { display: inline-flex; align-items: center; gap: 8px; }
+.ctl[hidden] { display: none; }
+.map-note { margin: 0; font-size: 14px; color: var(--stone-600); }
 
 .chart { position: relative; background: var(--paper); border: 1px solid var(--ink); touch-action: manipulation; }
 .chart canvas { display: block; }
@@ -356,6 +358,7 @@ footer.site li a:hover { color: var(--ink); text-decoration: underline; }
         <div class="seg" role="group" aria-labelledby="maptype-label" id="maptype">
           <button type="button" data-m="icicle" aria-pressed="true">Icicle</button>
           <button type="button" data-m="sunburst" aria-pressed="false">Sunburst</button>
+          <button type="button" data-m="territory" aria-pressed="false">Territory</button>
         </div>
       </div>
       <div class="ctl">
@@ -375,6 +378,7 @@ footer.site li a:hover { color: var(--ink); text-decoration: underline; }
       </div>
       <button type="button" class="btn outline small" id="up">Zoom out</button>
     </div>
+    <p class="map-note" id="map-note" role="status" hidden></p>
     <div class="chart" id="chart">
       <div class="load" id="load"><p id="load-msg" role="status">Loading the taxonomy…</p><button type="button" class="btn outline small" id="load-retry" hidden>Try again</button></div>
     </div>
@@ -427,7 +431,7 @@ const FILES = /*FILES*/null;
 const getJson = url => fetch(url).then(r => { if (!r.ok) throw new Error(url + ': ' + r.status); return r.json(); });
 /* ---------- the map ----------
    One canvas that draws a tree as a map. It owns the layout of the map type, the drawing, the zoom animation and
-   hit-testing. It reads nothing else from the page.
+   hit-testing. It reads nothing else from the page, and adds to it only the scripts a map type loads.
    The page gives it a d3 hierarchy and five functions. Each node's value is the number of concepts it holds. name,
    code, count and summary give a node's text. fill gives its colour in a colour mode.
    The page sends it commands and listens to three events. 'focus' says the map zoomed to another node. 'select' says
@@ -436,7 +440,8 @@ const getJson = url => fetch(url).then(r => { if (!r.ok) throw new Error(url + '
    lays the map out for a focus, a size and the rings, and blend() mixes two geometries during a zoom. cells() gives
    the cells in sight, each with its node. path() and outline() draw a cell and labels() names the cells. hit() finds
    the cell at a point, reach() is the smaller side of a cell as a tap target, and report() gives its box for the
-   test report. */
+   test report. A renderer may also have load(), for the libraries it needs first, edge(), to stroke a cell after it
+   is filled, and opens(), for the node a click on a cell zooms to when that is not the cell's own. */
 const NARROW_MAP = 520;  // Below this width the map works as on a phone: two rings, taller rows and larger targets.
 function createMap(box, opts) {
   'use strict';
@@ -449,7 +454,7 @@ function createMap(box, opts) {
   const font = (weight, px, family) => ({ css: `${weight} ${px}px ${family}`, px });
   const FONT = {
     focus: font(600, 13, SANS), child: font(600, 13, SANS), deeper: font(400, 13, SANS), small: font(400, 12, MONO),
-    arcChild: font(600, 12, SANS), arcDeeper: font(400, 12, SANS)
+    childSmall: font(600, 12, SANS), deeperSmall: font(400, 12, SANS)
   };
   const TAU = 2 * Math.PI;
   const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -461,7 +466,7 @@ function createMap(box, opts) {
   let size = { w: 0, h: 0, ratio: 1 }, geometry = null, cells = [], labels = [];
   // settled holds the labels of the end of the last zoom. Labels depend on the cells and the focus alone: anything
   // else that changes them must clear it.
-  let raf = 0, moving = false, lastZoom = { ms: 0, frames: 0 }, settled = null;
+  let raf = 0, moving = false, lastZoom = { ms: 0, frames: 0 }, settled = null, wanted = type;
   const span = new Map(), fills = new Map();
 
   // Each node's span of the map, from 0 to 1 for the root: its share of its parent's span by the concepts it holds.
@@ -515,22 +520,26 @@ function createMap(box, opts) {
   // A label starts at x, or is centred on it, and is turned by angle about that point. y is the middle of its line.
   const label = (d, text, f, x, y, color = INK, angle = 0, align = 'left') => ({ d, text, font: f, x, y, w: textWidth(text, f), color, angle, align });
 
+  // A total split in proportion to the shares, none under the floor: the larger shares give up what that takes.
+  // Where the floor does not fit, every share keeps its proportion.
+  function floored(share, total, floor) {
+    const sum = share.reduce((s, v) => s + v, 0), out = share.map(v => total * v / sum);
+    if (share.length * floor > total) return out;
+    const low = new Set();
+    for (let again = true; again;) {
+      again = false;
+      const free = total - low.size * floor, rest = share.reduce((s, v, i) => low.has(i) ? s : s + v, 0);
+      share.forEach((v, i) => { if (low.has(i)) out[i] = floor; else if ((out[i] = free * v / rest) < floor) { low.add(i); again = true; } });
+    }
+    return out;
+  }
   /* The focus's children share a length, the icicle's height or the sunburst's turn, by the concepts they hold. None
      is shorter than the floor, so every child has room for its name and a finger: the larger children give up the
      length. Where the floor does not fit, every child keeps its share. Inside a child everything keeps its
      proportions, and outside the focus the map runs on in a straight line, so two warps blend smoothly. The warp gives
      where a point of the span falls along the length. */
   function warpFor(f, length, floor) {
-    const kids = f.children || [], [f0, f1] = span.get(f);
-    const share = kids.map(k => span.get(k)[1] - span.get(k)[0]), h = share.map(s => length * s / (f1 - f0));
-    if (kids.length * floor <= length) {
-      const low = new Set();
-      for (let again = true; again;) {
-        again = false;
-        const free = length - low.size * floor, rest = share.reduce((s, v, i) => low.has(i) ? s : s + v, 0);
-        share.forEach((v, i) => { if (low.has(i)) h[i] = floor; else if ((h[i] = free * v / rest) < floor) { low.add(i); again = true; } });
-      }
-    }
+    const kids = f.children || [], [f0, f1] = span.get(f), h = floored(kids.map(k => span.get(k)[1] - span.get(k)[0]), length, floor);
     const stops = [];
     let y = 0;
     kids.forEach((k, i) => { const [a, b] = span.get(k); stops.push([a, b, y, y + h[i]]); y += h[i]; });
@@ -733,7 +742,7 @@ function createMap(box, opts) {
           });
           continue;
         }
-        const face = c.d.parent === f ? FONT.arcChild : FONT.arcDeeper, h = face.px * 1.2;
+        const face = c.d.parent === f ? FONT.childSmall : FONT.deeperSmall, h = face.px * 1.2;
         // An arc too thin across or along the radius for a line of text is skipped before any name is measured.
         if (c.r1 - c.r0 < h + 2 * PAD || c.r1 * (c.a1 - c.a0) < h + 2 * PAD) continue;
         const full = opts.name(c.d), mid = (c.a0 + c.a1) / 2;
@@ -760,14 +769,225 @@ function createMap(box, opts) {
       return out;
     }
   };
-  const RENDERERS = { icicle, sunburst };
+  /* ---------- the territory ----------
+     A Voronoi treemap in a circle that reads like a map. The focus's children are regions and theirs are districts,
+     sized by the concepts it holds, so it always shows two levels. The cells come from d3-voronoi-treemap,
+     loaded the first time the territory is picked, and are seeded by the focus, so a focus always gives the same
+     shapes: a map helps memory only if it stays put. A focus is laid out once for each size, before its zoom starts.
+     A zoom grows the old map from the region that opens, or shrinks it going up, and fades it as the new map comes
+     in. The focus is everything outside the circle, so a click there goes up. */
+  const LIBRARIES = [
+    ['d3-weighted-voronoi@1.1.3/build/d3-weighted-voronoi.min.js', 'sha384-BvZ+Eh61ww9ejGJK8csMd743RA2kqB+rgCRCUJJXRRA31rcQHaTZ0N1l/qsZ5Am/'],
+    ['d3-voronoi-map@2.1.1/build/d3-voronoi-map.min.js', 'sha384-rWzO8tl9HJ+tET82wTZxrCV/jHAmrrddwUa1I71w4cuHlYdMGWVutuxKqpBtAPhd'],
+    ['d3-voronoi-treemap@1.1.2/build/d3-voronoi-treemap.min.js', 'sha384-zslbUiFckelA+liBKLoqXPTltdf0vQr6YeEP1YW95nRgof1SS4dUMkgx43lk72+n']
+  ];
+  let loading = null;
+  // The scripts load in turn, as each needs the one before. After a failure the next pick tries again.
+  function loadLibraries() {
+    if (d3.voronoiTreemap) return Promise.resolve();
+    loading = loading || LIBRARIES.reduce((ready, [path, hash]) => ready.then(() => new Promise((done, fail) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/' + path; s.integrity = hash; s.crossOrigin = 'anonymous';
+      s.onload = done;
+      s.onerror = () => { s.remove(); fail(new Error('Could not load ' + path)); };
+      document.head.appendChild(s);
+    })), Promise.resolve()).catch(e => { loading = null; throw e; });
+    return loading;
+  }
+  // A random number generator seeded by a text: FNV-1a for the seed, then mulberry32.
+  function seeded(text) {
+    let h = 2166136261;
+    for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
+    return () => {
+      h = (h + 0x6D2B79F5) | 0;
+      let t = Math.imul(h ^ (h >>> 15), 1 | h);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const layouts = new WeakMap();
+  function layoutFor(f, sz) {
+    const key = sz.w + 'x' + sz.h, known = layouts.get(f);
+    if (known && known.key === key) return known;
+    const cx = sz.w / 2, cy = sz.h / 2, R = radius(sz) - 4;
+    // The circle as a polygon of 72 points, counterclockwise on the screen, as the library wants its clip.
+    const clip = d3.range(72).map(i => [cx + R * Math.cos(-TAU * i / 72), cy + R * Math.sin(-TAU * i / 72)]);
+    const kids = d => (d.children || []).filter(k => k.value > 0), shown = d => d === f || d.parent === f;
+    // A cell weighs the concepts it holds: a region with districts counts its own concept, as they count theirs.
+    const own = d => d.value - (shown(d) ? kids(d).reduce((sum, k) => sum + k.value, 0) : 0);
+    const tree = d3.hierarchy(f, d => shown(d) ? kids(d) : null).sum(own);
+    // Like the other maps, no region is under a floor, so it has room for its name: about 3,000 px² on a phone.
+    const regions = tree.children || [], disc = Math.PI * R * R;
+    const areas = floored(regions.map(r => r.value), disc, sz.w < NARROW_MAP ? 3000 : 4000);
+    regions.forEach((r, i) => { const k = areas[i] / disc * tree.value / r.value; r.each(n => { n.value *= k; }); });
+    d3.voronoiTreemap().clip(clip).prng(seeded(opts.code(f) || opts.name(f))).maxIterationCount(70).convergenceRatio(0.015)(tree);
+    const parts = [];
+    tree.each(n => {
+      if (!n.depth || !n.polygon) return;
+      const poly = n.polygon.map(([x, y]) => [x, y]), xs = poly.map(p => p[0]), ys = poly.map(p => p[1]), x = Math.min(...xs), y = Math.min(...ys);
+      parts.push({ d: n.data, level: n.depth, poly, centroid: d3.polygonCentroid(poly), area: Math.abs(d3.polygonArea(poly)),
+        box: [x, y, Math.max(...xs) - x, Math.max(...ys) - y], hollow: n.depth === 1 && !!n.children });
+    });
+    // Districts come first, so a hit finds the smallest cell and the regions' edges are drawn over them.
+    parts.sort((a, b) => b.level - a.level);
+    parts.push({ d: f, outside: true, hollow: true, cx, cy, R, w: sz.w, h: sz.h });
+    const out = { key, f, cx, cy, cells: parts };
+    layouts.set(f, out);
+    return out;
+  }
+  // Whether two convex polygons overlap: no edge of either separates them.
+  function overlaps(p, q) {
+    for (const poly of [p, q]) for (let i = 0; i < poly.length; i++) {
+      const [x0, y0] = poly[i], [x1, y1] = poly[(i + 1) % poly.length], nx = y0 - y1, ny = x1 - x0;
+      const ends = pts => { const d = pts.map(([x, y]) => x * nx + y * ny); return [Math.min(...d), Math.max(...d)]; };
+      const [a0, a1] = ends(p), [b0, b1] = ends(q);
+      if (a1 <= b0 || b1 <= a0) return false;
+    }
+    return true;
+  }
+  // The angle of a cell's long axis, from its corners' spread, turned so a label along it reads from the left.
+  function axis(c) {
+    if (c.axis !== undefined) return c.axis;
+    const [ox, oy] = c.centroid;
+    let xx = 0, yy = 0, xy = 0;
+    for (const [x, y] of c.poly) { xx += (x - ox) ** 2; yy += (y - oy) ** 2; xy += (x - ox) * (y - oy); }
+    let a = Math.atan2(2 * xy, xx - yy) / 2;
+    if (a > Math.PI / 2) a -= Math.PI; else if (a <= -Math.PI / 2) a += Math.PI;
+    return c.axis = a;
+  }
+  // How wide a convex polygon is at its narrowest: the least, over its edges, of how far its corners reach from one.
+  function leastWidth(poly) {
+    let least = Infinity;
+    poly.forEach(([x0, y0], i) => {
+      const [x1, y1] = poly[(i + 1) % poly.length], len = Math.hypot(x1 - x0, y1 - y0);
+      if (len > 0.5) least = Math.min(least, Math.max(...poly.map(([x, y]) => Math.abs((x1 - x0) * (y - y0) - (y1 - y0) * (x - x0)) / len)));
+    });
+    return least;
+  }
+  // Where a horizontal line at y crosses a convex polygon: its left and right ends, or null.
+  function across(poly, y) {
+    const xs = [];
+    poly.forEach(([x0, y0], i) => {
+      const [x1, y1] = poly[(i + 1) % poly.length];
+      if ((y0 <= y && y1 > y) || (y1 <= y && y0 > y)) xs.push(x0 + (y - y0) / (y1 - y0) * (x1 - x0));
+    });
+    return xs.length < 2 ? null : [Math.min(...xs), Math.max(...xs)];
+  }
+  const territory = {
+    name: 'Territory',
+    height: (w, h) => Math.min(w, h),
+    load: loadLibraries,
+    geometry: layoutFor,
+    // Going in, the old map grows from the cell that holds the new focus. Going up, it shrinks into the place the
+    // old focus has in the new map. Anywhere else, it shrinks to the middle.
+    blend(a, b, t) {
+      const holds = (c, d) => !c.outside && d.ancestors().includes(c.d), grow = 2.4;
+      const into = a.cells.find(c => holds(c, b.f)), back = !into && b.cells.find(c => holds(c, a.f));
+      const [px, py] = into ? into.centroid : back ? back.centroid : [a.cx, a.cy];
+      return { ...b, from: a, t, zoom: { px, py, s: into ? 1 + (grow - 1) * t : 1 - (1 - 1 / grow) * t } };
+    },
+    cells(g) {
+      if (!g.from) return g.cells;
+      const { px, py, s } = g.zoom, move = ([x, y]) => [px + (x - px) * s, py + (y - py) * s];
+      return [
+        ...g.from.cells.filter(c => !c.outside).map(c => ({ ...c, poly: c.poly.map(move), alpha: 1 - g.t })),
+        ...g.cells.map(c => ({ ...c, alpha: g.t }))
+      ];
+    },
+    path(c) {
+      if (c.outside) return;
+      c.poly.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+      ctx.closePath();
+    },
+    // Paper-coloured edges part the cells: wide between regions, thin between districts.
+    edge(c) {
+      if (c.outside) return;
+      ctx.strokeStyle = PAPER; ctx.lineWidth = c.level === 1 ? 3 : 1; ctx.stroke();
+    },
+    outline(c) { if (!c.outside) { ctx.beginPath(); territory.path(c); ctx.stroke(); } },
+    hit(list, x, y) {
+      const inner = list.find(c => !c.outside && d3.polygonContains(c.poly, [x, y]));
+      if (inner) return inner;
+      const out = list.find(c => c.outside);
+      return out && Math.hypot(x - out.cx, y - out.cy) > out.R ? out : null;
+    },
+    // Districts fill their region, so a click on one opens its region, and the district stays selected there.
+    opens: c => c.level === 2 ? c.d.parent : c.d,
+    reach: c => c.outside ? Infinity : leastWidth(c.poly),
+    report: c => c.outside ? { box: [0, 0, c.w, c.h], mid: [4, 4] } : { box: c.box, mid: c.centroid, poly: c.poly },
+    // Regions are named largest first: the name on up to two lines and what it holds, or less where that does not
+    // fit, turned along a thin region if need be. Then districts are named where they have room. A label is left out
+    // where it would leave its cell or cover one placed before; hover still names the cell. The way up sits in the
+    // corner, outside the circle.
+    labels(list, f, motion) {
+      if (motion) return [];
+      // A line is at most 8 px either side of its middle, as no label here is over 13 px.
+      const out = [], taken = [], step = 17, half = 8, pad = 2;
+      const free = block => !taken.some(t => overlaps(t, block));
+      // The first of the choices that fits: n lines, each made by lineAt(width) as [text, font, colour], as near
+      // the cell's centroid as they fit inside the cell and cover nothing, and only if every line has text. Every
+      // choice is tried across the page first; where turn is set, a single line may then run along the cell's long
+      // axis, turned to read from the left. A cell is convex, so a block of lines fits where its top and bottom
+      // edges do.
+      function place(c, choices, turn) {
+        const [ox, oy] = c.centroid;
+        for (const angle of [0, ...(turn && Math.abs(axis(c)) > 0.15 ? [axis(c)] : [])]) for (const [n, lineAt] of choices) {
+          if (angle && n > 1) continue;
+          const cos = Math.cos(angle), sin = Math.sin(angle), page = (u, v) => [ox + u * cos - v * sin, oy + u * sin + v * cos];
+          const poly = c.poly.map(([x, y]) => [(x - ox) * cos + (y - oy) * sin, (y - oy) * cos - (x - ox) * sin]);
+          for (const dy of [0, -0.5, 0.5, -1, 1, -1.5, 1.5, -2, 2]) {
+            const top = dy * step - (n - 1) * step / 2, y0 = top - half - pad, y1 = top + (n - 1) * step + half + pad;
+            const a = across(poly, y0), b = across(poly, y1);
+            if (!a || !b) continue;
+            const left = Math.max(a[0], b[0]) + pad, right = Math.min(a[1], b[1]) - pad, lines = lineAt(Math.min(right - left, 200));
+            const block = [page(left, y0), page(right, y0), page(right, y1), page(left, y1)];
+            if (lines.length !== n || lines.some(([text]) => !text) || !free(block)) continue;
+            lines.forEach(([text, face, color], i) => { const [x, y] = page((left + right) / 2, top + i * step); out.push(label(c.d, text, face, x, y, color, angle, 'center')); });
+            taken.push(block);
+            return true;
+          }
+        }
+        return false;
+      }
+      const outside = list.find(c => c.outside);
+      if (f.parent && outside) {
+        const up = label(f, '‹ Go up', FONT.small, 8, 14, MUTED);
+        out.push(up); taken.push([[8, 6], [8 + up.w, 6], [8 + up.w, 22], [8, 22]]);
+      }
+      const name = (c, face, n, w) => {
+        const lines = wrap(opts.name(c.d), face, w, n);
+        return lines.length === n ? lines.map(t => [t, face, INK]) : [];
+      };
+      const count = c => c.d.children ? [[opts.count(c.d), FONT.small, MUTED]] : [];
+      // A narrow map names its regions a size smaller, so a shortened name keeps more of itself.
+      const face = outside && outside.w < NARROW_MAP ? FONT.childSmall : FONT.child;
+      for (const c of list.filter(c => c.level === 1).sort((a, b) => b.area - a.area)) {
+        place(c, [[3, w => [...name(c, face, 2, w), ...count(c)]], [2, w => name(c, face, 2, w)],
+          [2, w => [...name(c, face, 1, w), ...count(c)]], [1, w => [[fit(opts.name(c.d), face, w), face, INK]]]], true);
+      }
+      // A district's name shows whole, or with at least 8 letters of it, as a stub is no help.
+      for (const c of list.filter(c => c.level === 2).sort((a, b) => b.area - a.area)) {
+        const full = opts.name(c.d);
+        place(c, [[1, w => { const t = w >= 24 ? fit(full, FONT.deeperSmall, Math.min(w, 150)) : ''; return [[t === full || t.length > 8 ? t : '', FONT.deeperSmall, INK]]; }]]);
+      }
+      return out;
+    }
+  };
+  const RENDERERS = { icicle, sunburst, territory };
 
   function draw() {
     const R = RENDERERS[type];
     ctx.setTransform(size.ratio, 0, 0, size.ratio, 0, 0);
     ctx.clearRect(0, 0, size.w, size.h);
     cells = R.cells(geometry, root, size);
-    for (const c of cells) { ctx.fillStyle = cellFill(c); ctx.beginPath(); R.path(c); ctx.fill(); }
+    // A cell may fade, as in the territory's zoom, be hollow, as a region with districts is, or have an edge.
+    for (const c of cells) {
+      ctx.globalAlpha = c.alpha ?? 1;
+      ctx.beginPath(); R.path(c);
+      if (!c.hollow) { ctx.fillStyle = cellFill(c); ctx.fill(); }
+      if (R.edge) R.edge(c);
+    }
+    ctx.globalAlpha = 1;
     const sel = selected && cells.find(c => c.d === selected);
     outlined = sel ? sel.d : null;
     if (sel) { ctx.lineWidth = 2; ctx.strokeStyle = INK; R.outline(sel); }
@@ -847,7 +1067,7 @@ function createMap(box, opts) {
     if (!c) return;
     if (c.d === focus) { zoomTo(focus.parent); return; }
     select(c.d);
-    zoomTo(c.d);
+    zoomTo(RENDERERS[type].opens ? RENDERERS[type].opens(c) : c.d);
   });
 
   const describe = () => { if (focus) cv.setAttribute('aria-label', `${RENDERERS[type].name} map, zoomed to ${opts.name(focus)}`); };
@@ -878,19 +1098,27 @@ function createMap(box, opts) {
       render(false);
     },
     // The new map type keeps the focus and the selection. It may want another height, so the canvas is sized again.
+    // A map type may need its libraries first. The promise says whether it is shown: not when another type was
+    // asked for while they loaded. It fails when they do not load and the type is still wanted.
     setMapType(t) {
-      if (!Object.hasOwn(RENDERERS, t) || t === type) return;
-      type = t; geometry = null; describe();
-      if (!resize()) render(false);
+      if (!Object.hasOwn(RENDERERS, t)) return Promise.reject(new Error('No map type ' + t));
+      wanted = t;
+      const R = RENDERERS[t], show = () => {
+        if (wanted !== t) return false;
+        if (t !== type) { type = t; geometry = null; describe(); if (!resize()) render(false); }
+        return true;
+      };
+      // A failure after another type was asked for changes nothing.
+      return R.load ? R.load().then(show, e => { if (wanted !== t) return false; throw e; }) : Promise.resolve(show());
     },
     setRings(n) { rings = n; render(true); },
     setColorMode(m) { colorMode = m; fills.clear(); redraw(); },
     zoomTo, select, resize,
     on(event, fn) { listeners[event].push(fn); },
-    // What the last frame drew, in CSS px to the hundredth. Each cell has its node, colour, bounding box and a point
-    // inside it; a sunburst cell also has its arc, with angles in radians clockwise from the top. Each label has its
-    // text, size, the corners of its box, its angle and its bounding box. The focus is named as well as coded, since
-    // a group of a grouping has no code.
+    // What the last frame drew, in CSS px to the hundredth. Each cell has its node, colour (none if it is hollow),
+    // bounding box and a point inside it; a sunburst cell also has its arc, with angles in radians clockwise from the
+    // top, and a territory cell its polygon. Each label has its text, size, the corners of its box, its angle and its
+    // bounding box. The focus is named as well as coded, since a group of a grouping has no code.
     lastFrame() {
       const px = v => Math.round(v * 100) / 100, rad = v => Math.round(v * 1e4) / 1e4;
       const boxOf = (x, y, w, h) => ({ x: px(x), y: px(y), w: px(w), h: px(h) }), R = RENDERERS[type];
@@ -898,10 +1126,11 @@ function createMap(box, opts) {
         map: type, focus: focus && opts.code(focus), focusName: focus && opts.name(focus), rings,
         selected: outlined && opts.code(outlined), moving, zoom: { ...lastZoom },
         cells: cells.map(c => {
-          const { box: b, mid, arc } = R.report(c);
+          const { box: b, mid, arc, poly } = R.report(c);
           return {
-            code: opts.code(c.d), name: opts.name(c.d), fill: cellFill(c), ...boxOf(...b), mid: { x: px(mid[0]), y: px(mid[1]) },
-            ...(arc && { arc: { cx: px(arc.cx), cy: px(arc.cy), r0: px(arc.r0), r1: px(arc.r1), a0: rad(arc.a0), a1: rad(arc.a1) } })
+            code: opts.code(c.d), name: opts.name(c.d), fill: c.hollow ? null : cellFill(c), ...boxOf(...b), mid: { x: px(mid[0]), y: px(mid[1]) },
+            ...(arc && { arc: { cx: px(arc.cx), cy: px(arc.cy), r0: px(arc.r0), r1: px(arc.r1), a0: rad(arc.a0), a1: rad(arc.a1) } }),
+            ...(poly && { poly: poly.map(p => p.map(px)) })
           };
         }),
         labels: labels.map(l => {
@@ -1654,24 +1883,41 @@ function start(DATA) {
     map.setRings(n);
   }
   document.querySelectorAll('#rings button').forEach(b => b.addEventListener('click', () => setRings(+b.dataset.r)));
-  // Each map type, with the hint that says how to go up in it.
-  const MAP_TYPES = { icicle: { goUp: 'Click the left column' }, sunburst: { goUp: 'Click the centre' } };
+  // Each map type: the hint that says how to go up in it, whether Rings applies, and what shows while its libraries
+  // load. The territory always shows two levels.
+  const MAP_TYPES = {
+    icicle: { goUp: 'Click the left column', rings: true },
+    sunburst: { goUp: 'Click the centre', rings: true },
+    territory: { goUp: 'Click outside the circle', rings: false, loading: 'Loading the territory map…' }
+  };
   // The map type an address names, or null.
   const isMapType = t => Object.hasOwn(MAP_TYPES, t ?? '');
   const mapTypeIn = search => { const t = new URLSearchParams(search).get('map'); return isMapType(t) ? t : null; };
+  const mapNote = document.getElementById('map-note'), ringsControl = document.getElementById('rings').closest('.ctl');
+  const note = text => { mapNote.textContent = text; mapNote.hidden = !text; };
   // The address always names the map type shown, so a copied link opens it: it is written in place, with no
-  // parameter for the icicle. A pick is also kept for the next visit.
+  // parameter for the icicle. A pick is also kept for the next visit. When a map type's libraries do not load, the
+  // icicle shows and a note says why.
   function setMapType(t, picked) {
-    document.querySelectorAll('#maptype button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === t)));
-    document.querySelector('#hint-up b').textContent = MAP_TYPES[t].goUp;
-    map.setMapType(t);
-    if (picked) try { localStorage.setItem('aot-map', t); } catch (e) {}
-    const p = new URLSearchParams(location.search);
-    if (t === 'icicle') p.delete('map'); else p.set('map', t);
-    const s = p.toString(), url = location.pathname + (s ? '?' + s : '') + location.hash;
-    if (url !== location.pathname + location.search + location.hash) try { history.replaceState(history.state, '', url); } catch (e) {}
+    const { loading } = MAP_TYPES[t];
+    if (loading) note(loading);
+    map.setMapType(t).then(shown => {
+      if (loading && mapNote.textContent === loading) note('');
+      if (!shown) return;
+      document.querySelectorAll('#maptype button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === t)));
+      document.querySelector('#hint-up b').textContent = MAP_TYPES[t].goUp;
+      ringsControl.hidden = !MAP_TYPES[t].rings;
+      if (picked) try { localStorage.setItem('aot-map', t); } catch (e) {}
+      const p = new URLSearchParams(location.search);
+      if (t === 'icicle') p.delete('map'); else p.set('map', t);
+      const s = p.toString(), url = location.pathname + (s ? '?' + s : '') + location.hash;
+      if (url !== location.pathname + location.search + location.hash) try { history.replaceState(history.state, '', url); } catch (e) {}
+    }, () => {
+      setMapType('icicle', false);
+      note('The territory map did not load, so the icicle is shown. Check your connection, then pick Territory again.');
+    });
   }
-  document.querySelectorAll('#maptype button').forEach(b => b.addEventListener('click', () => setMapType(b.dataset.m, true)));
+  document.querySelectorAll('#maptype button').forEach(b => b.addEventListener('click', () => { note(''); setMapType(b.dataset.m, true); }));
   document.querySelectorAll('#colormode button').forEach(b => b.addEventListener('click', () => {
     colorMode = b.dataset.c;
     document.querySelectorAll('#colormode button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));

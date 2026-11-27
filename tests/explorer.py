@@ -3,11 +3,23 @@ from playwright.sync_api import expect
 
 CANVAS = "#chart canvas"
 NARROW_MAP = 520  # Below this width the map works as on a phone.
-MAP_TYPES = ["icicle", "sunburst"]
+MAP_TYPES = ["icicle", "sunburst", "territory"]
 
 
 def expect_loaded(page, taxonomy):
     expect(page.locator("#st-concepts")).to_have_text(f"{len(taxonomy):,}")
+
+
+def open_map(page, taxonomy, map_type, address=""):
+    """Open the explorer at an address, such as #code, on a map type, once that map type shows. The territory map's
+    libraries load after the page, so a test that clicks must wait for it."""
+    page.goto(f"/?map={map_type}{address}")
+    expect_loaded(page, taxonomy)
+    wait_for_map_type(page, map_type)
+
+
+def wait_for_map_type(page, map_type):
+    page.wait_for_function(f"explorerMap.lastFrame().map === '{map_type}'")
 
 
 def open_concept(page, code, search_for=None):

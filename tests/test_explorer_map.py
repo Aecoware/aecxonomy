@@ -6,7 +6,7 @@ import pytest
 from playwright.sync_api import expect
 
 from explorer import (CANVAS, MAP_TYPES, cell, children, click_cell, code_of, concepts_under, expect_loaded, frame,
-                      narrow, open_concept)
+                      narrow, open_concept, open_map)
 
 
 def branches(taxonomy):
@@ -49,8 +49,7 @@ def test_clicking_the_focus_goes_up_and_the_zoom_path_jumps_to_any_ancestor(page
     # Notice to proceed sits under Milestones, under Events and risks.
     ntp = code_of(taxonomy, "Notice to proceed")
     milestones, events = taxonomy[ntp]["parent"], taxonomy[taxonomy[ntp]["parent"]]["parent"]
-    page.goto(f"/?map={map_type}")
-    expect_loaded(page, taxonomy)
+    open_map(page, taxonomy, map_type)
     click_cell(page, cell(page, events))
     click_cell(page, cell(page, milestones))
     assert frame(page)["focus"] == milestones
@@ -82,8 +81,7 @@ def test_clicking_a_concept_without_children_selects_it_outlines_it_and_writes_t
     spaces = code_of(taxonomy, "Spaces")
     parent = sorted(children(taxonomy, spaces))[0]
     leaf = next(k for k in sorted(children(taxonomy, parent)) if not children(taxonomy, k))
-    page.goto(f"/?map={map_type}")
-    expect_loaded(page, taxonomy)
+    open_map(page, taxonomy, map_type)
     click_cell(page, cell(page, spaces))
     click_cell(page, cell(page, leaf))
     f = frame(page)
@@ -121,10 +119,9 @@ def depth(taxonomy, code):
     return 1 if not taxonomy[code]["parent"] else 1 + depth(taxonomy, taxonomy[code]["parent"])
 
 
-@pytest.mark.parametrize("map_type", MAP_TYPES)
+@pytest.mark.parametrize("map_type", ["icicle", "sunburst"])  # the territory always shows two levels
 def test_the_rings_set_how_many_levels_the_map_shows(page, taxonomy, map_type):
-    page.goto(f"/?map={map_type}")
-    expect_loaded(page, taxonomy)
+    open_map(page, taxonomy, map_type)
     for rings in (4, 2, 3):
         page.locator("#rings").get_by_role("button", name=str(rings)).click()
         f = frame(page)
@@ -134,20 +131,25 @@ def test_the_rings_set_how_many_levels_the_map_shows(page, taxonomy, map_type):
 
 @pytest.mark.parametrize("map_type", MAP_TYPES)
 def test_the_colour_switch_colours_by_primary_tag_and_shows_its_legend(page, taxonomy, map_type):
-    page.goto(f"/?map={map_type}")
-    expect_loaded(page, taxonomy)
+    # The territory paints a region's districts, not the region, so there the check is on the districts.
+    shown = set(branches(taxonomy)) if map_type != "territory" else {k for b in branches(taxonomy) for k in children(taxonomy, b)}
+    fills = lambda: {c["code"]: c["fill"] for c in frame(page)["cells"] if c["code"] in shown}
+    open_map(page, taxonomy, map_type)
     legend = page.locator("#legend")
     expect(legend).to_be_hidden()
-    level_one = lambda f: {c["code"]: c["fill"] for c in f["cells"] if c["code"] in branches(taxonomy)}
-    assert len(set(level_one(frame(page)).values())) == len(branches(taxonomy))
+    assert len(set(fills().values())) == len(branches(taxonomy))  # a colour for each branch
 
     page.locator("#colormode").get_by_role("button", name="5W1H").click()
     expect(legend).to_be_visible()
     for tag in ("Who", "What", "Where", "When", "Why", "How"):
         expect(legend).to_contain_text(f"{tag}:")
-    for code, fill in level_one(frame(page)).items():
-        tag = taxonomy[code]["primary_tag"]
-        assert fill == page.evaluate(f"getComputedStyle(document.documentElement).getPropertyValue('--q-{tag}').trim()")
+    by_tag = {}
+    for code, fill in fills().items():
+        by_tag.setdefault(taxonomy[code]["primary_tag"], set()).add(fill)
+    assert all(len(f) == 1 for f in by_tag.values()) and len(set().union(*by_tag.values())) == len(by_tag)  # a colour for each tag
+    if map_type != "territory":
+        for tag, (fill,) in by_tag.items():
+            assert fill == page.evaluate(f"getComputedStyle(document.documentElement).getPropertyValue('--q-{tag}').trim()")
 
 
 def test_switching_the_grouping_keeps_the_selection(page, taxonomy):
@@ -189,8 +191,7 @@ def test_the_columns_layout_shares_the_selection_with_the_map(page, taxonomy):
 def test_search_finds_a_concept_by_its_uk_label_and_the_map_zooms_to_it(page, taxonomy, map_type):
     code, concept = next((k, c) for k, c in sorted(taxonomy.items())
                          if c["label_gb"] and c["label_gb"] != c["label"] and c["parent"] and not children(taxonomy, k))
-    page.goto(f"/?map={map_type}")
-    expect_loaded(page, taxonomy)
+    open_map(page, taxonomy, map_type)
     open_concept(page, code, search_for=concept["label_gb"])
     f = frame(page)
     assert (f["focus"], f["selected"]) == (concept["parent"], code)
@@ -270,6 +271,88 @@ def test_sunburst_labels_fit_their_arcs_and_read_from_the_left_and_every_child_i
     assert along_the_radius
 
 
+def polygon_area(poly):
+    return abs(sum(x0 * y1 - x1 * y0 for (x0, y0), (x1, y1) in zip(poly, poly[1:] + poly[:1]))) / 2
+
+
+def in_polygon(point, poly, slack=0.5):
+    """Whether a point lies inside a convex polygon, give or take slack px."""
+    (x, y), edges = point, list(zip(poly, poly[1:] + poly[:1]))
+    turn = 1 if sum(x0 * y1 - x1 * y0 for (x0, y0), (x1, y1) in edges) > 0 else -1
+    return all(turn * ((x1 - x0) * (y - y0) - (y1 - y0) * (x - x0)) / (math.hypot(x1 - x0, y1 - y0) or 1) >= -slack
+               for (x0, y0), (x1, y1) in edges)
+
+
+def least_width(poly):
+    """How wide a convex polygon is at its narrowest, as a finger sees it."""
+    edges = [(a, b) for a, b in zip(poly, poly[1:] + poly[:1]) if math.dist(a, b) > 0.5]
+    return min(max(abs((x1 - x0) * (y - y0) - (y1 - y0) * (x - x0)) / math.dist((x0, y0), (x1, y1)) for x, y in poly)
+               for (x0, y0), (x1, y1) in edges)
+
+
+def quads_overlap(p, q):
+    """Whether two convex polygons, such as turned label boxes, overlap: no edge of either separates them."""
+    for poly in (p, q):
+        for (x0, y0), (x1, y1) in zip(poly, poly[1:] + poly[:1]):
+            nx, ny = y0 - y1, x1 - x0
+            a, b = [x * nx + y * ny for x, y in p], [x * nx + y * ny for x, y in q]
+            if max(a) <= min(b) or max(b) <= min(a):
+                return False
+    return True
+
+
+def open_territory(page, taxonomy):
+    open_map(page, taxonomy, "territory")
+    return frame(page)
+
+
+def test_the_territory_shows_the_focus_s_children_as_regions_and_theirs_as_districts_in_a_circle(page, taxonomy):
+    f = open_territory(page, taxonomy)
+    box = page.locator(CANVAS).bounding_box()
+    cx, cy, r = box["width"] / 2, box["height"] / 2, min(box["width"], box["height"]) / 2
+    cells = {c["code"]: c for c in f["cells"] if c["code"]}
+    regions = branches(taxonomy)
+    assert set(cells) == set(regions) | {k for b in regions for k in children(taxonomy, b)}
+    assert all(math.hypot(x - cx, y - cy) <= r for c in cells.values() for x, y in c["poly"])
+    area = {k: polygon_area(cells[k]["poly"]) for k in regions}
+    # As judging task 1 asks of the icicle: the three biggest branches are the three biggest regions.
+    assert sorted(regions, key=lambda k: -area[k])[:3] == sorted(regions, key=lambda k: -concepts_under(taxonomy, k))[:3]
+    # Each region's share of the circle is its share of the concepts, except that the smallest are raised to a floor.
+    whole, held = sum(area.values()), sum(concepts_under(taxonomy, k) for k in regions)
+    share = {k: concepts_under(taxonomy, k) / held for k in regions}
+    assert max(abs(area[k] / whole - share[k]) for k in regions if share[k] > 0.05) < 0.02
+    assert min(area[k] / whole - share[k] for k in regions) > -0.02
+
+
+def test_territory_labels_sit_inside_their_cells_never_overlap_and_name_every_region_big_enough_to_tap(page, taxonomy):
+    page.emulate_media(reduced_motion="reduce")
+    open_territory(page, taxonomy)
+    floor = 24 if narrow(page) else 20
+    for focus in [None] + sorted(branches(taxonomy)):
+        f = open_by_address(page, focus)
+        polys, labels = {c["code"]: c.get("poly") for c in f["cells"]}, f["labels"]
+        for l in labels:
+            assert l["size"] >= 12, (focus, l["text"])
+            if l["code"] != focus:
+                assert all(in_polygon(p, polys[l["code"]]) for p in l["corners"]), (focus, l["text"])
+        assert [(a["text"], b["text"]) for i, a in enumerate(labels) for b in labels[i + 1:]
+                if quads_overlap(a["corners"], b["corners"])] == [], focus
+        assert {l["code"] for l in labels} >= set(children(taxonomy, focus or "")), focus
+        assert min(least_width(polys[k]) for k in children(taxonomy, focus or "")) >= floor, focus
+
+
+def test_coming_back_to_a_focus_gives_the_same_territory(page, taxonomy):
+    biggest = max(branches(taxonomy), key=lambda b: concepts_under(taxonomy, b))
+    shapes = lambda f: {c["code"]: (c["x"], c["y"], c["w"], c["h"]) for c in f["cells"]}
+    before = shapes(open_territory(page, taxonomy))
+    click_cell(page, cell(page, biggest))
+    assert frame(page)["focus"] == biggest
+    click_cell(page, cell(page, biggest))  # outside the circle: up
+    f = frame(page)
+    assert f["focus"] is None and shapes(f) == before
+    assert shapes(open_territory(page, taxonomy)) == before  # and on the next visit
+
+
 def test_on_a_touch_screen_a_tap_on_a_thin_cell_counts_for_the_concept_above_it(page, taxonomy):
     page.goto("/")
     expect_loaded(page, taxonomy)
@@ -285,8 +368,7 @@ def test_on_a_touch_screen_a_tap_on_a_thin_cell_counts_for_the_concept_above_it(
 @pytest.mark.parametrize("map_type", MAP_TYPES)
 def test_a_wheel_over_the_map_scrolls_the_page_and_leaves_the_focus(page, taxonomy, map_type):
     spaces = code_of(taxonomy, "Spaces")
-    page.goto(f"/?map={map_type}#{spaces}")
-    expect_loaded(page, taxonomy)
+    open_map(page, taxonomy, map_type, f"#{spaces}")
     page.locator(CANVAS).scroll_into_view_if_needed()
     box = page.locator(CANVAS).bounding_box()
     page.mouse.move(box["x"] + box["width"] * 0.6, box["y"] + box["height"] / 2)
@@ -300,8 +382,7 @@ def test_a_wheel_over_the_map_scrolls_the_page_and_leaves_the_focus(page, taxono
 @pytest.mark.parametrize("map_type", MAP_TYPES)
 def test_a_zoom_is_one_short_tween_and_reduced_motion_makes_it_instant(page, taxonomy, map_type):
     spaces = code_of(taxonomy, "Spaces")
-    page.goto(f"/?map={map_type}")
-    expect_loaded(page, taxonomy)
+    open_map(page, taxonomy, map_type)
     click_cell(page, cell(page, spaces))
     zoom = frame(page)["zoom"]
     assert zoom["frames"] > 1 and zoom["ms"] < 500
@@ -342,8 +423,7 @@ def test_the_page_stays_under_1400_elements_as_the_map_zooms(page, taxonomy, map
     count = lambda: page.evaluate("document.getElementsByTagName('*').length")
     biggest = max(branches(taxonomy), key=lambda b: concepts_under(taxonomy, b))
     child = max(children(taxonomy, biggest), key=lambda k: concepts_under(taxonomy, k))
-    page.goto(f"/?map={map_type}")
-    expect_loaded(page, taxonomy)
+    open_map(page, taxonomy, map_type)
     assert count() < 1400
     for code in (biggest, child, child, biggest):  # in, in, then up twice by the focus
         click_cell(page, cell(page, code))
@@ -374,8 +454,7 @@ def test_each_frame_of_a_zoom_takes_at_most_16_7_ms_with_the_cpu_slowed_4x(page,
     biggest = max(branches(taxonomy), key=lambda b: concepts_under(taxonomy, b))
     # Open the branch first, so its Turtle is in and no download lands during the zoom. Then go back to all
     # branches and rest the pointer on the branch, as a person does before clicking: hover previews it.
-    page.goto(f"/?map={map_type}#{biggest}")
-    expect_loaded(page, taxonomy)
+    open_map(page, taxonomy, map_type, f"#{biggest}")
     expect(page.locator("#panel pre")).to_contain_text(f"aeco:{biggest} ")
     zoom_path(page).get_by_role("button", name="All branches").click()
     target = cell(page, biggest)
