@@ -149,6 +149,8 @@ main.wrap { display: flex; flex-wrap: wrap; gap: 24px; padding-block: 32px 64px;
 .seg button:hover { background: var(--ground); }
 .seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
 .vseg button { font-weight: 500; }
+/* A control and its label wrap to a new line together. */
+.ctl { display: inline-flex; align-items: center; gap: 8px; }
 
 .chart { position: relative; background: var(--paper); border: 1px solid var(--ink); touch-action: manipulation; }
 .chart canvas { display: block; }
@@ -349,16 +351,27 @@ footer.site li a:hover { color: var(--ink); text-decoration: underline; }
   <section class="stage" id="view-map" role="tabpanel" aria-labelledby="tab-map">
     <div class="bar">
       <nav class="crumbs" id="crumbs" aria-label="Zoom path"></nav>
-      <span class="ctl-label" id="color-label">Colour</span>
-      <div class="seg" role="group" aria-labelledby="color-label" id="colormode">
-        <button type="button" data-c="branch" aria-pressed="true">Branch</button>
-        <button type="button" data-c="question" aria-pressed="false">5W1H</button>
+      <div class="ctl">
+        <span class="ctl-label" id="maptype-label">Map</span>
+        <div class="seg" role="group" aria-labelledby="maptype-label" id="maptype">
+          <button type="button" data-m="icicle" aria-pressed="true">Icicle</button>
+          <button type="button" data-m="sunburst" aria-pressed="false">Sunburst</button>
+        </div>
       </div>
-      <span class="ctl-label" id="rings-label">Rings</span>
-      <div class="seg" role="group" aria-labelledby="rings-label" id="rings">
-        <button type="button" data-r="2" aria-pressed="false">2</button>
-        <button type="button" data-r="3" aria-pressed="true">3</button>
-        <button type="button" data-r="4" aria-pressed="false">4</button>
+      <div class="ctl">
+        <span class="ctl-label" id="color-label">Colour</span>
+        <div class="seg" role="group" aria-labelledby="color-label" id="colormode">
+          <button type="button" data-c="branch" aria-pressed="true">Branch</button>
+          <button type="button" data-c="question" aria-pressed="false">5W1H</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <span class="ctl-label" id="rings-label">Rings</span>
+        <div class="seg" role="group" aria-labelledby="rings-label" id="rings">
+          <button type="button" data-r="2" aria-pressed="false">2</button>
+          <button type="button" data-r="3" aria-pressed="true">3</button>
+          <button type="button" data-r="4" aria-pressed="false">4</button>
+        </div>
       </div>
       <button type="button" class="btn outline small" id="up">Zoom out</button>
     </div>
@@ -368,7 +381,7 @@ footer.site li a:hover { color: var(--ink); text-decoration: underline; }
     <div class="legend" id="legend" hidden></div>
     <div class="hint" aria-hidden="true">
       <span><b>Click</b> a concept to open it and zoom in</span>
-      <span><b>Click the left column</b> to go up</span>
+      <span id="hint-up"><b>Click the left column</b> to go up</span>
       <span><b>Hover</b> to preview</span>
       <span><b>The zoom path</b> jumps to any level</span>
     </div>
@@ -419,9 +432,11 @@ const getJson = url => fetch(url).then(r => { if (!r.ok) throw new Error(url + '
    code, count and summary give a node's text. fill gives its colour in a colour mode.
    The page sends it commands and listens to three events. 'focus' says the map zoomed to another node. 'select' says
    another node, or none, is selected. 'hover' says the pointer moved onto another node, or off them all.
-   Each map type is a renderer with one interface. geometry() lays the map out for a focus, a size and the rings.
-   blend() mixes two geometries during a zoom. cells() gives the cells in sight, each with its node and box. labels()
-   names them, and hit() finds the cell at a point. */
+   Each map type is a renderer with one interface. height() gives the canvas height it wants at a width. geometry()
+   lays the map out for a focus, a size and the rings, and blend() mixes two geometries during a zoom. cells() gives
+   the cells in sight, each with its node. path() and outline() draw a cell and labels() names the cells. hit() finds
+   the cell at a point, reach() is the smaller side of a cell as a tap target, and report() gives its box for the
+   test report. */
 const NARROW_MAP = 520;  // Below this width the map works as on a phone: two rings, taller rows and larger targets.
 function createMap(box, opts) {
   'use strict';
@@ -430,9 +445,13 @@ function createMap(box, opts) {
   cv.setAttribute('role', 'img');
   box.prepend(cv);
   const style = getComputedStyle(box), cssVar = n => style.getPropertyValue(n).trim();
-  const INK = cssVar('--ink'), MUTED = cssVar('--stone-600'), SANS = cssVar('--sans'), MONO = cssVar('--mono');
+  const INK = cssVar('--ink'), MUTED = cssVar('--stone-600'), PAPER = cssVar('--paper'), SANS = cssVar('--sans'), MONO = cssVar('--mono');
   const font = (weight, px, family) => ({ css: `${weight} ${px}px ${family}`, px });
-  const FONT = { focus: font(600, 13, SANS), child: font(600, 13, SANS), deeper: font(400, 13, SANS), small: font(400, 12, MONO) };
+  const FONT = {
+    focus: font(600, 13, SANS), child: font(600, 13, SANS), deeper: font(400, 13, SANS), small: font(400, 12, MONO),
+    arcChild: font(600, 12, SANS), arcDeeper: font(400, 12, SANS)
+  };
+  const TAU = 2 * Math.PI;
   const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const listeners = { focus: [], select: [], hover: [] };
   const emit = (type, ...args) => listeners[type].forEach(fn => fn(...args));
@@ -440,7 +459,9 @@ function createMap(box, opts) {
   let root = null, focus = null, selected = null, hovered = null, outlined = null;
   let rings = 3, colorMode = 'branch', type = 'icicle';
   let size = { w: 0, h: 0, ratio: 1 }, geometry = null, cells = [], labels = [];
-  let raf = 0, moving = false, lastZoom = { ms: 0, frames: 0 };
+  // settled holds the labels of the end of the last zoom. Labels depend on the cells and the focus alone: anything
+  // else that changes them must clear it.
+  let raf = 0, moving = false, lastZoom = { ms: 0, frames: 0 }, settled = null;
   const span = new Map(), fills = new Map();
 
   // Each node's span of the map, from 0 to 1 for the root: its share of its parent's span by the concepts it holds.
@@ -451,6 +472,8 @@ function createMap(box, opts) {
     for (const k of kids) { const next = x + (to - from) * k.value / total; partition(k, x, next); x = next; }
   }
   const fillOf = d => { let f = fills.get(d); if (!f) fills.set(d, f = opts.fill(d, colorMode)); return f; };
+  // A cell may have a colour of its own, as the sunburst's disc does.
+  const cellFill = c => c.fill || fillOf(c.d);
 
   /* Text is measured with the canvas's own measureText, once for each text and font. */
   const widths = new Map(), fits = new Map();
@@ -460,6 +483,8 @@ function createMap(box, opts) {
     if (w === undefined) { ctx.font = f.css; widths.set(key, w = ctx.measureText(text).width); }
     return w;
   }
+  // The width of a text measured before, or Infinity. A frame of a zoom uses this, so it measures nothing new.
+  const measured = (text, f) => widths.get(f.css + '|' + text) ?? Infinity;
   // The longest start of the text that fits in max px, ending in an ellipsis when cut. '' when not 3 letters fit.
   function fit(text, f, max) {
     max = Math.floor(max);
@@ -487,37 +512,46 @@ function createMap(box, opts) {
     if (lines.length > n) lines.splice(n - 1, lines.length, lines.slice(n - 1).join(' '));
     return lines.map(l => fit(l, f, max)).filter(Boolean);
   }
-  const label = (d, text, f, x, y, color = INK) => ({ d, text, font: f, x, y, w: textWidth(text, f), color });
+  // A label starts at x, or is centred on it, and is turned by angle about that point. y is the middle of its line.
+  const label = (d, text, f, x, y, color = INK, angle = 0, align = 'left') => ({ d, text, font: f, x, y, w: textWidth(text, f), color, angle, align });
+
+  /* The focus's children share a length, the icicle's height or the sunburst's turn, by the concepts they hold. None
+     is shorter than the floor, so every child has room for its name and a finger: the larger children give up the
+     length. Where the floor does not fit, every child keeps its share. Inside a child everything keeps its
+     proportions, and outside the focus the map runs on in a straight line, so two warps blend smoothly. The warp gives
+     where a point of the span falls along the length. */
+  function warpFor(f, length, floor) {
+    const kids = f.children || [], [f0, f1] = span.get(f);
+    const share = kids.map(k => span.get(k)[1] - span.get(k)[0]), h = share.map(s => length * s / (f1 - f0));
+    if (kids.length * floor <= length) {
+      const low = new Set();
+      for (let again = true; again;) {
+        again = false;
+        const free = length - low.size * floor, rest = share.reduce((s, v, i) => low.has(i) ? s : s + v, 0);
+        share.forEach((v, i) => { if (low.has(i)) h[i] = floor; else if ((h[i] = free * v / rest) < floor) { low.add(i); again = true; } });
+      }
+    }
+    const stops = [];
+    let y = 0;
+    kids.forEach((k, i) => { const [a, b] = span.get(k); stops.push([a, b, y, y + h[i]]); y += h[i]; });
+    const scale = length / (f1 - f0);
+    return x => {
+      if (x <= f0 || !stops.length) return (x - f0) * scale;
+      if (x >= f1) return length + (x - f1) * scale;
+      for (const [a, b, y0, y1] of stops) if (x <= b) return y0 + (x - a) / (b - a) * (y1 - y0);
+      return length;
+    };
+  }
 
   /* ---------- the icicle ----------
-     The focus is the left column. The levels set by the rings share the width to its right. The focus's children
-     share its height by the concepts they hold. None is shorter than the floor, so every child has room for its name:
-     the larger children give up the height. Inside a child, everything keeps its proportions. Outside the focus the
-     map runs on in a straight line, so two geometries blend smoothly. */
+     The focus is the left column. The levels set by the rings share the width to its right, and the focus's children
+     share its height. */
   const icicle = {
     name: 'Icicle',
+    height: (w, h) => h,
     geometry(f, sz, n) {
-      const narrow = sz.w < NARROW_MAP, floor = narrow ? 30 : 20, kids = f.children || [], [f0, f1] = span.get(f);
-      const share = kids.map(k => span.get(k)[1] - span.get(k)[0]), h = share.map(s => sz.h * s / (f1 - f0));
-      if (kids.length * floor <= sz.h) {
-        const low = new Set();
-        for (let again = true; again;) {
-          again = false;
-          const free = sz.h - low.size * floor, rest = share.reduce((s, v, i) => low.has(i) ? s : s + v, 0);
-          share.forEach((v, i) => { if (low.has(i)) h[i] = floor; else if ((h[i] = free * v / rest) < floor) { low.add(i); again = true; } });
-        }
-      }
-      const stops = [];
-      let y = 0;
-      kids.forEach((k, i) => { const [a, b] = span.get(k); stops.push([a, b, y, y + h[i]]); y += h[i]; });
-      const scale = sz.h / (f1 - f0);
-      const warp = x => {
-        if (x <= f0 || !stops.length) return (x - f0) * scale;
-        if (x >= f1) return sz.h + (x - f1) * scale;
-        for (const [a, b, y0, y1] of stops) if (x <= b) return y0 + (x - a) / (b - a) * (y1 - y0);
-        return sz.h;
-      };
-      return { warp, depth: f.depth, levels: Math.max(1, Math.min(n, f.height)), focusW: narrow ? 96 : Math.min(168, Math.round(sz.w * 0.18)) };
+      const narrow = sz.w < NARROW_MAP;
+      return { warp: warpFor(f, sz.h, narrow ? 30 : 20), depth: f.depth, levels: Math.max(1, Math.min(n, f.height)), focusW: narrow ? 96 : Math.min(168, Math.round(sz.w * 0.18)) };
     },
     blend(a, b, t) {
       const mix = (p, q) => p + (q - p) * t;
@@ -539,9 +573,11 @@ function createMap(box, opts) {
       })(top);
       return out;
     },
-    fill(c) { ctx.fillRect(c.x, c.y, c.w - 1, c.h - (c.h > 3 ? 1 : 0)); },
+    path(c) { ctx.rect(c.x, c.y, c.w - 1, c.h - (c.h > 3 ? 1 : 0)); },
     outline(c) { ctx.strokeRect(c.x + 1, c.y + 1, c.w - 3, Math.max(1, c.h - 3)); },
     hit(list, x, y) { return list.find(c => x >= c.x && x < c.x + c.w && y >= c.y && y < c.y + c.h) || null; },
+    reach: c => Math.min(c.w, c.h),
+    report: c => ({ box: [c.x, c.y, c.w, c.h], mid: [c.x + c.w / 2, c.y + c.h / 2] }),
     // A name in each cell tall and wide enough, and its count when the whole name fits beside it. The focus column
     // gets its name on up to four lines, what it holds, and the way up. Every label stays inside its own cell, so
     // none overlap. While the map moves, only names that fit whole are drawn, so a frame measures nothing new.
@@ -561,7 +597,7 @@ function createMap(box, opts) {
         }
         if (c.h < 17) continue;
         const face = c.d.parent === f ? FONT.child : FONT.deeper, y = c.h > 44 ? c.y + 14 : c.y + c.h / 2;
-        const full = opts.name(c.d), name = motion ? (textWidth(full, face) <= max ? full : '') : fit(full, face, max);
+        const full = opts.name(c.d), name = motion ? (measured(full, face) <= max ? full : '') : fit(full, face, max);
         if (!name) continue;
         out.push(label(c.d, name, face, x, y));
         const count = c.d.children && name === full && !motion ? opts.count(c.d) : '', countW = count ? textWidth(count, FONT.small) : 0;
@@ -570,20 +606,178 @@ function createMap(box, opts) {
       return out;
     }
   };
-  const RENDERERS = { icicle };
+
+  /* ---------- the sunburst ----------
+     The focus is the disc in the middle, and the levels set by the rings circle it, each ring as wide as the disc's
+     radius. A node's arc is its share of the focus's span. A zoom moves the span, the depth and the
+     levels, and every arc follows. A name runs across its arc where the arc is wide enough and along the radius
+     otherwise, turned so it reads from the left. Every label is measured to stay inside its own arc, so none overlap.
+     Angles run clockwise from the top. */
+  const PAD = 3;  // How far a label keeps clear of its arc's edges, in px.
+  // A point at radius r and angle a from the cell's centre.
+  const polar = (c, r, a) => [c.cx + r * Math.sin(a), c.cy - r * Math.cos(a)];
+  // The angle of a point given from the centre, from 0 to a full turn.
+  const bearing = (x, y) => { const a = Math.atan2(x, -y); return a < 0 ? a + TAU : a; };
+  const whole = c => c.a1 - c.a0 > TAU - 1e-9;
+  // The distance from the centre to the nearest point of the segment p-q, both given from the centre.
+  function nearest([px, py], [qx, qy]) {
+    const dx = qx - px, dy = qy - py, t = Math.max(0, Math.min(1, -(px * dx + py * dy) / (dx * dx + dy * dy || 1)));
+    return Math.hypot(px + t * dx, py + t * dy);
+  }
+  // Whether a w by h box centred on (x, y) and turned by angle lies inside the cell, pad px clear of its edges. The
+  // inside edge of a ring curves away from a straight side, so the sides are checked against it, not only the corners.
+  function inside(c, x, y, w, h, angle, pad) {
+    const cos = Math.cos(angle), sin = Math.sin(angle);
+    const pts = [[-w / 2, -h / 2], [w / 2, -h / 2], [w / 2, h / 2], [-w / 2, h / 2]]
+      .map(([u, v]) => [x - c.cx + u * cos - v * sin, y - c.cy + u * sin + v * cos]);
+    for (const [px, py] of pts) {
+      const r = Math.hypot(px, py);
+      if (r > c.r1 - pad) return false;
+      if (!whole(c)) { const a = bearing(px, py); if (a < c.a0 + pad / r || a > c.a1 - pad / r) return false; }
+    }
+    return !c.r0 || pts.every((p, i) => nearest(p, pts[(i + 1) % 4]) >= c.r0 + pad);
+  }
+  // The widest box, up to limit px, that fits centred on (x, y), found by halving.
+  function widest(c, x, y, h, angle, limit) {
+    if (inside(c, x, y, limit, h, angle, PAD)) return limit;
+    if (!inside(c, x, y, 0, h, angle, PAD)) return 0;
+    let lo = 0, hi = limit;
+    for (let i = 0; i < 10; i++) { const m = (lo + hi) / 2; if (inside(c, x, y, m, h, angle, PAD)) lo = m; else hi = m; }
+    return lo;
+  }
+  // Adds the outline of a cell, inset px inside each of its edges, to the path as a shape of its own.
+  function sector(c, inset) {
+    const r0 = c.r0 && c.r0 + inset, r1 = Math.max(r0, c.r1 - inset), up = Math.PI / 2;
+    if (whole(c)) {
+      ctx.moveTo(c.cx + r1, c.cy); ctx.arc(c.cx, c.cy, r1, 0, TAU);
+      if (r0) { ctx.moveTo(c.cx + r0, c.cy); ctx.arc(c.cx, c.cy, r0, TAU, 0, true); }
+      return;
+    }
+    const s = c.a1 - c.a0, p1 = Math.min(s / 4, inset / r1), p0 = r0 && Math.min(s / 4, inset / r0), a = c.a0 + p1 - up;
+    ctx.moveTo(c.cx + r1 * Math.cos(a), c.cy + r1 * Math.sin(a));
+    ctx.arc(c.cx, c.cy, r1, a, c.a1 - p1 - up);
+    if (r0) ctx.arc(c.cx, c.cy, r0, c.a1 - p0 - up, c.a0 + p0 - up, true);
+    else ctx.lineTo(c.cx, c.cy);
+    ctx.closePath();
+  }
+  const radius = sz => Math.min(sz.w, sz.h) / 2 - 2;
+  const sunburst = {
+    name: 'Sunburst',
+    height: (w, h) => Math.min(w, h),
+    // The floor is an arc's length across the middle of the first ring: on a phone, the size of a tap target.
+    geometry(f, sz, n) {
+      const levels = Math.max(1, Math.min(n, f.height)), rw = radius(sz) / (levels + 1);
+      return { f, warp: warpFor(f, TAU, (sz.w < NARROW_MAP ? TAP : 20) / (1.5 * rw)), depth: f.depth, levels };
+    },
+    blend(a, b, t) {
+      const mix = (p, q) => p + (q - p) * t;
+      return { f: b.f, warp: x => mix(a.warp(x), b.warp(x)), depth: mix(a.depth, b.depth), levels: mix(a.levels, b.levels) };
+    },
+    // A node k levels out from the focus (a fraction while zooming) fills the ring from k to k + 1 disc radii, cut
+    // where it would reach into the disc. A node outside the focus, past the outer ring or thinner than a quarter
+    // pixel is skipped with everything under it. The disc is the last cell.
+    cells(g, top, sz) {
+      const R = radius(sz), rw = R / (g.levels + 1), cx = sz.w / 2, cy = sz.h / 2;
+      const out = [];
+      (function visit(d) {
+        const [a, b] = span.get(d), k = d.depth - g.depth;
+        if (k * rw >= R) return;
+        const a0 = Math.max(0, g.warp(a)), a1 = Math.min(TAU, g.warp(b));
+        if ((a1 - a0) * R < 0.25) return;
+        const r0 = Math.max(rw, k * rw), r1 = Math.min(R, (k + 1) * rw);
+        if (r1 - r0 > 0.5) out.push({ d, cx, cy, a0, a1, r0, r1 });
+        if (d.children) d.children.forEach(visit);
+      })(top);
+      out.push({ d: g.f, cx, cy, a0: 0, a1: TAU, r0: 0, r1: rw, disc: true, fill: PAPER });
+      return out;
+    },
+    path(c) { sector(c, 0.5); },
+    outline(c) { ctx.beginPath(); sector(c, 1.5); ctx.stroke(); },
+    hit(list, x, y) {
+      const disc = list[list.length - 1];
+      if (!disc) return null;
+      const dx = x - disc.cx, dy = y - disc.cy, r = Math.hypot(dx, dy);
+      if (r < disc.r1) return disc;
+      const a = bearing(dx, dy);
+      return list.find(c => !c.disc && r >= c.r0 && r < c.r1 && a >= c.a0 && a < c.a1) || null;
+    },
+    reach: c => c.disc ? 2 * c.r1 : Math.min(c.r1 - c.r0, (c.r0 + c.r1) / 2 * (c.a1 - c.a0)),
+    report(c) {
+      const pts = [polar(c, c.r0, c.a0), polar(c, c.r0, c.a1), polar(c, c.r1, c.a0), polar(c, c.r1, c.a1)];
+      for (let q = 0; q <= 4; q++) if (q * TAU / 4 >= c.a0 && q * TAU / 4 <= c.a1) pts.push(polar(c, c.r1, q * TAU / 4));
+      const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]), x = Math.min(...xs), y = Math.min(...ys);
+      return {
+        box: [x, y, Math.max(...xs) - x, Math.max(...ys) - y],
+        mid: c.disc ? [c.cx, c.cy] : polar(c, (c.r0 + c.r1) / 2, (c.a0 + c.a1) / 2),
+        arc: { cx: c.cx, cy: c.cy, a0: c.a0, a1: c.a1, r0: c.r0, r1: c.r1 }
+      };
+    },
+    // The disc holds the focus's name, what it holds and the way up, each line as wide as the circle allows there.
+    // While the map moves, only names that fit whole are drawn, so a frame measures nothing new.
+    labels(list, f, motion) {
+      const out = [];
+      for (const c of list) {
+        if (c.disc) {
+          if (motion) continue;
+          // A small disc keeps the name to two lines, so the way up still fits.
+          const lines = [
+            ...wrap(opts.name(f), FONT.focus, c.r1 * 1.5, c.r1 < 70 ? 2 : 3).map(t => [t, FONT.focus, INK]),
+            ...wrap(opts.summary(f), FONT.small, c.r1 * 1.5, 2).map(t => [t, FONT.small, MUTED]),
+            ...(f.parent ? [['‹ Go up', FONT.small, MUTED]] : [])
+          ];
+          const top = c.cy - (lines.length - 1) * 17 / 2;
+          lines.forEach(([text, face, color], i) => {
+            const y = top + i * 17, dy = Math.abs(y - c.cy) + face.px * 0.6, half = Math.sqrt(Math.max(0, (c.r1 - PAD) ** 2 - dy * dy));
+            const t = fit(text, face, 2 * half - 2);
+            if (t) out.push(label(f, t, face, c.cx, y, color, 0, 'center'));
+          });
+          continue;
+        }
+        const face = c.d.parent === f ? FONT.arcChild : FONT.arcDeeper, h = face.px * 1.2;
+        // An arc too thin across or along the radius for a line of text is skipped before any name is measured.
+        if (c.r1 - c.r0 < h + 2 * PAD || c.r1 * (c.a1 - c.a0) < h + 2 * PAD) continue;
+        const full = opts.name(c.d), mid = (c.a0 + c.a1) / 2;
+        // Across the arc, at its middle. A cut name is drawn across only where the arc has room for a fair part of it.
+        const [hx, hy] = polar(c, (c.r0 + c.r1) / 2, mid);
+        if (motion) {
+          const w = measured(full, face);
+          if (w < Infinity && inside(c, hx, hy, w, h, 0, PAD)) { out.push(label(c.d, full, face, hx, hy, INK, 0, 'center')); continue; }
+        } else {
+          const room = widest(c, hx, hy, h, 0, 220), text = room >= 40 ? fit(full, face, room) : '';
+          if (text && (text === full || room >= 72)) { out.push(label(c.d, text, face, hx, hy, INK, 0, 'center')); continue; }
+        }
+        // Along the radius, starting as near the centre as the arc is wide enough for a line of text.
+        const half = (c.a1 - c.a0) / 2;
+        const start = Math.max(c.r0 + PAD, half < Math.PI / 2 ? (PAD + h / 2 * Math.cos(half)) / Math.sin(half) : 0);
+        const room = Math.sqrt(Math.max(0, (c.r1 - PAD) ** 2 - h * h / 4)) - start;
+        if (room < 24) continue;
+        const text = motion ? (measured(full, face) <= room ? full : '') : fit(full, face, room);
+        if (!text) continue;
+        const w = textWidth(text, face), angle = mid > Math.PI ? mid - 3 * Math.PI / 2 : mid - Math.PI / 2;
+        const [x, y] = polar(c, start + w / 2, mid);
+        if (inside(c, x, y, w, h, angle, PAD - 0.5)) out.push(label(c.d, text, face, x, y, INK, angle, 'center'));
+      }
+      return out;
+    }
+  };
+  const RENDERERS = { icicle, sunburst };
 
   function draw() {
     const R = RENDERERS[type];
     ctx.setTransform(size.ratio, 0, 0, size.ratio, 0, 0);
     ctx.clearRect(0, 0, size.w, size.h);
     cells = R.cells(geometry, root, size);
-    for (const c of cells) { ctx.fillStyle = fillOf(c.d); R.fill(c); }
+    for (const c of cells) { ctx.fillStyle = cellFill(c); ctx.beginPath(); R.path(c); ctx.fill(); }
     const sel = selected && cells.find(c => c.d === selected);
     outlined = sel ? sel.d : null;
     if (sel) { ctx.lineWidth = 2; ctx.strokeStyle = INK; R.outline(sel); }
-    labels = R.labels(cells, focus, moving);
-    ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-    for (const l of labels) { ctx.font = l.font.css; ctx.fillStyle = l.color; ctx.fillText(l.text, l.x, l.y); }
+    labels = settled && settled.geometry === geometry ? settled.labels : R.labels(cells, focus, moving);
+    ctx.textBaseline = 'middle';
+    for (const l of labels) {
+      ctx.font = l.font.css; ctx.fillStyle = l.color; ctx.textAlign = l.align;
+      if (!l.angle) ctx.fillText(l.text, l.x, l.y);
+      else { ctx.save(); ctx.translate(l.x, l.y); ctx.rotate(l.angle); ctx.fillText(l.text, 0, 0); ctx.restore(); }
+    }
   }
   // Draw the settled map again, after a change that does not move it. A zoom in progress draws it anyway.
   const redraw = () => { if (geometry && !moving) draw(); };
@@ -598,8 +792,9 @@ function createMap(box, opts) {
       if (animate) lastZoom = { ms: 0, frames: 1 };
       return;
     }
-    // Measure the labels of the end of the zoom now, so no frame of it waits for text measurement.
-    R.labels(R.cells(to, root, size), focus, false);
+    // Lay out the labels of the end of the zoom now, so no frame of it waits for text measurement and the last
+    // frame draws them as they are.
+    settled = { geometry: to, labels: R.labels(R.cells(to, root, size), focus, false) };
     const from = geometry, start = performance.now();
     let frames = 0;
     const step = now => {
@@ -612,21 +807,24 @@ function createMap(box, opts) {
     moving = true;
     raf = requestAnimationFrame(step);
   }
-  // The canvas takes the box's width and the screen's pixel ratio. It is skipped while the box is hidden.
+  // The canvas takes the box's width, the height the map type wants and the screen's pixel ratio. It is skipped while
+  // the box is hidden. Says whether it laid the map out again.
   function resize() {
     const w = box.clientWidth;
-    if (!w) return;
-    const h = w < NARROW_MAP ? 560 : Math.min(720, Math.max(560, Math.round(window.innerHeight * 0.72))), ratio = window.devicePixelRatio || 1;
-    if (w === size.w && h === size.h && ratio === size.ratio) return;
+    if (!w) return false;
+    const tall = w < NARROW_MAP ? 560 : Math.min(720, Math.max(560, Math.round(window.innerHeight * 0.72)));
+    const h = RENDERERS[type].height(w, tall), ratio = window.devicePixelRatio || 1;
+    if (w === size.w && h === size.h && ratio === size.ratio) return false;
     size = { w, h, ratio };
     cv.width = Math.round(w * ratio); cv.height = Math.round(h * ratio);
     cv.style.width = w + 'px'; cv.style.height = h + 'px';
     geometry = null; render(false);
+    return true;
   }
   new ResizeObserver(resize).observe(box);
   resize();
   // Labels are measured again once the web fonts are in.
-  const refit = () => { widths.clear(); fits.clear(); redraw(); };
+  const refit = () => { widths.clear(); fits.clear(); settled = null; redraw(); };
   document.fonts.addEventListener('loadingdone', refit);
   document.fonts.ready.then(refit);
 
@@ -634,7 +832,7 @@ function createMap(box, opts) {
   // On a touch screen every target is at least 24 by 24 px. A tap on a smaller cell counts for the nearest concept
   // above it that is big enough, but never for the focus.
   function tapTarget(c) {
-    while (c && c.d !== focus && c.d.parent !== focus && (c.w < TAP || c.h < TAP)) c = cells.find(p => p.d === c.d.parent) || null;
+    while (c && c.d !== focus && c.d.parent !== focus && RENDERERS[type].reach(c) < TAP) c = cells.find(p => p.d === c.d.parent) || null;
     return c;
   }
   cv.addEventListener('pointermove', e => {
@@ -652,7 +850,7 @@ function createMap(box, opts) {
     zoomTo(c.d);
   });
 
-  const describe = () => cv.setAttribute('aria-label', `${RENDERERS[type].name} map, zoomed to ${opts.name(focus)}`);
+  const describe = () => { if (focus) cv.setAttribute('aria-label', `${RENDERERS[type].name} map, zoomed to ${opts.name(focus)}`); };
   // Zoom to a node. A node without children brings its parent into focus.
   function zoomTo(d, animate = true) {
     if (!d || !root) return;
@@ -679,20 +877,42 @@ function createMap(box, opts) {
       if (lost) emit('select', null);
       render(false);
     },
-    setMapType(t) { if (RENDERERS[t] && t !== type) { type = t; geometry = null; render(false); } },
+    // The new map type keeps the focus and the selection. It may want another height, so the canvas is sized again.
+    setMapType(t) {
+      if (!Object.hasOwn(RENDERERS, t) || t === type) return;
+      type = t; geometry = null; describe();
+      if (!resize()) render(false);
+    },
     setRings(n) { rings = n; render(true); },
     setColorMode(m) { colorMode = m; fills.clear(); redraw(); },
     zoomTo, select, resize,
     on(event, fn) { listeners[event].push(fn); },
-    // What the last frame drew: each cell's node, box and colour, and each label's text, size and box, in CSS px
-    // to the hundredth. The focus is named as well as coded, since a group of a grouping has no code.
+    // What the last frame drew, in CSS px to the hundredth. Each cell has its node, colour, bounding box and a point
+    // inside it; a sunburst cell also has its arc, with angles in radians clockwise from the top. Each label has its
+    // text, size, the corners of its box, its angle and its bounding box. The focus is named as well as coded, since
+    // a group of a grouping has no code.
     lastFrame() {
-      const px = v => Math.round(v * 100) / 100, boxOf = (x, y, w, h) => ({ x: px(x), y: px(y), w: px(w), h: px(h) });
+      const px = v => Math.round(v * 100) / 100, rad = v => Math.round(v * 1e4) / 1e4;
+      const boxOf = (x, y, w, h) => ({ x: px(x), y: px(y), w: px(w), h: px(h) }), R = RENDERERS[type];
       return {
         map: type, focus: focus && opts.code(focus), focusName: focus && opts.name(focus), rings,
         selected: outlined && opts.code(outlined), moving, zoom: { ...lastZoom },
-        cells: cells.map(c => ({ code: opts.code(c.d), name: opts.name(c.d), fill: fillOf(c.d), ...boxOf(c.x, c.y, c.w, c.h) })),
-        labels: labels.map(l => ({ code: opts.code(l.d), text: l.text, size: l.font.px, ...boxOf(l.x, l.y - l.font.px * 0.6, l.w, l.font.px * 1.2) }))
+        cells: cells.map(c => {
+          const { box: b, mid, arc } = R.report(c);
+          return {
+            code: opts.code(c.d), name: opts.name(c.d), fill: cellFill(c), ...boxOf(...b), mid: { x: px(mid[0]), y: px(mid[1]) },
+            ...(arc && { arc: { cx: px(arc.cx), cy: px(arc.cy), r0: px(arc.r0), r1: px(arc.r1), a0: rad(arc.a0), a1: rad(arc.a1) } })
+          };
+        }),
+        labels: labels.map(l => {
+          const h = l.font.px * 1.2, u = l.align === 'center' ? -l.w / 2 : 0, cos = Math.cos(l.angle), sin = Math.sin(l.angle);
+          const corners = [[u, -h / 2], [u + l.w, -h / 2], [u + l.w, h / 2], [u, h / 2]].map(([a, b]) => [l.x + a * cos - b * sin, l.y + a * sin + b * cos]);
+          const xs = corners.map(p => p[0]), ys = corners.map(p => p[1]), x = Math.min(...xs), y = Math.min(...ys);
+          return {
+            code: opts.code(l.d), text: l.text, size: l.font.px, angle: rad(l.angle), corners: corners.map(p => p.map(px)),
+            ...boxOf(x, y, Math.max(...xs) - x, Math.max(...ys) - y)
+          };
+        })
       };
     }
   };
@@ -1434,6 +1654,24 @@ function start(DATA) {
     map.setRings(n);
   }
   document.querySelectorAll('#rings button').forEach(b => b.addEventListener('click', () => setRings(+b.dataset.r)));
+  // Each map type, with the hint that says how to go up in it.
+  const MAP_TYPES = { icicle: { goUp: 'Click the left column' }, sunburst: { goUp: 'Click the centre' } };
+  // The map type an address names, or null.
+  const isMapType = t => Object.hasOwn(MAP_TYPES, t ?? '');
+  const mapTypeIn = search => { const t = new URLSearchParams(search).get('map'); return isMapType(t) ? t : null; };
+  // The address always names the map type shown, so a copied link opens it: it is written in place, with no
+  // parameter for the icicle. A pick is also kept for the next visit.
+  function setMapType(t, picked) {
+    document.querySelectorAll('#maptype button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === t)));
+    document.querySelector('#hint-up b').textContent = MAP_TYPES[t].goUp;
+    map.setMapType(t);
+    if (picked) try { localStorage.setItem('aot-map', t); } catch (e) {}
+    const p = new URLSearchParams(location.search);
+    if (t === 'icicle') p.delete('map'); else p.set('map', t);
+    const s = p.toString(), url = location.pathname + (s ? '?' + s : '') + location.hash;
+    if (url !== location.pathname + location.search + location.hash) try { history.replaceState(history.state, '', url); } catch (e) {}
+  }
+  document.querySelectorAll('#maptype button').forEach(b => b.addEventListener('click', () => setMapType(b.dataset.m, true)));
   document.querySelectorAll('#colormode button').forEach(b => b.addEventListener('click', () => {
     colorMode = b.dataset.c;
     document.querySelectorAll('#colormode button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
@@ -1454,6 +1692,9 @@ function start(DATA) {
   setLinks(linksOn, true);
   renderViewbar(); renderCount(); renderLegend();
   if (chartEl.clientWidth < NARROW_MAP) setRings(2);
+  // The map type a link names comes first, then the one picked last time, then the icicle.
+  let savedMap = null; try { savedMap = localStorage.getItem('aot-map'); } catch (e) {}
+  setMapType(mapTypeIn(location.search) || (isMapType(savedMap) ? savedMap : null) || 'icicle', false);
   map.setTree(root);
   // The address holds the grouping and the selected concept: #code, #grouping or #grouping/code.
   function fromHash(animate) {
@@ -1476,7 +1717,11 @@ function start(DATA) {
     if (sd && VIEWS[sd]) setDim(sd);
   }
   // Back, forward and an edited address move the map. An address without a hash goes back to the whole grouping.
-  window.addEventListener('hashchange', () => { if (!fromHash(true)) { map.zoomTo(root); map.select(null); } });
+  const followAddress = () => { if (!fromHash(true)) { map.zoomTo(root); map.select(null); } };
+  window.addEventListener('hashchange', followAddress);
+  // Back and forward also bring back each address's map type. Between addresses that differ in more than the hash
+  // there is no hashchange, so the hash is followed here too; following it twice changes nothing.
+  window.addEventListener('popstate', () => { setMapType(mapTypeIn(location.search) || 'icicle', false); followAddress(); });
   let saved = null; try { saved = localStorage.getItem('aot-tab'); } catch (e) {}
   if (saved === 'cols') setView('cols');
 }
