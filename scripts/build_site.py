@@ -5,16 +5,19 @@
 
 Reads src/, scripts/shapes.ttl and site/template.html. Writes to site/:
 
-  index.html          the explorer: one page with the data inside
-  aeco.ttl            the core taxonomy in one Turtle file: the scheme, the concepts,
-                      the 5W1H tags, the standard sets and the related links
-  aeco.jsonld         the same core taxonomy in JSON-LD
-  aeco-mappings.ttl   every link to an outside standard, in one Turtle file
+  index.html            the explorer page. It loads its data from the next two files.
+  explorer-data.json    the concepts, mappings, related concepts and findings the explorer shows
+  explorer-turtle.json  each concept's Turtle and the SHACL shapes, for the side panel's Data tabs
+  aeco.ttl              the core taxonomy in one Turtle file: the scheme, the concepts,
+                        the 5W1H tags, the standard sets and the related links
+  aeco.jsonld           the same core taxonomy in JSON-LD
+  aeco-mappings.ttl     every link to an outside standard, in one Turtle file
 
 Needs Python 3.9+, rdflib and pyshacl.
 """
 import csv
 import datetime as dt
+import hashlib
 import json
 import pathlib
 import re
@@ -140,7 +143,11 @@ def findings():
     return out
 
 
-def explorer_data(version, repo):
+def explorer_file_contents(version, repo):
+    """What goes in the explorer's two data files: what the page shows, and the Turtle its Data tabs show.
+
+    The Turtle is about two thirds of the bytes, so the page loads it only when a Data tab needs it.
+    """
     cs = {k: c for k, c in taxo.load().items() if not c["deprecated"]}
     maps = read_mappings()
     pairs = [[r["code_a"], r["code_b"]] for r in taxo.read_related()]
@@ -156,18 +163,28 @@ def explorer_data(version, repo):
         rows.append([code, c["parent"], c["label_en_us"], c["label_en_gb"], c["definition"], "|".join(c["alt_en_us"]),
                      "|".join(c["alt_en_gb"]), "|".join(c["hidden"]), "|".join(c["tags"]), c["scope_note"], "|".join(c["std"]),
                      c["created"], c["modified"]])
-    return {
+    data = {
         "version": version,
         "built": dt.date.today().isoformat(),
         "repo": repo,
         "c": rows,
         "m": {k: v for k, v in maps.items() if k in cs},
         "r": pairs,
-        "ttl": {code: concept_ttl(cs[code], maps, related) for code in cs},
         "v": findings(),
-        "shapes": (ROOT / "scripts" / "shapes.ttl").read_text(encoding="utf-8"),
         "tags": tag_defs,
     }
+    turtle = {
+        "ttl": {code: concept_ttl(cs[code], maps, related) for code in cs},
+        "shapes": (ROOT / "scripts" / "shapes.ttl").read_text(encoding="utf-8"),
+    }
+    return data, turtle
+
+
+def write_hashed_json(name, obj):
+    """Write obj to site/name, and return its address with a hash of the content, so browsers never reuse a stale copy."""
+    body = json.dumps(obj, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    (SITE / name).write_bytes(body)
+    return f"{name}?v={hashlib.sha256(body).hexdigest()[:12]}"
 
 
 def main():
@@ -179,13 +196,13 @@ def main():
     version = citation("version", "0.0.0")
     repo = citation("repository-code", "")
     core, links = write_exports(version)
-    data = explorer_data(version, repo)
+    data, turtle = explorer_file_contents(version, repo)
     template = (SITE / "template.html").read_text(encoding="utf-8")
-    if template.count("/*DATA*/null") != 1:
-        print("site/template.html must hold the marker /*DATA*/null exactly once.")
+    if template.count("/*FILES*/null") != 1:
+        print("site/template.html must hold the marker /*FILES*/null exactly once.")
         return 1
-    payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
-    (SITE / "index.html").write_text(template.replace("/*DATA*/null", payload), encoding="utf-8")
+    files = {"data": write_hashed_json("explorer-data.json", data), "turtle": write_hashed_json("explorer-turtle.json", turtle)}
+    (SITE / "index.html").write_text(template.replace("/*FILES*/null", json.dumps(files)), encoding="utf-8")
     print(f"site/index.html: {len(data['c'])} concepts, version {version}.")
     print(f"site/aeco.ttl and site/aeco.jsonld: {core} triples. site/aeco-mappings.ttl: {links} triples.")
     return 0

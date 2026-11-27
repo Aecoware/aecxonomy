@@ -29,6 +29,7 @@ Pull requests are welcome for small fixes, such as a typo or a broken link. For 
 ## Pull requests
 
 - Run `python3 scripts/taxo.py check` before you open a pull request. It must pass with no errors.
+- If you change the explorer or the build, run the tests too: `python3 -m pytest tests`. They build the site, then open it in a headless browser at a desktop size and a phone size. Install what they need once with `pip install -r tests/requirements.txt` and `python3 -m playwright install chromium`.
 - Do not change existing codes. New codes are given by a maintainer when the change is accepted.
 - Keep one topic in each pull request.
 

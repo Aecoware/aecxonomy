@@ -14,7 +14,9 @@
    Geist Mono for labels. Colour lives only in small stones with an ink edge, and in the map. One light look, no dark mode.
    Layout rules: spacing only from 4 8 12 16 24 32 48 64 96 px; type only at Geist Mono 12 px for labels and 13 px for
    data, Inter 13 / 15 / 17 / 19, Newsreader 24 (20 on a phone), the h2 from 28 to 40 and the h1 from 36 to 64; tap
-   targets 44 px high at 900 px and below, the one breakpoint. The map's text sizes are drawing units and scale with it.
+   targets 44 px high at 900 px and below, the one breakpoint. The map is drawn, not laid out, and has its own rules:
+   labels in Inter 13 px and Geist Mono 12 px; each row under the focus at least 20 px high, or 30 px when the map is
+   under 520 px wide, where a tap target is also at least 24 by 24 px.
    Page: the black bar and the header, the hero, the view and filter bar, then the active view beside the concept panel. */
 :root {
   --ink: #121211; --paper: #ffffff; --ground: #f1f0ec;
@@ -149,21 +151,15 @@ main.wrap { display: flex; flex-wrap: wrap; gap: 24px; padding-block: 32px 64px;
 .vseg button { font-weight: 500; }
 
 .chart { position: relative; background: var(--paper); border: 1px solid var(--ink); touch-action: manipulation; }
-.chart svg { display: block; width: 100%; height: auto; max-height: 76vh; margin: 0 auto; }
-.chart svg:focus-visible { outline: 2px solid var(--ink); outline-offset: -4px; }
-.chart path.arc { cursor: pointer; transition: opacity 140ms ease; }
-.chart text { font-family: var(--sans); pointer-events: none; user-select: none; }
-.chart .center-hit { cursor: pointer; }
+.chart canvas { display: block; }
+.load { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; min-height: 320px; padding: 24px; text-align: center; color: var(--stone-600); }
+.load[hidden] { display: none; }
+.load p { margin: 0; }
 /* The legend's items are the tags' definitions, so it is text, not labels. */
 .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; color: var(--stone-600); }
 .legend span { display: inline-flex; align-items: center; gap: 8px; }
 .hint { display: flex; flex-wrap: wrap; gap: 4px 24px; font-size: 13px; color: var(--stone-600); }
 .hint b { color: var(--ink); font-weight: 600; }
-.tip { position: absolute; z-index: 20; max-width: 300px; padding: 12px 16px; background: var(--ink); color: var(--paper); font-size: 13px; line-height: 1.45; pointer-events: none; }
-.tip .t1 { display: flex; gap: 8px; align-items: baseline; margin-bottom: 4px; }
-.tip .t1 b { font-size: 15px; }
-.tip .t1 code { font-family: var(--mono); font-size: 13px; opacity: 0.75; }
-.tip .t2 { opacity: 0.78; margin-bottom: 4px; }
 
 .cols-wrap { background: var(--paper); border: 1px solid var(--ink); overflow: hidden; display: flex; flex-direction: column; }
 .cols-scroll { overflow-x: auto; }
@@ -277,7 +273,7 @@ footer.site li a:hover { color: var(--ink); text-decoration: underline; }
   .why .pop { right: 0; width: auto; }
   footer.site { padding-block: 48px 32px; }
 }
-@media (prefers-reduced-motion: reduce) { .chart path.arc, .splitter::before, .splitter i { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .splitter::before, .splitter i { transition: none; } }
 </style>
 </head>
 <body>
@@ -366,13 +362,15 @@ footer.site li a:hover { color: var(--ink); text-decoration: underline; }
       </div>
       <button type="button" class="btn outline small" id="up">Zoom out</button>
     </div>
-    <div class="chart" id="chart"><div class="tip" id="tip" hidden></div></div>
+    <div class="chart" id="chart">
+      <div class="load" id="load"><p id="load-msg" role="status">Loading the taxonomy…</p><button type="button" class="btn outline small" id="load-retry" hidden>Try again</button></div>
+    </div>
     <div class="legend" id="legend" hidden></div>
     <div class="hint" aria-hidden="true">
-      <span><b>Scroll up</b> over a branch to zoom in, <b>scroll down</b> to zoom out</span>
+      <span><b>Click</b> a concept to open it and zoom in</span>
+      <span><b>Click the left column</b> to go up</span>
       <span><b>Hover</b> to preview</span>
-      <span><b>Click</b> to focus</span>
-      <span><b>Arrow keys</b> when the map is selected</span>
+      <span><b>The zoom path</b> jumps to any level</span>
     </div>
   </section>
 
@@ -412,8 +410,295 @@ footer.site li a:hover { color: var(--ink); text-decoration: underline; }
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>
-const DATA = /*DATA*/null;
-(function () {
+const FILES = /*FILES*/null;
+const getJson = url => fetch(url).then(r => { if (!r.ok) throw new Error(url + ': ' + r.status); return r.json(); });
+/* ---------- the map ----------
+   One canvas that draws a tree as a map. It owns the layout of the map type, the drawing, the zoom animation and
+   hit-testing. It reads nothing else from the page.
+   The page gives it a d3 hierarchy and five functions. Each node's value is the number of concepts it holds. name,
+   code, count and summary give a node's text. fill gives its colour in a colour mode.
+   The page sends it commands and listens to three events. 'focus' says the map zoomed to another node. 'select' says
+   another node, or none, is selected. 'hover' says the pointer moved onto another node, or off them all.
+   Each map type is a renderer with one interface. geometry() lays the map out for a focus, a size and the rings.
+   blend() mixes two geometries during a zoom. cells() gives the cells in sight, each with its node and box. labels()
+   names them, and hit() finds the cell at a point. */
+const NARROW_MAP = 520;  // Below this width the map works as on a phone: two rings, taller rows and larger targets.
+function createMap(box, opts) {
+  'use strict';
+  const ZOOM_MS = 350, TAP = 24;
+  const cv = document.createElement('canvas'), ctx = cv.getContext('2d');
+  cv.setAttribute('role', 'img');
+  box.prepend(cv);
+  const style = getComputedStyle(box), cssVar = n => style.getPropertyValue(n).trim();
+  const INK = cssVar('--ink'), MUTED = cssVar('--stone-600'), SANS = cssVar('--sans'), MONO = cssVar('--mono');
+  const font = (weight, px, family) => ({ css: `${weight} ${px}px ${family}`, px });
+  const FONT = { focus: font(600, 13, SANS), child: font(600, 13, SANS), deeper: font(400, 13, SANS), small: font(400, 12, MONO) };
+  const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const listeners = { focus: [], select: [], hover: [] };
+  const emit = (type, ...args) => listeners[type].forEach(fn => fn(...args));
+
+  let root = null, focus = null, selected = null, hovered = null, outlined = null;
+  let rings = 3, colorMode = 'branch', type = 'icicle';
+  let size = { w: 0, h: 0, ratio: 1 }, geometry = null, cells = [], labels = [];
+  let raf = 0, moving = false, lastZoom = { ms: 0, frames: 0 };
+  const span = new Map(), fills = new Map();
+
+  // Each node's span of the map, from 0 to 1 for the root: its share of its parent's span by the concepts it holds.
+  function partition(d, from, to) {
+    span.set(d, [from, to]);
+    const kids = d.children || [], total = kids.reduce((s, k) => s + k.value, 0);
+    let x = from;
+    for (const k of kids) { const next = x + (to - from) * k.value / total; partition(k, x, next); x = next; }
+  }
+  const fillOf = d => { let f = fills.get(d); if (!f) fills.set(d, f = opts.fill(d, colorMode)); return f; };
+
+  /* Text is measured with the canvas's own measureText, once for each text and font. */
+  const widths = new Map(), fits = new Map();
+  function textWidth(text, f) {
+    const key = f.css + '|' + text;
+    let w = widths.get(key);
+    if (w === undefined) { ctx.font = f.css; widths.set(key, w = ctx.measureText(text).width); }
+    return w;
+  }
+  // The longest start of the text that fits in max px, ending in an ellipsis when cut. '' when not 3 letters fit.
+  function fit(text, f, max) {
+    max = Math.floor(max);
+    const key = f.css + '|' + max + '|' + text;
+    let out = fits.get(key);
+    if (out !== undefined) return out;
+    if (textWidth(text, f) <= max) out = text;
+    else {
+      let lo = 0, hi = text.length - 1;
+      while (lo < hi) { const m = (lo + hi + 1) >> 1; if (textWidth(text.slice(0, m).trimEnd() + '…', f) <= max) lo = m; else hi = m - 1; }
+      out = lo >= 3 ? text.slice(0, lo).trimEnd() + '…' : '';
+    }
+    fits.set(key, out);
+    return out;
+  }
+  // The words of the text in lines that fit in max px, at most n lines. A word too long for a line is cut.
+  function wrap(text, f, max, n) {
+    const lines = [];
+    let line = '';
+    for (const word of text.split(' ')) {
+      const next = line ? line + ' ' + word : word;
+      if (!line || textWidth(next, f) <= max) line = next; else { lines.push(line); line = word; }
+    }
+    lines.push(line);
+    if (lines.length > n) lines.splice(n - 1, lines.length, lines.slice(n - 1).join(' '));
+    return lines.map(l => fit(l, f, max)).filter(Boolean);
+  }
+  const label = (d, text, f, x, y, color = INK) => ({ d, text, font: f, x, y, w: textWidth(text, f), color });
+
+  /* ---------- the icicle ----------
+     The focus is the left column. The levels set by the rings share the width to its right. The focus's children
+     share its height by the concepts they hold. None is shorter than the floor, so every child has room for its name:
+     the larger children give up the height. Inside a child, everything keeps its proportions. Outside the focus the
+     map runs on in a straight line, so two geometries blend smoothly. */
+  const icicle = {
+    name: 'Icicle',
+    geometry(f, sz, n) {
+      const narrow = sz.w < NARROW_MAP, floor = narrow ? 30 : 20, kids = f.children || [], [f0, f1] = span.get(f);
+      const share = kids.map(k => span.get(k)[1] - span.get(k)[0]), h = share.map(s => sz.h * s / (f1 - f0));
+      if (kids.length * floor <= sz.h) {
+        const low = new Set();
+        for (let again = true; again;) {
+          again = false;
+          const free = sz.h - low.size * floor, rest = share.reduce((s, v, i) => low.has(i) ? s : s + v, 0);
+          share.forEach((v, i) => { if (low.has(i)) h[i] = floor; else if ((h[i] = free * v / rest) < floor) { low.add(i); again = true; } });
+        }
+      }
+      const stops = [];
+      let y = 0;
+      kids.forEach((k, i) => { const [a, b] = span.get(k); stops.push([a, b, y, y + h[i]]); y += h[i]; });
+      const scale = sz.h / (f1 - f0);
+      const warp = x => {
+        if (x <= f0 || !stops.length) return (x - f0) * scale;
+        if (x >= f1) return sz.h + (x - f1) * scale;
+        for (const [a, b, y0, y1] of stops) if (x <= b) return y0 + (x - a) / (b - a) * (y1 - y0);
+        return sz.h;
+      };
+      return { warp, depth: f.depth, levels: Math.max(1, Math.min(n, f.height)), focusW: narrow ? 96 : Math.min(168, Math.round(sz.w * 0.18)) };
+    },
+    blend(a, b, t) {
+      const mix = (p, q) => p + (q - p) * t;
+      return { warp: x => mix(a.warp(x), b.warp(x)), depth: mix(a.depth, b.depth), levels: mix(a.levels, b.levels), focusW: mix(a.focusW, b.focusW) };
+    },
+    // A node k levels right of the focus (a fraction while zooming) sits between the column edges k and k + 1. A node
+    // past the right edge, above, below or thinner than a quarter pixel is skipped with everything under it.
+    cells(g, top, sz) {
+      const colW = (sz.w - g.focusW) / g.levels, edge = k => k <= 1 ? k * g.focusW : g.focusW + (k - 1) * colW;
+      const out = [];
+      (function visit(d) {
+        const k = d.depth - g.depth, x0 = edge(k);
+        if (x0 > sz.w - 0.5) return;
+        const [a, b] = span.get(d), y0 = g.warp(a), y1 = g.warp(b);
+        if (y1 <= 0 || y0 >= sz.h || y1 - y0 < 0.25) return;
+        const x1 = edge(k + 1);
+        if (x1 > 0.5) out.push({ d, x: x0, y: y0, w: x1 - x0, h: y1 - y0 });
+        if (d.children) d.children.forEach(visit);
+      })(top);
+      return out;
+    },
+    fill(c) { ctx.fillRect(c.x, c.y, c.w - 1, c.h - (c.h > 3 ? 1 : 0)); },
+    outline(c) { ctx.strokeRect(c.x + 1, c.y + 1, c.w - 3, Math.max(1, c.h - 3)); },
+    hit(list, x, y) { return list.find(c => x >= c.x && x < c.x + c.w && y >= c.y && y < c.y + c.h) || null; },
+    // A name in each cell tall and wide enough, and its count when the whole name fits beside it. The focus column
+    // gets its name on up to four lines, what it holds, and the way up. Every label stays inside its own cell, so
+    // none overlap. While the map moves, only names that fit whole are drawn, so a frame measures nothing new.
+    labels(list, f, motion) {
+      const out = [], pad = 8;
+      for (const c of list) {
+        const max = c.w - 2 * pad, x = c.x + pad;
+        if (max < 24) continue;
+        if (c.d === f && Math.abs(c.x) < 0.5 && !motion) {
+          let y = 20;
+          for (const line of wrap(opts.name(f), FONT.focus, max, 4)) { out.push(label(f, line, FONT.focus, x, y)); y += 18; }
+          y += 4;
+          for (const line of wrap(opts.summary(f), FONT.small, max, 2)) { out.push(label(f, line, FONT.small, x, y, MUTED)); y += 18; }
+          const up = f.parent && fit('‹ Go up', FONT.small, max);
+          if (up) out.push(label(f, up, FONT.small, x, y, MUTED));
+          continue;
+        }
+        if (c.h < 17) continue;
+        const face = c.d.parent === f ? FONT.child : FONT.deeper, y = c.h > 44 ? c.y + 14 : c.y + c.h / 2;
+        const full = opts.name(c.d), name = motion ? (textWidth(full, face) <= max ? full : '') : fit(full, face, max);
+        if (!name) continue;
+        out.push(label(c.d, name, face, x, y));
+        const count = c.d.children && name === full && !motion ? opts.count(c.d) : '', countW = count ? textWidth(count, FONT.small) : 0;
+        if (count && textWidth(name, face) + pad + countW <= max) out.push(label(c.d, count, FONT.small, c.x + c.w - pad - countW, y, MUTED));
+      }
+      return out;
+    }
+  };
+  const RENDERERS = { icicle };
+
+  function draw() {
+    const R = RENDERERS[type];
+    ctx.setTransform(size.ratio, 0, 0, size.ratio, 0, 0);
+    ctx.clearRect(0, 0, size.w, size.h);
+    cells = R.cells(geometry, root, size);
+    for (const c of cells) { ctx.fillStyle = fillOf(c.d); R.fill(c); }
+    const sel = selected && cells.find(c => c.d === selected);
+    outlined = sel ? sel.d : null;
+    if (sel) { ctx.lineWidth = 2; ctx.strokeStyle = INK; R.outline(sel); }
+    labels = R.labels(cells, focus, moving);
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+    for (const l of labels) { ctx.font = l.font.css; ctx.fillStyle = l.color; ctx.fillText(l.text, l.x, l.y); }
+  }
+  // Draw the settled map again, after a change that does not move it. A zoom in progress draws it anyway.
+  const redraw = () => { if (geometry && !moving) draw(); };
+  // Lay the map out for the focus and draw it, in one eased tween when animated. Reduced motion makes it instant.
+  function render(animate) {
+    cancelAnimationFrame(raf);
+    moving = false;
+    if (!root || !size.w) return;
+    const R = RENDERERS[type], to = R.geometry(focus, size, rings);
+    if (!animate || !geometry || reduced()) {
+      geometry = to; draw();
+      if (animate) lastZoom = { ms: 0, frames: 1 };
+      return;
+    }
+    // Measure the labels of the end of the zoom now, so no frame of it waits for text measurement.
+    R.labels(R.cells(to, root, size), focus, false);
+    const from = geometry, start = performance.now();
+    let frames = 0;
+    const step = now => {
+      const t = Math.max(0, Math.min(1, (now - start) / ZOOM_MS));
+      moving = t < 1;
+      geometry = moving ? R.blend(from, to, d3.easeCubicInOut(t)) : to;
+      draw(); frames++;
+      if (moving) raf = requestAnimationFrame(step); else lastZoom = { ms: now - start, frames };
+    };
+    moving = true;
+    raf = requestAnimationFrame(step);
+  }
+  // The canvas takes the box's width and the screen's pixel ratio. It is skipped while the box is hidden.
+  function resize() {
+    const w = box.clientWidth;
+    if (!w) return;
+    const h = w < NARROW_MAP ? 560 : Math.min(720, Math.max(560, Math.round(window.innerHeight * 0.72))), ratio = window.devicePixelRatio || 1;
+    if (w === size.w && h === size.h && ratio === size.ratio) return;
+    size = { w, h, ratio };
+    cv.width = Math.round(w * ratio); cv.height = Math.round(h * ratio);
+    cv.style.width = w + 'px'; cv.style.height = h + 'px';
+    geometry = null; render(false);
+  }
+  new ResizeObserver(resize).observe(box);
+  resize();
+  // Labels are measured again once the web fonts are in.
+  const refit = () => { widths.clear(); fits.clear(); redraw(); };
+  document.fonts.addEventListener('loadingdone', refit);
+  document.fonts.ready.then(refit);
+
+  const cellAt = e => { const r = cv.getBoundingClientRect(); return RENDERERS[type].hit(cells, e.clientX - r.left, e.clientY - r.top); };
+  // On a touch screen every target is at least 24 by 24 px. A tap on a smaller cell counts for the nearest concept
+  // above it that is big enough, but never for the focus.
+  function tapTarget(c) {
+    while (c && c.d !== focus && c.d.parent !== focus && (c.w < TAP || c.h < TAP)) c = cells.find(p => p.d === c.d.parent) || null;
+    return c;
+  }
+  cv.addEventListener('pointermove', e => {
+    if (e.pointerType === 'touch') return;
+    const c = cellAt(e), d = c && c.d !== focus ? c.d : null;
+    cv.style.cursor = d || (c && focus.parent) ? 'pointer' : 'default';
+    if (d !== hovered) { hovered = d; emit('hover', d, e); }
+  });
+  cv.addEventListener('pointerleave', () => { if (hovered) { hovered = null; emit('hover', null); } });
+  cv.addEventListener('click', e => {
+    const c = e.pointerType === 'mouse' ? cellAt(e) : tapTarget(cellAt(e));
+    if (!c) return;
+    if (c.d === focus) { zoomTo(focus.parent); return; }
+    select(c.d);
+    zoomTo(c.d);
+  });
+
+  const describe = () => cv.setAttribute('aria-label', `${RENDERERS[type].name} map, zoomed to ${opts.name(focus)}`);
+  // Zoom to a node. A node without children brings its parent into focus.
+  function zoomTo(d, animate = true) {
+    if (!d || !root) return;
+    if (!d.children) d = d.parent;
+    if (d === focus) return;
+    focus = d;
+    describe();
+    emit('focus', focus);
+    render(animate);
+  }
+  function select(d) {
+    if ((d || null) === selected) return;
+    selected = d || null;
+    emit('select', selected);
+    redraw();
+  }
+  return {
+    setTree(top) {
+      const lost = selected;
+      root = focus = top; selected = hovered = null; geometry = null;
+      span.clear(); fills.clear(); partition(top, 0, 1);
+      describe();
+      emit('focus', focus);
+      if (lost) emit('select', null);
+      render(false);
+    },
+    setMapType(t) { if (RENDERERS[t] && t !== type) { type = t; geometry = null; render(false); } },
+    setRings(n) { rings = n; render(true); },
+    setColorMode(m) { colorMode = m; fills.clear(); redraw(); },
+    zoomTo, select, resize,
+    on(event, fn) { listeners[event].push(fn); },
+    // What the last frame drew: each cell's node, box and colour, and each label's text, size and box, in CSS px
+    // to the hundredth. The focus is named as well as coded, since a group of a grouping has no code.
+    lastFrame() {
+      const px = v => Math.round(v * 100) / 100, boxOf = (x, y, w, h) => ({ x: px(x), y: px(y), w: px(w), h: px(h) });
+      return {
+        map: type, focus: focus && opts.code(focus), focusName: focus && opts.name(focus), rings,
+        selected: outlined && opts.code(outlined), moving, zoom: { ...lastZoom },
+        cells: cells.map(c => ({ code: opts.code(c.d), name: opts.name(c.d), fill: fillOf(c.d), ...boxOf(c.x, c.y, c.w, c.h) })),
+        labels: labels.map(l => ({ code: opts.code(l.d), text: l.text, size: l.font.px, ...boxOf(l.x, l.y - l.font.px * 0.6, l.w, l.font.px * 1.2) }))
+      };
+    }
+  };
+}
+
+function start(DATA) {
   'use strict';
   const TAGS = ['Who', 'What', 'Where', 'When', 'Why', 'How'];
   const SRC = { ifc: 'IFC 4.3', uniclass: 'Uniclass 2015', wikidata: 'Wikidata', brick: 'Brick', rec: 'RealEstateCore', bot: 'BOT', iso: 'ISO 12006-2', riba: 'RIBA Plan of Work' };
@@ -503,20 +788,18 @@ const DATA = /*DATA*/null;
         return { g, kids: tops.map(proj).filter(Boolean) };
       }).filter(x => x.kids.length) };
     }
-    const r = d3.hierarchy(rootD, d => d.kids.length ? d.kids : null).sum(d => d.kids.length ? 0 : 1);
-    d3.partition().size([2 * Math.PI, r.height + 1])(r);
-    const byC = new Map(), occAll = new Map(), occ = new Map();
+    // Each node's value is the number of concepts it holds, itself included, so the map sizes it by that. A concept
+    // shown only for the path does not count.
+    const r = d3.hierarchy(rootD, d => d.kids.length ? d.kids : null).sum(d => d.c && d.member ? 1 : 0);
+    const byC = new Map(), occAll = new Map();
     let placements = 0;
     r.each(d => {
       const c = d.data.c;
       if (c) {
-        const n = occ.get(c.code) || 0; occ.set(c.code, n + 1);
-        d.key = c.code + '#' + n;
         if (!byC.has(c.code)) byC.set(c.code, d);
         (occAll.get(c.code) || occAll.set(c.code, []).get(c.code)).push(d);
         if (d.data.member) placements++;
-      } else d.key = d.data.g ? 'g:' + vk + ':' + d.data.g.key : 'root';
-      d.current = { x0: d.x0, x1: d.x1, y0: d.y0, y1: d.y1 };
+      }
       d.group = d.depth >= 1 ? d.ancestors().reverse()[1] : null;
     });
     if (v.groups) r.children.forEach(g => { const s = new Set(); g.each(d => { if (d.data.c && d.data.member) s.add(d.data.c.code); }); g.uniq = s.size; });
@@ -528,7 +811,7 @@ const DATA = /*DATA*/null;
   let linksOn = false;
   try { linksOn = localStorage.getItem('aot-links') === '1'; } catch (e) {}
   let viewKey = 'branches', T = buildTree('branches'), root = T.root;
-  let focus = root, selected = null, hovered = null, busy = false, searchHits = null, view = 'map';
+  let focus = root, selected = null, view = 'map', colorMode = 'branch';
 
   /* ---------- filters ---------- */
   const fTags = new Set(), fStd = new Set();
@@ -606,13 +889,13 @@ const DATA = /*DATA*/null;
     clr.addEventListener('click', () => { fTags.clear(); fStd.clear(); exactOnly = false; document.getElementById('exact').checked = false; document.querySelectorAll('#fq .chipbtn, #fs .chipbtn').forEach(b => b.setAttribute('aria-pressed', 'false')); onFilter(); });
     box.appendChild(clr);
   }
-  function onFilter() { computeMatches(); renderCount(); highlight(); drawCenter(); if (view === 'cols') colsRender(); renderPanel(selected, false); }
+  function onFilter() { computeMatches(); renderCount(); if (view === 'cols') colsRender(); renderPanel(selected, false); }
 
   /* ---------- view switcher ---------- */
   const vseg = document.getElementById('vseg'), vdesc = document.getElementById('vdesc');
   VIEW_ORDER.forEach(k => {
     const b = el('button', null, VIEWS[k].label); b.type = 'button'; b.dataset.v = k;
-    b.addEventListener('click', () => setDim(k, true));
+    b.addEventListener('click', () => setDim(k));
     vseg.appendChild(b);
   });
   function renderViewbar() {
@@ -629,77 +912,52 @@ const DATA = /*DATA*/null;
     if (!on) {
       fStd.clear(); exactOnly = false; document.getElementById('exact').checked = false;
       document.querySelectorAll('#fs .chipbtn').forEach(b => b.setAttribute('aria-pressed', 'false'));
-      if (viewKey === 'standards') setDim('branches', true);
+      if (viewKey === 'standards') setDim('branches');
     }
     renderViewbar();
     if (!quiet) onFilter();
   }
   plug.addEventListener('click', () => setLinks(!linksOn));
 
-  /* ---------- chart ---------- */
-  const W = 820, R = W / 2;
-  let RINGS = 3, effR = 3, ringW = R / 4, colorMode = 'branch';
-  const effRings = f => Math.max(1, Math.min(RINGS, f.height));
+  /* ---------- the map ---------- */
   const chartEl = document.getElementById('chart');
-  const tip = document.getElementById('tip');
-  const svg = d3.select(chartEl).append('svg').attr('viewBox', [-R, -R, W, W]).attr('tabindex', 0).attr('role', 'application').attr('aria-label', 'Sunburst map of the taxonomy. Arrow keys move, Enter zooms in, Escape zooms out.');
-  const gArcs = svg.append('g'), gLabels = svg.append('g').attr('text-anchor', 'middle'), center = svg.append('g');
-  const centerHit = center.append('circle').attr('class', 'center-hit').attr('fill', 'transparent');
-  const centerT1 = center.append('text').attr('text-anchor', 'middle').attr('font-weight', 600);
-  const centerT2 = center.append('text').attr('text-anchor', 'middle').attr('font-size', 12.5);
-  const arc = d3.arc().startAngle(d => d.x0).endAngle(d => d.x1)
-    .padAngle(d => Math.min((d.x1 - d.x0) / 2, 0.004)).padRadius(R * 0.6)
-    .innerRadius(d => d.y0 * ringW).outerRadius(d => Math.max(d.y0 * ringW, d.y1 * ringW - 1.5));
-  const arcVisible = d => d.y1 <= effR + 1 && d.y0 >= 1 && d.x1 > d.x0 + 1e-6;
-  const labelVisible = d => arcVisible(d) && ((d.y1 + d.y0) / 2 * (R / (effR + 1))) * (d.x1 - d.x0) > 13;
-  function labelTransform(d) {
-    const x = (d.x0 + d.x1) / 2 * 180 / Math.PI, y = (d.y0 + d.y1) / 2 * ringW;
-    return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
-  }
-  function fitText(d) {
-    const max = Math.max(3, Math.floor((R / (effR + 1) - 14) / 6.3));
-    const t = nameOf(d);
-    return t.length > max ? t.slice(0, max - 1).trimEnd() + '…' : t;
-  }
-  const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let path = gArcs.selectAll('path'), label = gLabels.selectAll('text');
-  function bind() {
-    const nodes = root.descendants().slice(1);
-    path = gArcs.selectAll('path').data(nodes, d => d.key).join(
-      enter => enter.append('path').attr('class', 'arc').attr('fill-opacity', 0).attr('pointer-events', 'none').attr('d', d => arc(d.current))
-        .on('pointerenter', (event, d) => { hovered = d; highlight(); showTip(event, d); renderPanel(d, true); })
-        .on('pointermove', moveTip)
-        .on('pointerleave', () => { hovered = null; highlight(); hideTip(); })
-        .on('click', (event, d) => { select(d); zoomTo(d.children ? d : d.parent); }),
-      update => update,
-      exit => exit.attr('pointer-events', 'none').transition().duration(reduced() ? 0 : 260).attr('fill-opacity', 0).remove());
-    label = gLabels.selectAll('text').data(nodes, d => d.key).join(
-      enter => enter.append('text').attr('dy', '0.35em').attr('font-size', 11.5).attr('fill-opacity', 0).attr('transform', d => labelTransform(d.current)),
-      update => update,
-      exit => exit.remove());
-    path.order(); label.order();
-  }
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const clamp = v => Math.max(0.12, Math.min(0.92, v));
-  let INK = '#121211', SURF = '#ffffff';
-  function colorize() {
-    const L = parseFloat(css('--arc-l')), step = parseFloat(css('--arc-step')), S = parseFloat(css('--arc-s'));
-    INK = css('--ink'); SURF = css('--paper');
-    const q = {}; TAGS.forEach(t => q[t] = css('--q-' + t.toLowerCase()));
-    const v = VIEWS[viewKey], gcol = new Map(), off = v.groups ? 1 : 0;
-    if (v.groups) v.groups.forEach((g, i) => gcol.set(g.key, g.tag ? q[g.tag] : g.key === 'none' ? d3.interpolateRgb(css('--stone-600'), SURF)(0.45) : d3.hsl((i * 360 / v.groups.length + 215) % 360, Math.min(0.62, S + 0.12), clamp(L - 0.1)).formatHex()));
-    path.attr('fill', d => {
-      if (d.data.g) return gcol.get(d.data.g.key);
-      const c = d.data.c, dc = d.depth - off;
-      let col;
-      if (colorMode === 'question') { const base = d3.hsl(q[c.tags[0]] || '#999999'); base.l = clamp(base.l + (dc - 1) * step * 0.6); col = base.formatHex(); }
-      else col = d3.hsl((branchIndex.get(c.top.code) * 24 + 205) % 360, S, clamp(L + (dc - 1) * step)).formatHex();
-      return d.data.member ? col : d3.interpolateRgb(col, SURF)(0.62);
-    });
-    label.attr('fill', INK);
-    centerT1.attr('fill', INK); centerT2.attr('fill', css('--stone-600'));
-    markSelected(); renderLegend();
+  const TINT = {
+    L: parseFloat(css('--arc-l')), step: parseFloat(css('--arc-step')), S: parseFloat(css('--arc-s')),
+    ground: css('--ground'), paper: css('--paper'), grey: css('--stone-600'),
+    q: Object.fromEntries(TAGS.map(t => [t, css('--q-' + t.toLowerCase())]))
+  };
+  // The colour rules: a hue for each branch, a step darker for each level; the 5W1H palette by primary tag; grey for
+  // "no link yet". A concept shown only for the path is faded. The hues spread over however many branches there are.
+  function fillOf(d, mode) {
+    const v = VIEWS[viewKey];
+    if (!d.parent) return TINT.ground;
+    if (d.data.g) {
+      const g = d.data.g, i = v.groups.indexOf(g);
+      if (g.tag) return TINT.q[g.tag];
+      if (g.key === 'none') return d3.interpolateRgb(TINT.grey, TINT.paper)(0.45);
+      return d3.hsl((i * 360 / v.groups.length + 215) % 360, Math.min(0.62, TINT.S + 0.12), clamp(TINT.L - 0.1)).formatHex();
+    }
+    const c = d.data.c, level = d.depth - (v.groups ? 1 : 0);
+    let col;
+    if (mode === 'question') { const base = d3.hsl(TINT.q[c.tags[0]] || '#999999'); base.l = clamp(base.l + (level - 1) * TINT.step * 0.6); col = base.formatHex(); }
+    else col = d3.hsl((branchIndex.get(c.top.code) * 360 / tops.length + 205) % 360, TINT.S, clamp(TINT.L + (level - 1) * TINT.step)).formatHex();
+    return d.data.member ? col : d3.interpolateRgb(col, TINT.paper)(0.62);
   }
+  function summaryOf(d) {
+    if (d !== root) return `${fmt(below(d))} below`;
+    return viewKey === 'branches' ? `${fmt(TOTAL)} concepts` : `${fmt(TOTAL)} concepts in ${fmt(T.placements)} places`;
+  }
+  const map = createMap(chartEl, {
+    name: nameOf, code: d => d.data.c ? d.data.c.code : null, fill: fillOf, summary: summaryOf,
+    count: d => fmt(d.data.g ? d.uniq : below(d))
+  });
+  map.on('focus', f => { focus = f; drawCrumbs(); if (!selected) renderPanel(null, false); });
+  map.on('select', d => { selected = d; renderPanel(d, false); if (view === 'cols') colsRender(); writeHash(); });
+  map.on('hover', d => renderPanel(d || selected, !!d));
+  // The map's report of what it drew last. Tests read it, since it is the only way to look inside the canvas.
+  window.explorerMap = { lastFrame: map.lastFrame };
   function renderLegend() {
     const lg = document.getElementById('legend'); lg.textContent = '';
     lg.hidden = colorMode !== 'question';
@@ -707,177 +965,34 @@ const DATA = /*DATA*/null;
     TAGS.forEach(t => { const s = el('span'); const i = el('i'); i.style.background = `var(--q-${t.toLowerCase()})`; s.appendChild(i); s.appendChild(document.createTextNode(`${t}: ${DATA.tags[t]}`)); lg.appendChild(s); });
     lg.appendChild(el('span', null, 'Colour shows the primary tag.'));
   }
-
-  function computeTargets() {
-    root.each(d => {
-      d.target = {
-        x0: Math.max(0, Math.min(1, (d.x0 - focus.x0) / (focus.x1 - focus.x0))) * 2 * Math.PI,
-        x1: Math.max(0, Math.min(1, (d.x1 - focus.x0) / (focus.x1 - focus.x0))) * 2 * Math.PI,
-        y0: Math.max(0, d.y0 - focus.depth), y1: Math.max(0, d.y1 - focus.depth)
-      };
-      if (!d.current) d.current = { x0: d.target.x0, x1: d.target.x1, y0: d.target.y0, y1: d.target.y0 };
-    });
-  }
-  function applyVisibility(animate) {
-    effR = effRings(focus);
-    const newW = R / (effR + 1);
-    computeTargets();
-    const t = animate ? svg.transition().duration(reduced() ? 0 : 640).ease(d3.easeCubicInOut) : null;
-    if (t) { const iw = d3.interpolate(ringW, newW); t.tween('ring', () => s => { ringW = iw(s); }); } else ringW = newW;
-    if (!t) {
-      root.each(d => d.current = d.target);
-      path.interrupt().attr('d', d => arc(d.current)).attr('fill-opacity', d => arcVisible(d.current) ? 1 : 0).attr('pointer-events', d => arcVisible(d.current) ? 'auto' : 'none');
-      label.interrupt().attr('fill-opacity', d => +labelVisible(d.current)).attr('transform', d => labelTransform(d.current)).text(fitText);
-      return Promise.resolve();
-    }
-    busy = true;
-    path.transition(t)
-      .tween('data', d => { const i = d3.interpolate(d.current, d.target); return s => d.current = i(s); })
-      .filter(function (d) { return +this.getAttribute('fill-opacity') || arcVisible(d.target); })
-      .attr('fill-opacity', d => arcVisible(d.target) ? 1 : 0)
-      .attr('pointer-events', d => arcVisible(d.target) ? 'auto' : 'none')
-      .attrTween('d', d => () => arc(d.current));
-    label.text(fitText).filter(function (d) { return +this.getAttribute('fill-opacity') || labelVisible(d.target); }).transition(t)
-      .attr('fill-opacity', d => +labelVisible(d.target))
-      .attrTween('transform', d => () => labelTransform(d.current));
-    return t.end().catch(() => {}).then(() => { busy = false; });
-  }
-  function drawCenter() {
-    const r = R / (effRings(focus) + 1) - 4;
-    centerHit.attr('r', r);
-    const name = focus === root ? VIEWS[viewKey].root : nameOf(focus);
-    const maxC = Math.max(8, Math.floor(r * 1.7 / 8.4));
-    const lines = []; let cur = '';
-    for (const w of name.split(' ')) { if ((cur + ' ' + w).trim().length > maxC && cur) { lines.push(cur); cur = w; } else cur = (cur + ' ' + w).trim(); }
-    if (cur) lines.push(cur);
-    const shown = lines.slice(0, 3), fsz = shown.length > 2 ? 14 : 16;
-    centerT1.selectAll('tspan').remove();
-    centerT1.attr('font-size', fsz).attr('y', -((shown.length - 1) * fsz * 0.6) - 6);
-    shown.forEach((l, i) => centerT1.append('tspan').attr('x', 0).attr('dy', i ? fsz * 1.15 : 0).text(l));
-    let n;
-    if (matchSet) { const mc = matchCount.get(focus) || 0; n = `${fmt(mc)} ${mc === 1 ? 'match' : 'matches'}`; }
-    else if (focus === root) n = viewKey === 'branches' ? `${fmt(TOTAL)} concepts` : `${fmt(TOTAL)} concepts in ${fmt(T.placements)} places`;
-    else n = `${fmt(below(focus))} below`;
-    centerT2.attr('y', ((shown.length - 1) * fsz * 0.6) + 16).text(focus === root ? n : `${n} · click to go up`);
-  }
   function drawCrumbs() {
     const box = document.getElementById('crumbs'); box.textContent = '';
     focus.ancestors().reverse().forEach((d, i) => {
       if (i) { const s = el('span', 'sep', '›'); s.setAttribute('aria-hidden', 'true'); box.appendChild(s); }
-      const name = d === root ? VIEWS[viewKey].root : nameOf(d);
-      if (d === focus) box.appendChild(el('span', 'here', name));
-      else { const b = el('button', null, name); b.type = 'button'; b.addEventListener('click', () => zoomTo(d)); box.appendChild(b); }
+      if (d === focus) box.appendChild(el('span', 'here', nameOf(d)));
+      else { const b = el('button', null, nameOf(d)); b.type = 'button'; b.addEventListener('click', () => map.zoomTo(d)); box.appendChild(b); }
     });
     document.getElementById('up').disabled = focus === root;
-  }
-  function zoomTo(p) {
-    if (!p) return Promise.resolve();
-    if (!p.children) p = p.parent;
-    if (p === focus) return Promise.resolve();
-    focus = p; drawCenter(); drawCrumbs(); highlight(); hideTip();
-    return applyVisibility(view === 'map');
-  }
-  function markSelected() {
-    path.attr('stroke', d => d === selected ? INK : SURF).attr('stroke-width', d => d === selected ? 2.2 : 0.75);
-    if (selected) path.filter(d => d === selected).raise();
   }
   function writeHash() {
     const code = selected && selected.data.c ? selected.data.c.code : '';
     const h = [viewKey !== 'branches' ? viewKey : '', code].filter(Boolean).join('/');
     try { history.replaceState(null, '', h ? '#' + h : location.pathname + location.search); } catch (e) {}
   }
-  function select(d, quiet) {
-    selected = d; markSelected(); renderPanel(d, false);
-    if (view === 'cols') colsRender();
-    if (!quiet) writeHash();
-  }
   function twinsOf(d) { return d.data.c ? (T.occAll.get(d.data.c.code) || [d]) : [d]; }
-  function highlight() {
-    if (hovered) {
-      const ts = twinsOf(hovered), anc = new Set();
-      ts.forEach(t => t.ancestors().forEach(a => anc.add(a)));
-      path.attr('opacity', d => (anc.has(d) || d.ancestors().some(a => ts.includes(a))) ? 1 : 0.3);
-      return;
-    }
-    const set = searchHits ? new Set(searchHits) : matchSet;
-    if (!set) { path.attr('opacity', 1); return; }
-    const keep = new Set();
-    set.forEach(n => n.ancestors().forEach(a => keep.add(a)));
-    path.attr('opacity', d => set.has(d) ? 1 : keep.has(d) ? 0.5 : 0.12);
-  }
-  function otherPlaces(d) { return twinsOf(d).filter(t => t !== d && t.group && t.group.data.g).map(t => t.group.data.g.label); }
-  function showTip(event, d) {
-    if (event.pointerType === 'touch') return;
-    tip.textContent = '';
-    const t1 = el('div', 't1'); t1.appendChild(el('b', null, nameOf(d))); t1.appendChild(el('code', null, d.data.c ? d.data.c.code : VIEWS[viewKey].label)); tip.appendChild(t1);
-    const chain = d.ancestors().reverse().slice(1, -1).map(nameOf);
-    const parts = [];
-    if (chain.length) parts.push(chain.join(' › '));
-    parts.push(d.children ? (matchSet ? `${matchCount.get(d) || 0} matches below` : `${below(d)} below`) : 'no children');
-    if (d.data.c) parts.push(d.data.c.tags.join(', '));
-    if (d.data.c && !d.data.member) parts.push('path only');
-    const op = otherPlaces(d); if (op.length) parts.push('also under ' + op.join(', '));
-    tip.appendChild(el('div', 't2', parts.join(' · ')));
-    const def = d.data.c ? d.data.c.def : d.data.g ? d.data.g.def : '';
-    tip.appendChild(el('div', null, def.length > 150 ? def.slice(0, 148).trimEnd() + '…' : def));
-    tip.hidden = false; moveTip(event);
-  }
-  function moveTip(event) {
-    if (tip.hidden) return;
-    const box = chartEl.getBoundingClientRect();
-    let x = event.clientX - box.left + 16, y = event.clientY - box.top + 16;
-    if (x + tip.offsetWidth > box.width - 8) x = event.clientX - box.left - tip.offsetWidth - 16;
-    if (y + tip.offsetHeight > box.height - 8) y = event.clientY - box.top - tip.offsetHeight - 16;
-    tip.style.left = Math.max(8, x) + 'px'; tip.style.top = Math.max(8, y) + 'px';
-  }
-  function hideTip() { tip.hidden = true; }
-  chartEl.addEventListener('pointerleave', () => { hovered = null; highlight(); hideTip(); renderPanel(selected, false); });
-  centerHit.on('click', () => { if (focus.parent) zoomTo(focus.parent); });
-  let acc = 0, lastStep = 0;
-  chartEl.addEventListener('wheel', (event) => {
-    // Take the wheel only when it can zoom, so the page still scrolls past the map.
-    const inward = event.deltaY < 0, step = inward && hovered ? hovered.ancestors().reverse()[focus.depth + 1] : null;
-    if (inward ? !(step && step.children) : !focus.parent) { acc = 0; return; }
-    event.preventDefault();
-    const now = performance.now();
-    if (now - lastStep > 420) acc = 0;
-    acc += event.deltaY * (event.ctrlKey ? 3 : 1);
-    if (busy || now - lastStep < 380) return;
-    if (acc < -40) {
-      acc = 0; lastStep = now;
-      if (!hovered) return;
-      const next = hovered.ancestors().reverse()[focus.depth + 1];
-      if (next && next.children) zoomTo(next);
-    } else if (acc > 40) { acc = 0; lastStep = now; if (focus.parent) zoomTo(focus.parent); }
-  }, { passive: false });
-  svg.on('keydown', (event) => {
-    const k = event.key;
-    const cur = selected && selected.parent === focus ? selected : (focus.children ? focus.children[0] : null);
-    if (!cur) return;
-    const sibs = cur.parent.children, i = sibs.indexOf(cur);
-    if (k === 'ArrowDown') { event.preventDefault(); select(sibs[(i + 1) % sibs.length]); }
-    else if (k === 'ArrowUp') { event.preventDefault(); select(sibs[(i - 1 + sibs.length) % sibs.length]); }
-    else if (k === 'ArrowRight' || k === 'Enter') { event.preventDefault(); if (cur.children) zoomTo(cur).then(() => select(cur.children[0])); }
-    else if (k === 'ArrowLeft' || k === 'Escape') { event.preventDefault(); if (focus.parent) { const back = focus; zoomTo(focus.parent).then(() => select(back)); } }
-  });
 
-  /* ---------- switch view: the same concepts, re-cut ---------- */
-  function setDim(vk, animate, keepHash) {
+  /* ---------- switch grouping: the same concepts, re-cut ---------- */
+  function setDim(vk) {
     if (vk === viewKey || !VIEWS[vk]) return;
-    const prev = new Map(); path.each(d => prev.set(d.key, d.current));
     const selCode = selected && selected.data.c ? selected.data.c.code : null;
     viewKey = vk; T = buildTree(vk); root = T.root;
-    root.each(d => { const p = prev.get(d.key); d.current = p ? { x0: p.x0, x1: p.x1, y0: p.y0, y1: p.y1 } : null; });
-    focus = root; hovered = null; hideTip();
-    searchHits = null; results.hidden = true; q.setAttribute('aria-expanded', 'false');
-    selected = selCode ? T.byC.get(selCode) || null : null;
-    effR = effRings(focus); computeTargets();
-    bind(); computeMatches(); colorize(); renderViewbar(); drawCenter(); drawCrumbs(); highlight();
-    applyVisibility(animate && view === 'map');
-    renderPanel(selected, false);
+    results.hidden = true; q.setAttribute('aria-expanded', 'false');
+    computeMatches(); renderViewbar();
+    map.setTree(root);
+    map.select(selCode ? T.byC.get(selCode) || null : null);
+    writeHash();
     if (view === 'cols') colsRender();
     try { localStorage.setItem('aot-dim', vk); } catch (e) {}
-    if (!keepHash) writeHash();
   }
 
   /* ---------- columns ---------- */
@@ -903,7 +1018,7 @@ const DATA = /*DATA*/null;
         b.appendChild(el('span', null, nameOf(n)));
         b.appendChild(el('span', 'm', n.children ? fmt(matchSet ? matchCount.get(n) || 0 : n.data.g ? n.uniq : below(n)) : (matchSet && !matchSet.has(n) ? '' : n.data.c ? n.data.c.code : '')));
         if (n.children) b.appendChild(el('span', 'chev', '›'));
-        b.addEventListener('click', () => select(n));
+        b.addEventListener('click', () => map.select(n));
         b.addEventListener('mouseenter', () => { if (!isSel) renderPanel(n, true); });
         b.addEventListener('mouseleave', () => renderPanel(selected, false));
         col.appendChild(b);
@@ -915,12 +1030,12 @@ const DATA = /*DATA*/null;
   }
   colsEl.addEventListener('keydown', (e) => {
     const cur = selected || null;
-    if (!cur) { if (e.key.startsWith('Arrow')) { e.preventDefault(); select(visibleKids(root)[0]); } return; }
+    if (!cur) { if (e.key.startsWith('Arrow')) { e.preventDefault(); map.select(visibleKids(root)[0]); } return; }
     const sibs = visibleKids(cur.parent), i = sibs.indexOf(cur);
-    if (e.key === 'ArrowDown') { e.preventDefault(); select(sibs[Math.min(sibs.length - 1, i + 1)]); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); select(sibs[Math.max(0, i - 1)]); }
-    else if (e.key === 'ArrowRight') { e.preventDefault(); const k = visibleKids(cur); if (k.length) select(k[0]); }
-    else if (e.key === 'ArrowLeft') { e.preventDefault(); if (cur.parent && cur.parent !== root) select(cur.parent); }
+    if (e.key === 'ArrowDown') { e.preventDefault(); map.select(sibs[Math.min(sibs.length - 1, i + 1)]); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); map.select(sibs[Math.max(0, i - 1)]); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); const k = visibleKids(cur); if (k.length) map.select(k[0]); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); if (cur.parent && cur.parent !== root) map.select(cur.parent); }
     const s = colsEl.querySelector('button.sel'); if (s) s.focus();
   });
 
@@ -933,7 +1048,7 @@ const DATA = /*DATA*/null;
     document.getElementById('view-cols').hidden = v !== 'cols';
     try { localStorage.setItem('aot-tab', v); } catch (e) {}
     if (v === 'cols') colsRender();
-    else if (selected) { const t = selected.children ? selected : selected.parent; if (t !== focus) { focus = t; drawCenter(); drawCrumbs(); applyVisibility(false); highlight(); } }
+    else if (selected) map.zoomTo(selected, false);
   }
   document.getElementById('tab-map').addEventListener('click', () => setView('map'));
   document.getElementById('tab-cols').addEventListener('click', () => setView('cols'));
@@ -998,7 +1113,12 @@ const DATA = /*DATA*/null;
   const OUT_PFX = Object.keys(PFX_OF).map(s => `@prefix ${PFX_OF[s]}: <${NS[s]}> .`);
   const ttlPfx = () => [P.aeco, P.skos, P.dct, P.xsd].concat(linksOn ? OUT_PFX : []).join('\n') + '\n';
   const MATCH_LINE = / skos:(exact|close|broad|narrow)Match /;
-  const conceptTtl = c => DATA.ttl[c.code].split('\n').filter(l => linksOn || !MATCH_LINE.test(l)).join('\n').replace(/\n+$/, '');
+  // Each concept's Turtle and the shapes are most of the data, so they load the first time a selected concept shows them.
+  // A hover preview never starts the download: it shows the Turtle only once it is here.
+  let turtle = null, turtleLoad = null;
+  const loadTurtle = () => turtleLoad || (turtleLoad = getJson(FILES.turtle).then(t => (turtle = t), e => { turtleLoad = null; throw e; }));
+  const fromTurtle = (preview, f) => () => turtle ? f(turtle) : preview ? '# Click the concept to load its Turtle.' : loadTurtle().then(f);
+  const conceptTtl = (t, c) => t.ttl[c.code].split('\n').filter(l => linksOn || !MATCH_LINE.test(l)).join('\n').replace(/\n+$/, '');
   const sparqlPfx = list => list.map(x => x.replace('@prefix', 'PREFIX').replace(/ \.$/, '')).join('\n');
   function jsonld(c) {
     const o = { '@context': { aeco: 'https://w3id.org/aeco/', skos: 'http://www.w3.org/2004/02/skos/core#', dct: 'http://purl.org/dc/terms/' }, '@id': 'aeco:' + c.code, '@type': 'skos:Concept', 'skos:inScheme': { '@id': 'aeco:base' } };
@@ -1081,14 +1201,16 @@ const DATA = /*DATA*/null;
     const get = () => spec.find(s => s.k === cur);
     const paint = () => {
       const s = get();
-      pre.innerHTML = highlightCode(s.text(), s.lang);
       tabs.querySelectorAll('button[role="tab"]').forEach(b => b.setAttribute('aria-selected', b.dataset.k === cur ? 'true' : 'false'));
       note.textContent = s.note;
+      pre.textContent = 'Loading…';
+      Promise.resolve(s.text()).then(t => { if (get() === s) pre.innerHTML = highlightCode(t, s.lang); },
+        () => { if (get() === s) pre.textContent = 'This did not load. Pick the tab again to retry.'; });
     };
     spec.forEach(s => { const b = el('button', null, s.label); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.k = s.k; b.addEventListener('click', () => { cur = dataTab = s.k; paint(); }); tabs.appendChild(b); });
     const cp = el('button', 'copy', 'Copy'); cp.type = 'button';
     function selectPre() { const r = document.createRange(); r.selectNodeContents(pre); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
-    cp.addEventListener('click', () => { const t = get().text(); try { navigator.clipboard.writeText(t).then(() => { cp.textContent = 'Copied'; setTimeout(() => cp.textContent = 'Copy', 1400); }, selectPre); } catch (e) { selectPre(); } });
+    cp.addEventListener('click', () => { Promise.resolve(get().text()).then(t => navigator.clipboard.writeText(t)).then(() => { cp.textContent = 'Copied'; setTimeout(() => cp.textContent = 'Copy', 1400); }, selectPre); });
     tabs.appendChild(cp);
     box.appendChild(tabs); box.appendChild(pre); box.appendChild(note);
     paint();
@@ -1125,7 +1247,7 @@ const DATA = /*DATA*/null;
     panel.appendChild(mode);
     if (!d) return renderOverview();
     if (d.data.g) return renderGroup(d, mode);
-    return renderConcept(d, mode);
+    return renderConcept(d, mode, preview);
   }
   function renderOverview() {
     panel.appendChild(el('h2', null, 'Aecoware Open Taxonomy'));
@@ -1133,7 +1255,7 @@ const DATA = /*DATA*/null;
     const vks = VIEW_ORDER.filter(k => linksOn || k !== 'standards');
     panel.appendChild(kvList([['Format', 'SKOS in Turtle and JSON-LD'], ['Validation', 'SHACL shapes, run with pySHACL'], ['Namespace', 'https://w3id.org/aeco/'], ['Outside links', linksOn ? `${fmt(LINKS.rdf)} to ${LINKS.sources} standards, plus ${fmt(LINKS.byName)} by name to ISO 12006-2 and RIBA` : 'Unplugged. Use the button above the map to add them.'], ['Views', `${vks.length === 4 ? 'Four' : 'Three'} ways to cut the same concepts. The core tree stays the one source.`]]));
     const vl = el('div', 'kids');
-    vks.forEach(k => { const b = el('button'); b.type = 'button'; b.appendChild(el('span', null, VIEWS[k].label)); b.appendChild(el('span', 'n', k === viewKey ? 'on' : '')); b.title = VIEWS[k].desc; b.addEventListener('click', () => setDim(k, true)); vl.appendChild(b); });
+    vks.forEach(k => { const b = el('button'); b.type = 'button'; b.appendChild(el('span', null, VIEWS[k].label)); b.appendChild(el('span', 'n', k === viewKey ? 'on' : '')); b.title = VIEWS[k].desc; b.addEventListener('click', () => setDim(k)); vl.appendChild(b); });
     panel.appendChild(sec('Views', vl));
     const kids = visibleKids(root);
     panel.appendChild(sec(`${kids.length} ${VIEWS[viewKey].col.toLowerCase()} in this view`, kidList(kids)));
@@ -1169,7 +1291,7 @@ const DATA = /*DATA*/null;
     if (spec) panel.appendChild(sec('Data', dataBlock(spec)));
     else panel.appendChild(el('p', 'note', 'Linked by name only. These links sit in a TSV file outside the RDF, because the standard text and codes are not open.'));
   }
-  function renderConcept(d, mode) {
+  function renderConcept(d, mode, preview) {
     const c = d.data.c, res = DATA.v[c.code] || [];
     const viol = res.filter(r => r[1] === 'Violation').length, warn = res.filter(r => r[1] === 'Warning').length;
     mode.appendChild(el('span', 'chip ' + (viol ? 'warn' : 'ok'), viol ? `SHACL: ${viol} violation` : 'SHACL: conforms'));
@@ -1211,8 +1333,6 @@ const DATA = /*DATA*/null;
         b.appendChild(el('span', null, t.ancestors().reverse().slice(1, -1).map(nameOf).join(' › ') || VIEWS[viewKey].root));
         b.appendChild(el('span', 'n', t === d ? 'here' : t.data.member ? '' : 'path'));
         b.addEventListener('click', () => goTo(t));
-        b.addEventListener('mouseenter', () => { if (view === 'map' && arcVisible(t.current)) { hovered = t; highlight(); } });
-        b.addEventListener('mouseleave', () => { if (view === 'map') { hovered = null; highlight(); } });
         box.appendChild(b);
       });
       panel.appendChild(sec(`Places in this view (${ts.length})`, box));
@@ -1237,10 +1357,10 @@ const DATA = /*DATA*/null;
     const rl = (related.get(c.code) || []).map(x => T.byC.get(x)).filter(Boolean);
     if (rl.length) panel.appendChild(sec(`Related (${rl.length})`, kidList(rl, true)));
     panel.appendChild(sec('Data', dataBlock([
-      { k: 'ttl', label: 'Turtle', lang: 'ttl', text: () => ttlPfx() + '\n' + conceptTtl(c), note: linksOn ? 'The concept as it sits in the repo, with its outside links and related links.' : 'The concept as it sits in the repo, with its related links. Outside links are unplugged.' },
+      { k: 'ttl', label: 'Turtle', lang: 'ttl', text: fromTurtle(preview, t => ttlPfx() + '\n' + conceptTtl(t, c)), note: linksOn ? 'The concept as it sits in the repo, with its outside links and related links.' : 'The concept as it sits in the repo, with its related links. Outside links are unplugged.' },
       { k: 'jsonld', label: 'JSON-LD', lang: 'json', text: () => jsonld(c), note: 'The same triples in JSON-LD, for web tools.' },
       { k: 'shacl', label: 'SHACL report', lang: 'ttl', text: () => shaclReport(c), note: 'Validation run with pySHACL against the shapes, plus the rules SHACL cannot express.' },
-      { k: 'shapes', label: 'Shapes', lang: 'ttl', text: () => DATA.shapes, note: 'scripts/shapes.ttl: the SHACL shapes every concept must pass.' }
+      { k: 'shapes', label: 'Shapes', lang: 'ttl', text: fromTurtle(preview, t => t.shapes), note: 'scripts/shapes.ttl: the SHACL shapes every concept must pass.' }
     ])));
   }
   function kidList(list, showBranch) {
@@ -1251,14 +1371,12 @@ const DATA = /*DATA*/null;
       b.appendChild(el('span', null, nameOf(n)));
       const meta = showBranch && n.data.c && n.data.c.top !== n.data.c ? n.data.c.top.label : n.children ? fmt(matchSet ? matchCount.get(n) || 0 : n.data.g ? n.uniq : below(n)) : n.data.c ? n.data.c.code : '';
       b.appendChild(el('span', 'n', meta));
-      b.addEventListener('mouseenter', () => { if (view === 'map' && arcVisible(n.current)) { hovered = n; highlight(); } });
-      b.addEventListener('mouseleave', () => { if (view === 'map') { hovered = null; highlight(); } });
       b.addEventListener('click', () => goTo(n));
       box.appendChild(b);
     });
     return box;
   }
-  function goTo(n) { hovered = null; select(n); if (view === 'map') zoomTo(n.children ? n : n.parent).then(highlight); }
+  function goTo(n) { map.select(n); if (view === 'map') map.zoomTo(n); }
 
   /* ---------- search ---------- */
   const q = document.getElementById('q'), results = document.getElementById('results');
@@ -1268,7 +1386,7 @@ const DATA = /*DATA*/null;
   const pathText = n => n.ancestors().reverse().slice(1, -1).map(nameOf).join(' › ');
   function runSearch() {
     const v = q.value.trim().toLowerCase();
-    if (!v) { results.hidden = true; q.setAttribute('aria-expanded', 'false'); searchHits = null; highlight(); return; }
+    if (!v) { results.hidden = true; q.setAttribute('aria-expanded', 'false'); return; }
     const amb = ambiguous.get(v), scored = [];
     for (const it of index) {
       let s = -1;
@@ -1279,8 +1397,7 @@ const DATA = /*DATA*/null;
     }
     scored.sort((a, b) => b[0] - a[0] || a[1].label.length - b[1].label.length);
     list = scored.slice(0, 9).map(x => T.byC.get(x[1].code)).filter(Boolean);
-    searchHits = scored.flatMap(x => T.occAll.get(x[1].code) || []);
-    highlight(); active = 0; results.textContent = '';
+    active = 0; results.textContent = '';
     if (amb && amb.length > 1) { const f = el('div', 'flag'); f.appendChild(el('strong', null, `"${q.value.trim()}" fits ${amb.length} concepts.`)); f.appendChild(el('span', null, 'Pick the one you mean.')); results.appendChild(f); }
     if (!list.length) results.appendChild(el('div', 'empty', 'No concept matches. Try a synonym or a code like aeco-01008.'));
     list.forEach((n, i) => {
@@ -1295,7 +1412,7 @@ const DATA = /*DATA*/null;
     results.querySelectorAll('button[role="option"]').forEach((b, i) => b.setAttribute('aria-selected', i === active ? 'true' : 'false'));
     if (list.length) q.setAttribute('aria-activedescendant', 'opt' + active); else q.removeAttribute('aria-activedescendant');
   }
-  function pick(n) { results.hidden = true; q.setAttribute('aria-expanded', 'false'); searchHits = null; goTo(n); }
+  function pick(n) { results.hidden = true; q.setAttribute('aria-expanded', 'false'); goTo(n); }
   q.addEventListener('input', runSearch);
   q.addEventListener('focus', () => { if (q.value.trim()) runSearch(); });
   q.addEventListener('blur', () => setTimeout(() => { results.hidden = true; q.setAttribute('aria-expanded', 'false'); }, 120));
@@ -1310,17 +1427,17 @@ const DATA = /*DATA*/null;
   });
 
   /* ---------- controls ---------- */
-  document.getElementById('up').addEventListener('click', () => { if (focus.parent) zoomTo(focus.parent); });
-  document.getElementById('home').addEventListener('click', e => { e.preventDefault(); select(null); zoomTo(root); renderPanel(null, false); });
-  document.querySelectorAll('#rings button').forEach(b => b.addEventListener('click', () => {
-    RINGS = +b.dataset.r;
-    document.querySelectorAll('#rings button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
-    drawCenter(); applyVisibility(true);
-  }));
+  document.getElementById('up').addEventListener('click', () => map.zoomTo(focus.parent));
+  document.getElementById('home').addEventListener('click', e => { e.preventDefault(); map.select(null); map.zoomTo(root); renderPanel(null, false); });
+  function setRings(n) {
+    document.querySelectorAll('#rings button').forEach(x => x.setAttribute('aria-pressed', String(+x.dataset.r === n)));
+    map.setRings(n);
+  }
+  document.querySelectorAll('#rings button').forEach(b => b.addEventListener('click', () => setRings(+b.dataset.r)));
   document.querySelectorAll('#colormode button').forEach(b => b.addEventListener('click', () => {
     colorMode = b.dataset.c;
     document.querySelectorAll('#colormode button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
-    colorize();
+    map.setColorMode(colorMode); renderLegend();
   }));
 
   /* ---------- start ---------- */
@@ -1335,8 +1452,11 @@ const DATA = /*DATA*/null;
   document.getElementById('f-notice').href = DATA.repo + '/blob/main/NOTICE.md';
   document.getElementById('f-repo').href = DATA.repo;
   setLinks(linksOn, true);
-  bind(); colorize(); renderViewbar(); renderCount();
-  function fromHash() {
+  renderViewbar(); renderCount(); renderLegend();
+  if (chartEl.clientWidth < NARROW_MAP) setRings(2);
+  map.setTree(root);
+  // The address holds the grouping and the selected concept: #code, #grouping or #grouping/code.
+  function fromHash(animate) {
     const h = decodeURIComponent((location.hash || '').slice(1));
     if (!h) return false;
     let vk = 'branches', code = h;
@@ -1345,22 +1465,32 @@ const DATA = /*DATA*/null;
     if (!VIEWS[vk]) return false;
     if (code && !byCode.has(code)) return false;
     if (vk === 'standards' && !linksOn) setLinks(true, true);
-    if (vk !== viewKey) setDim(vk, false, true);
-    const n = code ? T.byC.get(code) : null;
-    focus = n ? (n.children ? n : n.parent) : root;
-    drawCenter(); drawCrumbs(); applyVisibility(false);
-    if (n) select(n, true); else renderPanel(null, false);
-    highlight();
+    setDim(vk);
+    const n = code ? T.byC.get(code) || null : null;
+    map.zoomTo(n || root, animate);
+    map.select(n);
     return true;
   }
-  if (!fromHash()) {
+  if (!fromHash(false)) {
     let sd = null; try { sd = localStorage.getItem('aot-dim'); } catch (e) {}
-    if (sd && VIEWS[sd] && sd !== viewKey) setDim(sd, false, true);
-    focus = root; drawCenter(); drawCrumbs(); applyVisibility(false); renderPanel(null, false);
+    if (sd && VIEWS[sd]) setDim(sd);
   }
-  window.addEventListener('hashchange', fromHash);
+  // Back, forward and an edited address move the map. An address without a hash goes back to the whole grouping.
+  window.addEventListener('hashchange', () => { if (!fromHash(true)) { map.zoomTo(root); map.select(null); } });
   let saved = null; try { saved = localStorage.getItem('aot-tab'); } catch (e) {}
   if (saved === 'cols') setView('cols');
+}
+
+/* ---------- load the data, then start ---------- */
+(function boot() {
+  'use strict';
+  const box = document.getElementById('load'), msg = document.getElementById('load-msg'), retry = document.getElementById('load-retry');
+  getJson(FILES.data).then(data => { start(data); box.hidden = true; }).catch(() => {
+    msg.textContent = 'The taxonomy did not load. Check your connection, then try again. The downloads above still work.';
+    retry.hidden = false;
+  });
+  // A reload also fetches the scripts again, in case one of those failed rather than the data.
+  retry.addEventListener('click', () => location.reload());
 })();
 </script>
 </body>

@@ -98,9 +98,10 @@ scripts/
   build_site.py              builds the explorer and the merged data files
 site/
   template.html              the explorer source
+tests/                       tests of the build and the explorer
 ```
 
-`scripts/build_site.py` writes `site/index.html` (the explorer), `site/aeco.ttl` and `site/aeco.jsonld` (the core taxonomy in one file) and `site/aeco-mappings.ttl` (all links to outside standards). GitHub Actions builds and publishes them on every change to `main`.
+`scripts/build_site.py` writes `site/index.html` (the explorer) and the two files it loads, `site/explorer-data.json` and `site/explorer-turtle.json`. It also writes `site/aeco.ttl` and `site/aeco.jsonld` (the core taxonomy in one file) and `site/aeco-mappings.ttl` (all mappings to outside standards). GitHub Actions builds and publishes them on every change to `main`.
 
 ## Use it
 
@@ -146,6 +147,14 @@ Run the checks:
 pip install rdflib pyshacl
 python3 scripts/taxo.py check
 python3 scripts/build_site.py
+```
+
+Run the tests of the build and the explorer:
+
+```
+pip install -r tests/requirements.txt
+python3 -m playwright install chromium
+python3 -m pytest tests
 ```
 
 ## Versions
