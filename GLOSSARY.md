@@ -55,6 +55,14 @@ _Avoid_: Chart, sunburst
 How the map is drawn: as an icicle, a sunburst or a territory map.
 _Avoid_: Variant, style
 
+**Region**:
+In the territory map, a child of the focus, drawn as one cell of the circle.
+_Avoid_: Area, zone
+
+**District**:
+In the territory map, a child of a region, drawn as a cell inside it. A click on a district opens its region.
+_Avoid_: Subregion
+
 **Filter**:
 A 5W1H tag or an outside standard that narrows which concepts the explorer shows. A concept counts under every tag it has.
 _Avoid_: Facet

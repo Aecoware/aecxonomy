@@ -3,10 +3,23 @@ from playwright.sync_api import expect
 
 CANVAS = "#chart canvas"
 NARROW_MAP = 520  # Below this width the map works as on a phone.
+MAP_TYPES = ["icicle", "sunburst", "territory"]
 
 
 def expect_loaded(page, taxonomy):
     expect(page.locator("#st-concepts")).to_have_text(f"{len(taxonomy):,}")
+
+
+def open_map(page, taxonomy, map_type, address=""):
+    """Open the explorer at an address, such as #code, on a map type, once that map type shows. The territory map's
+    libraries load after the page, so a test that clicks must wait for it."""
+    page.goto(f"/?map={map_type}{address}")
+    expect_loaded(page, taxonomy)
+    wait_for_map_type(page, map_type)
+
+
+def wait_for_map_type(page, map_type):
+    page.wait_for_function(f"explorerMap.lastFrame().map === '{map_type}'")
 
 
 def open_concept(page, code, search_for=None):
@@ -25,17 +38,17 @@ def cell(page, code):
     return next(c for c in frame(page)["cells"] if c["code"] == code)
 
 
-def centre(c):
-    """The middle of a drawn cell, as a position on the canvas."""
-    return {"x": c["x"] + c["w"] / 2, "y": c["y"] + c["h"] / 2}
-
-
 def click_cell(page, c):
-    page.locator(CANVAS).click(position=centre(c))
+    page.locator(CANVAS).click(position=c["mid"])
 
 
 def narrow(page):
     return page.locator(CANVAS).bounding_box()["width"] < NARROW_MAP
+
+
+def code_of(taxonomy, label):
+    """The code of the concept with this US label."""
+    return next(k for k, c in taxonomy.items() if c["label"] == label)
 
 
 def children(taxonomy, code):

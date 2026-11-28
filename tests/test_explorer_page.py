@@ -1,15 +1,17 @@
 """The built explorer, used the way a person uses it, at a desktop size and a phone size."""
+import pytest
 from playwright.sync_api import expect
 
-from explorer import expect_loaded, open_concept
+from explorer import MAP_TYPES, expect_loaded, open_concept, open_map
 
 DATA_REQUEST = "**/explorer-data.json*"
 
 
-def test_search_finds_a_concept_and_the_side_panel_shows_it_with_its_warnings(page, taxonomy):
+@pytest.mark.parametrize("map_type", MAP_TYPES)
+def test_search_finds_a_concept_and_the_side_panel_shows_it_with_its_warnings(page, taxonomy, map_type):
     # A Shared concept without a UK label always gets a warning, so it makes a known example.
     code, concept = next((k, c) for k, c in sorted(taxonomy.items()) if c["shared"] and not c["label_gb"])
-    page.goto("/")
+    open_map(page, taxonomy, map_type)
     open_concept(page, code, search_for=concept["label"])
     panel = page.locator("#panel")
     expect(panel.get_by_role("heading", level=2)).to_have_text(concept["label"])
